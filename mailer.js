@@ -1,26 +1,11 @@
 // ============================================================
-//  mailer.js — Brevo SMTP (works on Railway, sends to any email)
+//  mailer.js — Resend (HTTPS-based, works on Railway)
 // ============================================================
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_SMTP_KEY,
-    },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Verify connection on startup
-transporter.verify((error) => {
-    if (error) {
-        console.error('[mailer] Brevo connection FAILED:', error.message);
-    } else {
-        console.log('[mailer] Brevo ready — sending as', process.env.BREVO_USER);
-    }
-});
+console.log('[mailer] Using Resend for email delivery');
 
 async function sendAlertEmail(to, name, location, pm25, category) {
     const html = `
@@ -45,12 +30,15 @@ async function sendAlertEmail(to, name, location, pm25, category) {
       </div>
     </div>
     `;
-    return transporter.sendMail({
-        from: '"FreshZone Alerts" <freshzone.alerts@gmail.com>',
+
+    const { error } = await resend.emails.send({
+        from:    'FreshZone Alerts <onboarding@resend.dev>',
         to,
         subject: `🚨 Smoke/Vape Detected — ${location}`,
         html,
     });
+
+    if (error) throw new Error(error.message);
 }
 
 async function sendOTPEmail(to, name, otp, type) {
@@ -77,12 +65,15 @@ async function sendOTPEmail(to, name, otp, type) {
       </div>
     </div>
     `;
-    return transporter.sendMail({
-        from: '"FreshZone" <freshzone.alerts@gmail.com>',
+
+    const { error } = await resend.emails.send({
+        from:    'FreshZone <onboarding@resend.dev>',
         to,
         subject,
         html,
     });
+
+    if (error) throw new Error(error.message);
 }
 
 module.exports = { sendAlertEmail, sendOTPEmail };
