@@ -272,6 +272,10 @@
         // Track last event IDs seen to avoid double-notifying
         const seenEventIds = new Set(JSON.parse(localStorage.getItem('fz-seen-events') || '[]'));
 
+        // Track acknowledged zones locally so the card stays green
+        // even if ESP32 is still sending high readings
+        const acknowledgedZones = new Set(JSON.parse(sessionStorage.getItem('fz-acked-zones') || '[]'));
+
         // ── RENDER ZONE CARD ───────────────────────────────────
         function renderZone(zoneCode, data) {
             const z = ZONES[zoneCode];
@@ -305,7 +309,7 @@
             const recordedAt = data.recorded_at ? new Date(data.recorded_at).toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' }) : '—';
 
             // Update status
-            if (smoke) {
+            if (smoke && !acknowledgedZones.has(zoneCode)) {
                 card.className = 'location-card detecting';
                 dot.className  = 'status-dot dot-detecting';
                 statusText.innerHTML = '<strong>● VAPE / SMOKE DETECTED</strong>';
@@ -316,10 +320,26 @@
                 // Show acknowledge button for admin only
                 if (isAdmin && ackBtn) {
                     ackBtn.style.display = 'block';
+                    ackBtn.disabled = false;
                 }
 
                 activeAlerts[zoneCode] = true;
+            } else if (smoke && acknowledgedZones.has(zoneCode)) {
+                // Already acknowledged — show as clear even if ESP32 still reading high
+                card.className = 'location-card clear';
+                dot.className  = 'status-dot dot-clear';
+                statusText.innerHTML = '● Acknowledged';
+                statusText.style.color = 'var(--success)';
+                aqiBadge.className = 'aqi-badge aqi-moderate';
+                aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
+                if (ackBtn) ackBtn.style.display = 'none';
+                activeAlerts[zoneCode] = false;
             } else {
+                // Sensor is genuinely clear or offline — remove from acknowledged set
+                if (acknowledgedZones.has(zoneCode)) {
+                    acknowledgedZones.delete(zoneCode);
+                    sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
+                }
                 card.className = 'location-card clear';
                 dot.className  = 'status-dot dot-clear';
                 statusText.innerHTML = '● Clear';
@@ -387,14 +407,23 @@
 
         // ── ACKNOWLEDGE ALERT (Admin only) ────────────────────
         async function acknowledgeAlert(nodeCode, locationName) {
+            const z = ZONES[nodeCode];
+            const ackBtn = z ? document.getElementById(z.ackBtn) : null;
+
+            // Disable button immediately to prevent double-click
+            if (ackBtn) { ackBtn.disabled = true; ackBtn.textContent = 'Acknowledging…'; }
+
             try {
-                // Get the open event for this zone
                 const eventsData = await apiFetch('/readings/open-events');
-                if (!eventsData || !eventsData.success) return;
+                if (!eventsData || !eventsData.success) {
+                    if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = '✔ Acknowledge'; }
+                    return;
+                }
 
                 const event = eventsData.data.find(e => e.node_code === nodeCode);
                 if (!event) {
                     showNotification('No active alert found for this zone.', 'warning');
+                    if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = '✔ Acknowledge'; }
                     return;
                 }
 
@@ -406,20 +435,33 @@
                 if (result && result.success) {
                     showNotification(`Alert acknowledged for ${locationName}. Staff notified.`, 'success');
 
-                    // Hide ack button and update card
-                    const z = ZONES[nodeCode];
+                    // Mark zone as acknowledged in sessionStorage
+                    acknowledgedZones.add(nodeCode);
+                    sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
+
+                    // Update card immediately
                     if (z) {
-                        const ackBtn = document.getElementById(z.ackBtn);
+                        const card = document.getElementById(z.card);
+                        const dot = document.getElementById(z.dot);
+                        const statusText = document.getElementById(z.statusText);
+                        if (card) card.className = 'location-card clear';
+                        if (dot) dot.className = 'status-dot dot-clear';
+                        if (statusText) {
+                            statusText.innerHTML = '● Acknowledged';
+                            statusText.style.color = 'var(--success)';
+                        }
                         if (ackBtn) ackBtn.style.display = 'none';
                     }
 
-                    // Refresh data
-                    fetchLiveData();
+                    // Refresh after short delay
+                    setTimeout(() => { fetchLiveData(); fetchOpenEvents(); }, 1500);
                 } else {
                     showNotification('Failed to acknowledge. Try again.', 'error');
+                    if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = '✔ Acknowledge'; }
                 }
             } catch(err) {
                 showNotification('Connection error. Try again.', 'error');
+                if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = '✔ Acknowledge'; }
             }
         }
 
@@ -458,17 +500,21 @@
 
         // ── START POLLING ──────────────────────────────────────
         fetchLiveData();
-        setInterval(fetchLiveData, 10000); // every 10 seconds
 
-        // Staff: poll for new open events every 8 seconds
+        // Single interval — 5s for Admin, 10s for Staff/others. No duplicate calls.
+        const pollInterval = isAdmin ? 5000 : 10000;
+        setInterval(fetchLiveData, pollInterval);
+
+        // Staff: poll for open events every 8 seconds
         if (isStaff) {
             fetchOpenEvents();
             setInterval(fetchOpenEvents, 8000);
         }
 
-        // Admin: also refresh open events to keep ack buttons updated
+        // Admin: poll open events at same rate as live data
         if (isAdmin) {
-            setInterval(fetchLiveData, 5000); // faster for admin
+            fetchOpenEvents();
+            setInterval(fetchOpenEvents, 5000);
         }
 
         // ── HOTKEYS ────────────────────────────────────────────
