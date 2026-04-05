@@ -1,30 +1,11 @@
 // ============================================================
-//  mailer.js — Nodemailer + Gmail
+//  mailer.js — Resend (replaces Gmail SMTP which Railway blocks)
 // ============================================================
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // SSL
-    auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Verify connection on startup
-transporter.verify((error) => {
-    if (error) {
-        console.error('[mailer] Gmail connection FAILED:', error.message);
-        console.error('[mailer] GMAIL_USER:', process.env.GMAIL_USER);
-    } else {
-        console.log('[mailer] Gmail ready to send emails as', process.env.GMAIL_USER);
-    }
-});
+console.log('[mailer] Using Resend for email delivery');
 
 async function sendAlertEmail(to, name, location, pm25, category) {
     const html = `
@@ -49,12 +30,15 @@ async function sendAlertEmail(to, name, location, pm25, category) {
       </div>
     </div>
     `;
-    return transporter.sendMail({
-        from:    `"FreshZone Alerts" <${process.env.GMAIL_USER}>`,
+
+    const { error } = await resend.emails.send({
+        from:    'FreshZone Alerts <onboarding@resend.dev>',
         to,
         subject: `🚨 Smoke/Vape Detected — ${location}`,
         html,
     });
+
+    if (error) throw new Error(error.message);
 }
 
 async function sendOTPEmail(to, name, otp, type) {
@@ -81,12 +65,15 @@ async function sendOTPEmail(to, name, otp, type) {
       </div>
     </div>
     `;
-    return transporter.sendMail({
-        from:    `"FreshZone" <${process.env.GMAIL_USER}>`,
+
+    const { error } = await resend.emails.send({
+        from:    'FreshZone <onboarding@resend.dev>',
         to,
         subject,
         html,
     });
+
+    if (error) throw new Error(error.message);
 }
 
 module.exports = { sendAlertEmail, sendOTPEmail };
