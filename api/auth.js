@@ -81,21 +81,23 @@ router.post('/send-otp', async (req, res) => {
             userData: type === 'signup' ? { name, employeeId, contact, position, password } : null
         });
 
-        // Try to send email, but don't fail if it can't (e.g. no network/SMTP)
+        // Send email — fail loudly if it doesn't work
         try {
             await sendOTPEmail(email, name || 'User', otp, type);
             console.log(`[send-otp] Email sent to ${email}`);
         } catch (mailErr) {
-            console.warn('[send-otp] Email failed (running in local/dev mode):', mailErr.message);
+            console.error('[send-otp] Email failed:', mailErr.message);
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to send OTP email. Please try again later.'
+            });
         }
 
-        // Always return OTP in dev mode so local testing works without Gmail
-        const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
         res.json({
             success: true,
-            message: `OTP sent to ${email}`,
-            ...(isDev ? { dev_otp: otp } : {})
+            message: `OTP sent to ${email}`
         });
+
     } catch (err) {
         console.error('[send-otp] Error:', err.message);
         res.status(500).json({ success: false, message: err.message });
@@ -141,7 +143,6 @@ router.post('/verify-otp', async (req, res) => {
         }
     } catch (err) {
         console.error('[verify-otp] DB error:', err.message, err.code || '');
-        // Provide a more helpful error message based on the error type
         let message = 'Server error.';
         if (err.code === 'ER_DUP_ENTRY') {
             message = 'An account with this email or employee ID already exists.';
