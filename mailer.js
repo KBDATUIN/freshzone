@@ -2,7 +2,9 @@
 //  mailer.js — Nodemailer + Gmail
 // ============================================================
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+
+// Do NOT call dotenv here — Railway injects env vars directly.
+// dotenv is loaded once in server.js before anything else.
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -16,7 +18,7 @@ const transporter = nodemailer.createTransport({
 transporter.verify((error) => {
     if (error) {
         console.error('[mailer] Gmail connection FAILED:', error.message);
-        console.error('[mailer] Check GMAIL_USER and GMAIL_APP_PASSWORD in .env');
+        console.error('[mailer] GMAIL_USER:', process.env.GMAIL_USER);
     } else {
         console.log('[mailer] Gmail ready to send emails as', process.env.GMAIL_USER);
     }
