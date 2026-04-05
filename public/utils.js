@@ -2,7 +2,7 @@
 //  utils.js (UPDATED) — shared utilities + API helper
 // ============================================================
 
-const API = 'https://unreceptive-pseudocharitable-jorge.ngrok-free.dev';
+const API = 'freshzone-production.up.railway.app';
 
 // ── API HELPER ────────────────────────────────────────────────
 // Attaches the JWT token to every request automatically
