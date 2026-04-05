@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshZone | History</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── KEYFRAMES ─────────────────────────────────────── */
+        @keyframes rowSlideIn {
+            from { opacity:0; transform:translateX(-18px); }
+            to   { opacity:1; transform:translateX(0); }
+        }
+        @keyframes tagPulse {
+            0%,100% { box-shadow:0 0 0 0 rgba(220,53,69,0.35); }
+            50%     { box-shadow:0 0 0 7px rgba(220,53,69,0); }
+        }
+        @keyframes countPop {
+            from { transform:translateY(8px); opacity:0; }
+            to   { transform:translateY(0);   opacity:1; }
+        }
+
+        /* ── STATS GRID ─────────────────────────────────────── */
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:2rem; }
+        .stat-box h3 {
+            font-size:2rem; color:var(--primary); display:inline-block;
+            transition:transform 0.4s cubic-bezier(0.4,0,0.2,1), color 0.3s;
+        }
+        .stat-box:hover h3 { transform:scale(1.14); color:var(--secondary); }
+        .stat-box h3.pop { animation:countPop 0.35s cubic-bezier(0.4,0,0.2,1) both; }
+        .stats-grid .stat-box:nth-child(1) { animation-delay:0.10s; }
+        .stats-grid .stat-box:nth-child(2) { animation-delay:0.22s; }
+        .stats-grid .stat-box:nth-child(3) { animation-delay:0.34s; }
+
+        /* ── TABLE ──────────────────────────────────────────── */
+        table { width:100%; border-collapse:collapse; min-width:600px; }
+        th,td { padding:1.1rem 1.2rem; text-align:left; border-bottom:1px solid #eee; font-size:0.95rem; }
+        th { background:#f8f9fa; color:var(--gray); font-size:0.85rem; font-weight:600; }
+        tbody tr { transition:background 0.22s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1); }
+        tbody tr:hover td { background:rgba(0,180,216,0.06); }
+        tbody tr:hover    { transform:translateX(5px); }
+        tbody tr.row-animate { opacity:0; animation:rowSlideIn 0.42s cubic-bezier(0.4,0,0.2,1) forwards; }
+        .tag-danger { animation:tagPulse 3s ease-in-out infinite; }
+
+        /* ── FILTER BAR ─────────────────────────────────────── */
+        .filter-bar { display:flex; gap:0.75rem; flex-wrap:wrap; align-items:flex-end; margin-bottom:1.5rem; }
+        .filter-bar label { font-size:0.78rem; margin-top:0; margin-bottom:0.2rem; }
+        .filter-bar input,
+        .filter-bar select { font-size:0.85rem; padding:0.5rem 0.75rem; margin-top:0; border-radius:8px; }
+        .filter-bar button { width:auto; padding:0.52rem 1.2rem; margin-top:0; font-size:0.82rem; border-radius:8px; }
+        .filter-group { display:flex; flex-direction:column; }
+        .export-btn { width:auto; padding:0.52rem 1.1rem; margin-top:0; font-size:0.82rem; border-radius:8px; background:var(--success) !important; }
+
+        /* ── HERO ───────────────────────────────────────────── */
+        .page-hero {
+            display:flex; flex-direction:column; align-items:center;
+            justify-content:center; background:#e5f6ff; padding:2rem;
+            border-radius:15px; margin-bottom:2rem; text-align:center;
+        }
+        .page-hero h1 { margin-bottom:0.5rem; }
+        .page-hero p  { margin-bottom:1rem; font-size:1rem; color:#555; }
+        .page-hero img { width:160px; height:auto; margin-top:0.5rem; animation:float 6s ease-in-out infinite; }
+        [data-theme="dark"] .page-hero { background:rgba(0,80,120,0.3); }
+        [data-theme="dark"] .page-hero p { color:#a0b8c8; }
+
+        /* ── EMPTY STATE ─────────────────────────────────────── */
+        .empty-row td { text-align:center; color:var(--gray); padding:2.5rem; font-style:italic; }
+    </style>
+</head>
+<body>
+
+    <!-- Smoke background — same as dashboard -->
+    <div class="smoke-container" aria-hidden="true">
+        <div class="smoke-particle" style="left:8%;  width:200px;height:200px;animation-delay:0s;"></div>
+        <div class="smoke-particle" style="left:28%; width:140px;height:140px;animation-delay:3s;"></div>
+        <div class="smoke-particle" style="left:55%; width:220px;height:220px;animation-delay:6s;"></div>
+        <div class="smoke-particle" style="left:78%; width:170px;height:170px;animation-delay:1.5s;"></div>
+    </div>
+
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
+                <img src="logo1.png" alt="FreshZone Logo">
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html">Monitor</a>
+                <a href="history.html" class="active">History</a>
+                <a href="profile.html">Profile</a>
+                <a href="contact.html">Contact</a>
+                <a href="#" onclick="openLogoutModal();return false;">Logout</a>
+                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">⏾</button>
+            </div>
+            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true">
+        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
+            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu">✕</button>
+            <a href="dashboard.html">📡 Monitor</a>
+            <a href="history.html" class="active">📋 History</a>
+            <a href="profile.html">👤 Profile</a>
+            <a href="contact.html">✉️ Contact</a>
+            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;">🚪 Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-hero">
+            <div>
+                <h1>Detection History</h1>
+                <p>Complete archive of campus air quality events</p>
+            </div>
+            <img src="vape.png" alt="No Vaping Allowed">
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <p>Today's Alerts</p>
+                <h3 id="stat-today">0</h3>
+            </div>
+            <div class="stat-box">
+                <p>Total Records</p>
+                <h3 id="stat-total" style="color:var(--success)">0</h3>
+            </div>
+            <div class="stat-box">
+                <p>Resolved</p>
+                <h3 id="stat-resolved">0</h3>
+            </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label for="filter-search">Search</label>
+                <input type="text" id="filter-search" placeholder="Location or action…" oninput="renderTable()">
+            </div>
+            <div class="filter-group">
+                <label for="filter-status">Status</label>
+                <select id="filter-status" onchange="renderTable()">
+                    <option value="">All</option>
+                    <option value="Detected">Detected</option>
+                    <option value="Success">Success</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-date">Date</label>
+                <input type="date" id="filter-date" onchange="renderTable()">
+            </div>
+            <button onclick="clearFilters()" style="width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:var(--gray) !important;">Clear</button>
+            <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+        </div>
+
+        <div class="log-container">
+            <table role="table" aria-label="Detection history log">
+                <thead>
+                    <tr>
+                        <th>Date &amp; Time</th>
+                        <th>Location</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                        <th>Response</th>
+                        <th>By</th>
+                    </tr>
+                </thead>
+                <tbody id="history-tbody">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="session-warning" role="status"></div>
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+    <div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+        <div class="modal-content-custom">
+            <h3 id="logout-title">Confirm Logout</h3>
+            <p>Are you sure you want to log out of FreshZone?</p>
+            <div class="modal-btn-group">
+                <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <footer><p>© 2026 FreshZone – Clear Air Monitoring System</p></footer>
+
+    <script src="utils.js"></script>
+    <script>
+        // Auth guard
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; }
+
+        let allRecords = [];
+
+        async function loadHistory() {
+            try {
+                const data = await apiFetch('/history');
+                if (data && data.success) {
+                    allRecords = data.data;
+                } else {
+                    allRecords = [];
+                }
+                renderTable();
+                loadStats();
+            } catch(err) {
+                showNotification('Failed to load history.', 'error');
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const data = await apiFetch('/history/stats');
+                if (data && data.success) {
+                    setStatAnimated('stat-today',    data.stats.today);
+                    setStatAnimated('stat-total',    data.stats.total);
+                    setStatAnimated('stat-resolved', data.stats.resolved);
+                }
+            } catch(err) {}
+        }
+
+        function renderTable() {
+            const search  = document.getElementById('filter-search').value.toLowerCase();
+            const status  = document.getElementById('filter-status').value;
+            const dateVal = document.getElementById('filter-date').value;
+            const tbody   = document.getElementById('history-tbody');
+
+            let records = allRecords.filter(r => {
+                const matchSearch = !search ||
+                    (r.location    || '').toLowerCase().includes(search) ||
+                    (r.action      || '').toLowerCase().includes(search) ||
+                    (r.handled_by  || '').toLowerCase().includes(search);
+                const matchStatus = !status || r.status === status;
+                const matchDate   = !dateVal || (r.datetime || '').startsWith(dateVal);
+                return matchSearch && matchStatus && matchDate;
+            });
+
+            tbody.style.transition = 'opacity 0.18s ease';
+            tbody.style.opacity = '0';
+            setTimeout(() => {
+                tbody.innerHTML = '';
+                if (records.length === 0) {
+                    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No records found matching your filters.</td></tr>';
+                } else {
+                    records.forEach((r, i) => {
+                        const isDetected = r.status === 'Detected';
+                        const tr = document.createElement('tr');
+                        tr.className = 'row-animate';
+                        tr.style.animationDelay = (i * 0.055) + 's';
+                        tr.innerHTML = `
+                            <td data-label="Date">${r.datetime || '—'}</td>
+                            <td data-label="Location">${r.location || '—'}</td>
+                            <td data-label="Action">${r.action || '—'}</td>
+                            <td data-label="Status"><span class="tag ${isDetected ? 'tag-danger' : 'tag-success'}">${r.status}</span></td>
+                            <td data-label="Response">${r.response || '—'}</td>
+                            <td data-label="By">${r.handled_by || '—'}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+                tbody.style.opacity = '1';
+            }, 180);
+        }
+
+        function setStatAnimated(id, val) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = val;
+            el.classList.remove('pop');
+            void el.offsetWidth;
+            el.classList.add('pop');
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-search').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-date').value = '';
+            renderTable();
+        }
+
+        function exportCSV() {
+            const header = 'Date & Time,Location,Action,Status,Response,By\n';
+            const rows = allRecords.map(r =>
+                `"${r.datetime}","${r.location}","${r.action}","${r.status}","${r.response}","${r.handled_by||''}"`
+            ).join('\n');
+            const blob = new Blob([header + rows], { type: 'text/csv' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'freshzone-history.csv'; a.click();
+            showNotification('CSV exported successfully.', 'success');
+        }
+
+        loadHistory();
+        initHotkeys('history');
+    </script>
+</body>
+</html>

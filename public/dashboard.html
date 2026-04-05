@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshZone | Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── SENSOR CARDS ─────────────────────────────────── */
+        .aqi-badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: bold; margin-top: 4px;
+        }
+        .aqi-good     { background:#dcfce7; color:#15803d; }
+        .aqi-moderate { background:#fef9c3; color:#854d0e; }
+        .aqi-alert    { background:#fee2e2; color:#dc2626; }
+        .aqi-offline  { background:#f1f5f9; color:#64748b; }
+
+        .card-timestamp { font-size:0.7rem; color:var(--gray); margin-top:4px; display:block; }
+
+        .location-card { transition: all 0.4s ease; position: relative; overflow: hidden; }
+        .location-card.detecting {
+            background: #fff5f5 !important;
+            border-left-color: var(--danger) !important;
+            animation: cardPulse 2s ease-in-out infinite;
+        }
+        .location-card.clear { border-left-color: var(--success) !important; }
+        .location-card.offline { border-left-color: #aaa !important; opacity: 0.7; }
+
+        @keyframes cardPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(220,53,69,0.2); }
+            50%      { box-shadow: 0 0 0 10px rgba(220,53,69,0); }
+        }
+        [data-theme="dark"] .location-card.detecting { background: rgba(220,53,69,0.1) !important; }
+        [data-theme="dark"] .location-card.offline { opacity: 0.5; }
+
+        /* ── STATUS DOT ───────────────────────────────────── */
+        .status-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
+        .dot-clear    { background:#22c55e; box-shadow:0 0 6px #22c55e; }
+        .dot-detecting{ background:#ef4444; box-shadow:0 0 6px #ef4444; animation:dotBlink 1s ease-in-out infinite; }
+        .dot-offline  { background:#94a3b8; }
+        @keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        /* ── ADMIN ACKNOWLEDGE BUTTON ─────────────────────── */
+        .ack-btn {
+            margin-top:10px; padding:8px 20px; background:#e74c3c; color:white;
+            border:none; border-radius:8px; font-weight:600; cursor:pointer;
+            font-size:0.85rem; transition:all 0.2s; width:100%;
+        }
+        .ack-btn:hover { background:#c0392b; transform:scale(1.02); }
+
+        /* ── STAFF VIEW ONLY INDICATOR ────────────────────── */
+        .staff-alert-bar {
+            display:none; background:#fff3cd; border:1px solid #ffc107;
+            border-radius:10px; padding:12px 16px; margin-bottom:1.5rem;
+            font-size:0.9rem; color:#856404; font-family:sans-serif;
+            align-items:center; gap:10px;
+        }
+        .staff-alert-bar.visible { display:flex; }
+        [data-theme="dark"] .staff-alert-bar { background:rgba(255,193,7,0.1); color:#ffc107; border-color:rgba(255,193,7,0.3); }
+
+        /* ── LIVE INDICATOR ───────────────────────────────── */
+        .live-badge {
+            display:inline-flex; align-items:center; gap:5px;
+            background:#dcfce7; color:#15803d; border-radius:20px;
+            padding:3px 10px; font-size:0.72rem; font-weight:600;
+            margin-left:8px; vertical-align:middle;
+        }
+        .live-dot { width:7px; height:7px; border-radius:50%; background:#22c55e; animation:dotBlink 1.5s ease-in-out infinite; }
+        [data-theme="dark"] .live-badge { background:rgba(34,197,94,0.15); color:#4ade80; }
+
+        /* ── LAST UPDATED BAR ─────────────────────────────── */
+        .last-updated-bar {
+            text-align:center; font-size:0.75rem; color:var(--gray);
+            margin-bottom:1rem; font-family:sans-serif;
+        }
+
+        /* ── PM VALUES ────────────────────────────────────── */
+        .pm-values {
+            display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;
+        }
+        .pm-chip {
+            background:var(--card-bg, #f8f9fa); border:0.5px solid var(--border-color, #e0e0e0);
+            border-radius:6px; padding:2px 8px; font-size:0.72rem; color:var(--gray);
+            font-family:sans-serif;
+        }
+        [data-theme="dark"] .pm-chip { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); }
+
+        /* ── STAFF RESPONSE MODAL ─────────────────────────── */
+        .staff-response-modal {
+            position:fixed; inset:0; background:rgba(0,0,0,0.6);
+            backdrop-filter:blur(6px); display:none;
+            align-items:center; justify-content:center; z-index:11000;
+        }
+        .staff-response-modal.open { display:flex; }
+        .staff-response-card {
+            background:white; border-radius:18px; padding:28px 28px 24px;
+            max-width:380px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3);
+            border-top:5px solid #e74c3c; animation:slideUp 0.4s cubic-bezier(0.175,0.885,0.32,1.1);
+        }
+        [data-theme="dark"] .staff-response-card { background:#1a2a3a; }
+        @keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+        .staff-response-card h3 { margin:0 0 8px; color:#e74c3c; font-size:1.1rem; font-family:sans-serif; }
+        .staff-response-card p  { margin:0 0 20px; color:#555; font-size:0.9rem; line-height:1.6; font-family:sans-serif; }
+        [data-theme="dark"] .staff-response-card p { color:#aaa; }
+        .staff-response-card .location-tag {
+            display:inline-block; background:#fee2e2; color:#dc2626;
+            border-radius:6px; padding:2px 10px; font-size:0.82rem;
+            font-weight:600; margin-bottom:14px; font-family:sans-serif;
+        }
+        .staff-respond-btn {
+            width:100%; padding:12px; background:#3498db; color:white;
+            border:none; border-radius:10px; font-weight:700; font-size:0.95rem;
+            cursor:pointer; transition:0.2s; font-family:sans-serif;
+        }
+        .staff-respond-btn:hover { background:#2980b9; transform:scale(1.02); }
+        .staff-dismiss-btn {
+            width:100%; padding:10px; background:transparent; color:var(--gray);
+            border:1px solid var(--gray); border-radius:10px; font-size:0.85rem;
+            cursor:pointer; margin-top:8px; font-family:sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="smoke-container" aria-hidden="true">
+        <div class="smoke-particle" style="left:10%;width:200px;height:200px;animation-delay:0s;"></div>
+        <div class="smoke-particle" style="left:30%;width:150px;height:150px;animation-delay:2s;"></div>
+        <div class="smoke-particle" style="left:60%;width:250px;height:250px;animation-delay:4s;"></div>
+        <div class="smoke-particle" style="left:85%;width:180px;height:180px;animation-delay:1s;"></div>
+    </div>
+
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
+                <img src="logo1.png" alt="FreshZone Logo">
+            </a>
+            <div class="nav-links" id="desktop-nav">
+                <a href="dashboard.html" class="active">Monitor</a>
+                <a href="history.html">History</a>
+                <a href="profile.html">Profile</a>
+                <a href="contact.html">Contact</a>
+                <a href="#" onclick="openLogoutModal();return false;">Logout</a>
+                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+            </div>
+            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true" aria-label="Navigation menu">
+        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
+            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu">✕</button>
+            <a href="dashboard.html" class="active">📡 Monitor</a>
+            <a href="history.html">📋 History</a>
+            <a href="profile.html">👤 Profile</a>
+            <a href="contact.html">✉️ Contact</a>
+            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;">🚪 Logout</a>
+        </div>
+    </div>
+
+    <div class="container" style="position:relative;z-index:10;">
+        <div class="hero">
+            <h1>Campus Smoke Monitor <span class="live-badge"><span class="live-dot"></span>LIVE</span></h1>
+            <p>Real-time air quality monitoring — 4th Floor Comfort Rooms</p>
+            <div class="flex-btn-container">
+                <button onclick="location.href='history.html'"
+                    style="width:auto;padding:12px 30px;background:var(--secondary);font-size:1rem;">
+                    View Detection History
+                </button>
+            </div>
+        </div>
+
+        <!-- Staff info bar — only shown to staff -->
+        <div class="staff-alert-bar" id="staff-info-bar">
+            <span style="font-size:1.2rem;">ℹ️</span>
+            <span>You are logged in as <strong>Staff</strong>. Only Administrators can acknowledge alerts. You will be notified when action is required.</span>
+        </div>
+
+        <div class="last-updated-bar" id="last-updated-bar">Fetching sensor data…</div>
+
+        <div class="grid" id="sensor-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px,1fr));">
+
+            <!-- ZONE 1: 4th Floor Male CR -->
+            <div class="location-card" id="card-zone1" role="region" aria-label="4th Floor Male CR status">
+                <h3 id="name-zone1">4th Floor Male CR</h3>
+                <p id="status-zone1" style="font-weight:bold;">
+                    <span class="status-dot dot-offline" id="dot-zone1"></span>
+                    <span id="status-text-zone1">Loading…</span>
+                </p>
+                <span class="aqi-badge aqi-offline" id="aqi-zone1">AQI: —</span>
+                <div class="pm-values" id="pm-zone1"></div>
+                <small class="card-timestamp" id="ts-zone1">Last reading: —</small>
+                <!-- Admin only acknowledge button -->
+                <button class="ack-btn" id="ack-zone1" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE1','4th Floor Male CR')">
+                    ✔ Acknowledge Alert
+                </button>
+            </div>
+
+            <!-- ZONE 2: 4th Floor Female CR -->
+            <div class="location-card" id="card-zone2" role="region" aria-label="4th Floor Female CR status">
+                <h3 id="name-zone2">4th Floor Female CR</h3>
+                <p id="status-zone2" style="font-weight:bold;">
+                    <span class="status-dot dot-offline" id="dot-zone2"></span>
+                    <span id="status-text-zone2">Loading…</span>
+                </p>
+                <span class="aqi-badge aqi-offline" id="aqi-zone2">AQI: —</span>
+                <div class="pm-values" id="pm-zone2"></div>
+                <small class="card-timestamp" id="ts-zone2">Last reading: —</small>
+                <!-- Admin only acknowledge button -->
+                <button class="ack-btn" id="ack-zone2" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE2','4th Floor Female CR')">
+                    ✔ Acknowledge Alert
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Staff Response Modal — shown to staff when admin acknowledges -->
+    <div class="staff-response-modal" id="staff-response-modal" role="alertdialog" aria-modal="true" aria-labelledby="staff-modal-title">
+        <div class="staff-response-card">
+            <h3 id="staff-modal-title">🚨 Vape / Smoke Detected</h3>
+            <span class="location-tag" id="staff-modal-location">—</span>
+            <p id="staff-modal-text">An alert has been detected in your area. Please proceed to the location for inspection immediately.</p>
+            <button class="staff-respond-btn" onclick="staffRespond()">✅ I Understand — On My Way</button>
+            <button class="staff-dismiss-btn" onclick="dismissStaffModal()">Dismiss</button>
+        </div>
+    </div>
+
+    <div id="session-warning" role="status"></div>
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+    <div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+        <div class="modal-content-custom">
+            <h3 id="logout-title">Confirm Logout</h3>
+            <p>Are you sure you want to log out of FreshZone?</p>
+            <div class="modal-btn-group">
+                <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 FreshZone – Clear Air Monitoring System</p>
+    </footer>
+
+    <script src="utils.js"></script>
+    <script>
+        // ── AUTH GUARD ─────────────────────────────────────────
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; }
+
+        const isAdmin = user?.position === 'Administrator';
+        const isStaff = user?.position === 'Staff / Teachers';
+
+        // Show staff info bar
+        if (isStaff) {
+            document.getElementById('staff-info-bar').classList.add('visible');
+        }
+
+        // Zone code → card element mapping
+        const ZONES = {
+            'ESP32-ZONE1': { card:'card-zone1', dot:'dot-zone1', statusText:'status-text-zone1', aqi:'aqi-zone1', pm:'pm-zone1', ts:'ts-zone1', ackBtn:'ack-zone1' },
+            'ESP32-ZONE2': { card:'card-zone2', dot:'dot-zone2', statusText:'status-text-zone2', aqi:'aqi-zone2', pm:'pm-zone2', ts:'ts-zone2', ackBtn:'ack-zone2' },
+        };
+
+        // Track which zones currently have active alerts
+        const activeAlerts = {};
+        // Track last event IDs seen to avoid double-notifying
+        const seenEventIds = new Set(JSON.parse(localStorage.getItem('fz-seen-events') || '[]'));
+
+        // ── RENDER ZONE CARD ───────────────────────────────────
+        function renderZone(zoneCode, data) {
+            const z = ZONES[zoneCode];
+            if (!z) return;
+
+            const card       = document.getElementById(z.card);
+            const dot        = document.getElementById(z.dot);
+            const statusText = document.getElementById(z.statusText);
+            const aqiBadge   = document.getElementById(z.aqi);
+            const pmDiv      = document.getElementById(z.pm);
+            const ts         = document.getElementById(z.ts);
+            const ackBtn     = document.getElementById(z.ackBtn);
+
+            if (!data || !data.node_active) {
+                // Offline
+                card.className = 'location-card offline';
+                dot.className  = 'status-dot dot-offline';
+                statusText.textContent = 'Sensor Offline';
+                aqiBadge.textContent   = 'AQI: —';
+                aqiBadge.className     = 'aqi-badge aqi-offline';
+                pmDiv.innerHTML        = '';
+                ts.textContent         = 'No data received';
+                if (ackBtn) ackBtn.style.display = 'none';
+                return;
+            }
+
+            const smoke    = data.smoke_detected;
+            const aqi      = data.aqi_value;
+            const category = data.aqi_category || 'Good';
+            const pm25     = parseFloat(data.pm2_5 || 0).toFixed(1);
+            const recordedAt = data.recorded_at ? new Date(data.recorded_at).toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' }) : '—';
+
+            // Update status
+            if (smoke) {
+                card.className = 'location-card detecting';
+                dot.className  = 'status-dot dot-detecting';
+                statusText.innerHTML = '<strong>● VAPE / SMOKE DETECTED</strong>';
+                statusText.style.color = 'var(--danger)';
+                aqiBadge.className = 'aqi-badge aqi-alert';
+                aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
+
+                // Show acknowledge button for admin only
+                if (isAdmin && ackBtn) {
+                    ackBtn.style.display = 'block';
+                }
+
+                activeAlerts[zoneCode] = true;
+            } else {
+                card.className = 'location-card clear';
+                dot.className  = 'status-dot dot-clear';
+                statusText.innerHTML = '● Clear';
+                statusText.style.color = 'var(--success)';
+
+                // AQI color
+                if (aqi <= 50) {
+                    aqiBadge.className = 'aqi-badge aqi-good';
+                } else if (aqi <= 100) {
+                    aqiBadge.className = 'aqi-badge aqi-moderate';
+                } else {
+                    aqiBadge.className = 'aqi-badge aqi-alert';
+                }
+                aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
+
+                if (ackBtn) ackBtn.style.display = 'none';
+                activeAlerts[zoneCode] = false;
+            }
+
+            // PM chips
+            pmDiv.innerHTML = `
+                <span class="pm-chip">PM1.0: ${parseFloat(data.pm1_0 || 0).toFixed(1)} µg/m³</span>
+                <span class="pm-chip">PM2.5: ${pm25} µg/m³</span>
+                <span class="pm-chip">PM10: ${parseFloat(data.pm10 || 0).toFixed(1)} µg/m³</span>
+            `;
+
+            ts.textContent = `Last reading: ${recordedAt}`;
+        }
+
+        // ── FETCH LIVE SENSOR DATA ─────────────────────────────
+        async function fetchLiveData() {
+            try {
+                const data = await apiFetch('/readings/live');
+                if (!data || !data.success) return;
+
+                data.data.forEach(zone => {
+                    renderZone(zone.node_code, zone);
+                });
+
+                document.getElementById('last-updated-bar').textContent =
+                    `Last updated: ${new Date().toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' })} — Auto-refreshes every 10 seconds`;
+
+            } catch(err) {
+                document.getElementById('last-updated-bar').textContent = 'Connection error — retrying…';
+            }
+        }
+
+        // ── FETCH OPEN EVENTS (for staff notification) ─────────
+        async function fetchOpenEvents() {
+            try {
+                const data = await apiFetch('/readings/open-events');
+                if (!data || !data.success) return;
+
+                data.data.forEach(event => {
+                    // Only show staff modal for new events they haven't seen
+                    if (isStaff && !seenEventIds.has(event.id)) {
+                        seenEventIds.add(event.id);
+                        localStorage.setItem('fz-seen-events', JSON.stringify([...seenEventIds]));
+                        showStaffModal(event.location_name, event.id);
+                    }
+                });
+
+            } catch(err) {}
+        }
+
+        // ── ACKNOWLEDGE ALERT (Admin only) ────────────────────
+        async function acknowledgeAlert(nodeCode, locationName) {
+            try {
+                // Get the open event for this zone
+                const eventsData = await apiFetch('/readings/open-events');
+                if (!eventsData || !eventsData.success) return;
+
+                const event = eventsData.data.find(e => e.node_code === nodeCode);
+                if (!event) {
+                    showNotification('No active alert found for this zone.', 'warning');
+                    return;
+                }
+
+                const result = await apiFetch(`/readings/acknowledge/${event.id}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ notes: `Acknowledged by ${user.full_name || user.name}` })
+                });
+
+                if (result && result.success) {
+                    showNotification(`Alert acknowledged for ${locationName}. Staff notified.`, 'success');
+
+                    // Hide ack button and update card
+                    const z = ZONES[nodeCode];
+                    if (z) {
+                        const ackBtn = document.getElementById(z.ackBtn);
+                        if (ackBtn) ackBtn.style.display = 'none';
+                    }
+
+                    // Refresh data
+                    fetchLiveData();
+                } else {
+                    showNotification('Failed to acknowledge. Try again.', 'error');
+                }
+            } catch(err) {
+                showNotification('Connection error. Try again.', 'error');
+            }
+        }
+
+        // ── STAFF MODAL ────────────────────────────────────────
+        let currentStaffEventId = null;
+
+        function showStaffModal(locationName, eventId) {
+            currentStaffEventId = eventId;
+            document.getElementById('staff-modal-location').textContent = locationName;
+            document.getElementById('staff-modal-text').textContent =
+                `Vape or smoke has been detected at ${locationName}. Please proceed to the location for inspection immediately.`;
+            document.getElementById('staff-response-modal').classList.add('open');
+
+            // Also play a subtle notification
+            showNotification(`⚠️ Alert: Vape detected at ${locationName}`, 'error', 5000);
+        }
+
+        async function staffRespond() {
+            document.getElementById('staff-response-modal').classList.remove('open');
+            showNotification('Response recorded. Thank you for your quick action.', 'success');
+
+            // Log response via API if event ID available
+            if (currentStaffEventId) {
+                try {
+                    await apiFetch(`/readings/acknowledge/${currentStaffEventId}`, {
+                        method: 'POST',
+                        body: JSON.stringify({ notes: `Staff responded: ${user.full_name || user.name}` })
+                    });
+                } catch(err) {}
+            }
+        }
+
+        function dismissStaffModal() {
+            document.getElementById('staff-response-modal').classList.remove('open');
+        }
+
+        // ── START POLLING ──────────────────────────────────────
+        fetchLiveData();
+        setInterval(fetchLiveData, 10000); // every 10 seconds
+
+        // Staff: poll for new open events every 8 seconds
+        if (isStaff) {
+            fetchOpenEvents();
+            setInterval(fetchOpenEvents, 8000);
+        }
+
+        // Admin: also refresh open events to keep ack buttons updated
+        if (isAdmin) {
+            setInterval(fetchLiveData, 5000); // faster for admin
+        }
+
+        // ── HOTKEYS ────────────────────────────────────────────
+        initHotkeys('dashboard');
+    </script>
+</body>
+</html>

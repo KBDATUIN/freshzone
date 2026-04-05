@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshZone | Profile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+        <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
+            <img src="logo1.png" alt="FreshZone Logo">
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html">Monitor</a>
+            <a href="history.html">History</a>
+            <a href="profile.html" class="active">Profile</a>
+            <a href="contact.html">Contact</a>
+            <a href="#" onclick="openLogoutModal();return false;">Logout</a>
+            <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+        </div>
+        <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true">
+    <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
+        <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu">✕</button>
+        <a href="dashboard.html">📡 Monitor</a>
+        <a href="history.html">📋 History</a>
+        <a href="profile.html" class="active">👤 Profile</a>
+        <a href="contact.html">✉️ Contact</a>
+        <a href="#" onclick="openLogoutModal();closeMobileNav();return false;">🚪 Logout</a>
+    </div>
+</div>
+
+<div class="container profile-wrapper">
+    <div class="glass-card profile-card">
+
+        <!-- Avatar -->
+        <div class="profile-avatar">
+            <img src="" id="userPhoto" class="profile-img" alt="Profile photo" style="object-fit:cover;object-position:center center;">
+            <input type="file" id="upload" hidden accept="image/*" onchange="previewFile()">
+            <button class="change-photo-btn" onclick="document.getElementById('upload').click()" aria-label="Change profile photo">
+                📷 Change Photo
+            </button>
+        </div>
+
+        <div class="profile-name" id="userName">—</div>
+
+        <div class="profile-divider"></div>
+
+        <!-- View mode -->
+        <div class="profile-details" id="profile-view">
+            <p><strong>Position:</strong> <span id="userPosition"></span></p>
+            <p><strong>Contact:</strong>  <span id="userContact"></span></p>
+            <p><strong>Email:</strong>    <span id="userEmail"></span></p>
+            <p><strong>Employee ID:</strong> <span id="userEmployeeID"></span></p>
+            <p><strong>Date Joined:</strong> <span id="userDateJoined"></span></p>
+            <p><strong>Last Login:</strong>  <span id="userLastLogin"></span></p>
+            <p><strong>Emergency Contact:</strong> <span id="userEmergency"></span></p>
+        </div>
+
+        <div id="roleMessage" class="profile-access"></div>
+
+        <!-- Edit Profile button -->
+        <button onclick="toggleEdit(true)" id="edit-btn" style="margin-top:1rem;width:auto;padding:0.55rem 1.5rem;font-size:0.85rem;border-radius:10px;">
+            ✏️ Edit Profile
+        </button>
+
+        <!-- Edit form (hidden by default) -->
+        <div class="profile-edit-form" id="profile-edit" style="display:none;">
+            <div class="input-group">
+                <label for="edit-name">Full Name</label>
+                <input type="text" id="edit-name">
+            </div>
+            <div class="input-group">
+                <label for="edit-contact">Contact Number</label>
+                <input type="tel" id="edit-contact">
+            </div>
+            <div class="input-group">
+                <label for="edit-emergency">Emergency Contact</label>
+                <input type="text" id="edit-emergency" placeholder="Name & number">
+            </div>
+            <div class="btn-row">
+                <button class="btn-success" onclick="saveProfile()" style="margin-top:0;">💾 Save</button>
+                <button onclick="toggleEdit(false)" style="margin-top:0;background:var(--gray)!important;">Cancel</button>
+            </div>
+        </div>
+
+        <div class="profile-divider" style="margin-top:1.2rem;"></div>
+
+        <!-- Change password section -->
+        <div class="change-pw-section">
+            <h4>🔒 Change Password</h4>
+            <div class="input-group">
+                <label for="pw-current">Current Password</label>
+                <div class="input-password-wrap">
+                    <input type="password" id="pw-current" placeholder="Current password">
+                    <button type="button" class="eye-btn" onclick="togglePassword('pw-current',this)" aria-label="Toggle visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="pw-new">New Password</label>
+                <div class="input-password-wrap">
+                    <input type="password" id="pw-new" placeholder="Min. 8 characters">
+                    <button type="button" class="eye-btn" onclick="togglePassword('pw-new',this)" aria-label="Toggle visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </div>
+                <div class="pw-strength-bar" id="profile-pw-bar"></div>
+                <span class="pw-strength-label" id="profile-pw-label"></span>
+            </div>
+            <button onclick="changePassword()" style="margin-top:0.75rem;width:auto;padding:0.55rem 1.4rem;font-size:0.82rem;border-radius:10px;background:var(--primary)!important;">
+                Update Password
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div id="session-warning" role="status"></div>
+<div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+<div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+    <div class="modal-content-custom">
+        <h3 id="logout-title">Confirm Logout</h3>
+        <p>Are you sure you want to log out of FreshZone?</p>
+        <div class="modal-btn-group">
+            <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+            <button class="cancel-btn"  onclick="closeLogoutModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<footer><p>© 2026 FreshZone – Clear Air Monitoring System</p></footer>
+
+<script src="utils.js"></script>
+<script>
+    // Auth guard — uses JWT token from new backend
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const token = localStorage.getItem('fz-token');
+
+    if (!currentUser || !token) {
+        alert('No user logged in!');
+        window.location.href = 'auth.html';
+    }
+
+    async function loadProfile() {
+        try {
+            const data = await apiFetch('/profile');
+            if (!data || !data.success) {
+                showNotification('Failed to load profile.', 'error');
+                return;
+            }
+            const u = data.user;
+
+            document.getElementById('userName').textContent       = u.full_name || '—';
+            document.getElementById('userEmail').textContent      = u.email || '—';
+            document.getElementById('userContact').textContent    = u.contact_number || '—';
+            document.getElementById('userPosition').textContent   = u.position || '—';
+            document.getElementById('userEmployeeID').textContent = u.employee_id || '—';
+            const phLocale = 'en-PH';
+            const phTZ     = { timeZone: 'Asia/Manila' };
+            document.getElementById('userDateJoined').textContent = u.date_joined
+                ? new Date(u.date_joined).toLocaleDateString(phLocale, { ...phTZ, year:'numeric', month:'long', day:'numeric' })
+                : '—';
+            document.getElementById('userLastLogin').textContent  = u.last_login
+                ? new Date(u.last_login).toLocaleString(phLocale, { ...phTZ, year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true })
+                : '—';
+            document.getElementById('userEmergency').textContent  = u.emergency_contact || '—';
+            // Use cached photo from localStorage first to avoid flash, then API photo
+            const cachedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const photoSrc = u.photo_url || cachedUser.photo_url
+                || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.full_name) + '&background=00b4d8&color=fff&size=150';
+            document.getElementById('userPhoto').src = photoSrc;
+
+            const rm = document.getElementById('roleMessage');
+            if (u.position === 'Administrator') {
+                rm.textContent = '⭐ Full Administrative Access';
+                rm.style.background = 'rgba(0,78,122,0.1)';
+                rm.style.color = 'var(--primary)';
+            } else {
+                rm.textContent = '✅ Staff Access';
+                rm.style.background = 'rgba(40,167,69,0.1)';
+                rm.style.color = 'var(--success)';
+            }
+        } catch (err) {
+            showNotification('Error loading profile.', 'error');
+        }
+    }
+
+    function toggleEdit(open) {
+        document.getElementById('profile-edit').style.display = open ? 'block' : 'none';
+        document.getElementById('profile-view').style.display = open ? 'none' : 'block';
+        document.getElementById('edit-btn').style.display     = open ? 'none' : 'inline-block';
+        if (open) {
+            document.getElementById('edit-name').value      = document.getElementById('userName').textContent;
+            document.getElementById('edit-contact').value   = document.getElementById('userContact').textContent;
+            document.getElementById('edit-emergency').value = document.getElementById('userEmergency').textContent;
+        }
+    }
+
+    async function saveProfile() {
+        const full_name         = document.getElementById('edit-name').value.trim();
+        const contact_number    = document.getElementById('edit-contact').value.trim();
+        const emergency_contact = document.getElementById('edit-emergency').value.trim();
+
+        if (!full_name) { showNotification('Name cannot be empty.', 'error'); return; }
+
+        const data = await apiFetch('/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ full_name, contact_number, emergency_contact })
+        });
+
+        if (data && data.success) {
+            // Update localStorage name too
+            const cu = JSON.parse(localStorage.getItem('currentUser'));
+            cu.full_name = full_name;
+            localStorage.setItem('currentUser', JSON.stringify(cu));
+            loadProfile();
+            toggleEdit(false);
+            showNotification('Profile updated successfully!', 'success');
+        } else {
+            showNotification(data?.message || 'Failed to update profile.', 'error');
+        }
+    }
+
+    async function changePassword() {
+        const current_password = document.getElementById('pw-current').value.trim();
+        const new_password     = document.getElementById('pw-new').value.trim();
+
+        if (!current_password || !new_password) { showNotification('Please fill both fields.', 'error'); return; }
+        if (new_password.length < 8) { showNotification('New password must be at least 8 characters.', 'error'); return; }
+
+        const data = await apiFetch('/profile/change-password', {
+            method: 'POST',
+            body: JSON.stringify({ current_password, new_password })
+        });
+
+        if (data && data.success) {
+            document.getElementById('pw-current').value = '';
+            document.getElementById('pw-new').value     = '';
+            document.getElementById('profile-pw-bar').style.width = '0%';
+            document.getElementById('profile-pw-label').textContent = '';
+            showNotification('Password updated successfully!', 'success');
+        } else {
+            showNotification(data?.message || 'Failed to change password.', 'error');
+        }
+    }
+
+    function previewFile() {
+        const file = document.getElementById('upload').files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { showNotification('Image must be under 5MB.', 'error'); return; }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const img = new Image();
+            img.onload = async () => {
+                // Center-crop to square using canvas — fixes the half-photo bug
+                const size   = Math.min(img.width, img.height);
+                const canvas = document.createElement('canvas');
+                canvas.width  = 150;
+                canvas.height = 150;
+                const ctx = canvas.getContext('2d');
+
+                // Draw cropped square centered on subject
+                const sx = (img.width  - size) / 2;
+                const sy = (img.height - size) / 2;
+                ctx.drawImage(img, sx, sy, size, size, 0, 0, 150, 150);
+
+                // Get compressed base64 — kept small so it fits in DB TEXT column
+                const croppedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                // Update preview immediately
+                document.getElementById('userPhoto').src = croppedBase64;
+
+                // Save to backend
+                const data = await apiFetch('/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        full_name: document.getElementById('userName').textContent,
+                        photo_url: croppedBase64
+                    })
+                });
+                if (data && data.success) {
+                    // Update localStorage too so it persists across pages
+                    const cu = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                    cu.photo_url = croppedBase64;
+                    localStorage.setItem('currentUser', JSON.stringify(cu));
+                    showNotification('Photo updated!', 'success');
+                }
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Password strength
+    document.getElementById('pw-new').addEventListener('input', function() {
+        let pw = this.value, score = 0;
+        if (pw.length >= 8) score++;
+        if (pw.length >= 12) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        const levels = [
+            {pct:'0%',color:'#ddd',text:''},
+            {pct:'20%',color:'#e74c3c',text:'Very Weak'},
+            {pct:'40%',color:'#e67e22',text:'Weak'},
+            {pct:'60%',color:'#f39c12',text:'Fair'},
+            {pct:'80%',color:'#2ecc71',text:'Strong'},
+            {pct:'100%',color:'#27ae60',text:'Very Strong'},
+        ];
+        const lv = levels[Math.min(score,5)];
+        document.getElementById('profile-pw-bar').style.width = lv.pct;
+        document.getElementById('profile-pw-bar').style.background = lv.color;
+        document.getElementById('profile-pw-label').textContent = lv.text;
+        document.getElementById('profile-pw-label').style.color = lv.color;
+    });
+
+    loadProfile();
+    initHotkeys('profile');
+</script>
+</body>
+</html>

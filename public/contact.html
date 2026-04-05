@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshZone | Contact</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .ticket-success {
+            background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7;
+            border-radius: 12px; padding: 1.2rem; text-align: center;
+            font-weight: 600; margin-top: 1rem; display: none; font-family: sans-serif;
+        }
+        [data-theme="dark"] .ticket-success { background: rgba(6,95,70,0.3); color: #6ee7b7; border-color: rgba(110,231,183,0.3); }
+
+        /* Admin inbox */
+        .inbox-section { margin-top: 2rem; }
+        .inbox-section h3 { color: var(--primary); margin-bottom: 1rem; }
+        .ticket-item {
+            background: white; border-radius: 12px; padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem; border-left: 5px solid var(--secondary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        [data-theme="dark"] .ticket-item { background: #0f1e2c; }
+        .ticket-item .ticket-meta { font-size: 0.75rem; color: var(--gray); margin-bottom: 0.4rem; }
+        .ticket-item .ticket-subject { font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; }
+        .ticket-item .ticket-msg { font-size: 0.88rem; color: var(--dark); }
+        .ticket-item .ticket-resolve {
+            width: auto; padding: 0.3rem 0.8rem; margin-top: 0.6rem;
+            font-size: 0.75rem; border-radius: 6px; background: var(--success) !important;
+        }
+        .ticket-item.resolved { border-left-color: var(--gray); opacity: 0.65; }
+        .no-tickets { text-align: center; color: var(--gray); font-style: italic; padding: 1.5rem 0; }
+        .char-count { font-size: 0.72rem; color: var(--gray); float: right; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
+                <img src="logo1.png" alt="FreshZone Logo">
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html">Monitor</a>
+                <a href="history.html">History</a>
+                <a href="profile.html">Profile</a>
+                <a href="contact.html" class="active">Contact</a>
+                <a href="#" onclick="openLogoutModal();return false;">Logout</a>
+                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+            </div>
+            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true">
+        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
+            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu">✕</button>
+            <a href="dashboard.html">📡 Monitor</a>
+            <a href="history.html">📋 History</a>
+            <a href="profile.html">👤 Profile</a>
+            <a href="contact.html" class="active">✉️ Contact</a>
+            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;">🚪 Logout</a>
+        </div>
+    </div>
+
+    <div class="container" style="max-width:720px;">
+
+        <!-- Report Form -->
+        <div class="glass-card">
+            <h2>📩 Send a Report</h2>
+            <p style="color:var(--gray);margin-bottom:1.2rem;margin-top:0.3rem;">
+                Have feedback or a device issue? Let us know.
+            </p>
+
+            <label for="contact-name">Full Name</label>
+            <input type="text" id="contact-name" placeholder="Your Name">
+
+            <label for="contact-email">Email Address</label>
+            <input type="email" id="contact-email" placeholder="your@email.com">
+
+            <label for="contact-subject">Subject</label>
+            <select id="contact-subject">
+                <option value="" disabled selected>Select a subject</option>
+                <option value="Smoke Alert Feedback">Smoke Alert Feedback</option>
+                <option value="Device Maintenance">Device Maintenance</option>
+                <option value="General Suggestion">General Suggestion</option>
+                <option value="Bug Report">Bug Report</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="contact-message">
+                Message
+                <span class="char-count"><span id="char-counter">0</span>/500</span>
+            </label>
+            <textarea id="contact-message" rows="5" placeholder="Describe the issue or suggestion…" maxlength="500" oninput="document.getElementById('char-counter').textContent=this.value.length;"></textarea>
+
+            <button onclick="submitReport()">✉️ Submit Report</button>
+
+            <!-- Confirmation box -->
+            <div class="ticket-success" id="ticket-confirm"></div>
+        </div>
+
+        <!-- Admin Inbox (only visible to Administrators) -->
+        <div class="inbox-section glass-card" id="admin-inbox" style="display:none;">
+            <h3>📥 Admin Inbox</h3>
+            <div id="inbox-list"></div>
+        </div>
+
+    </div>
+
+    <div id="session-warning" role="status"></div>
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+    <div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+        <div class="modal-content-custom">
+            <h3 id="logout-title">Confirm Logout</h3>
+            <p>Are you sure you want to log out of FreshZone?</p>
+            <div class="modal-btn-group">
+                <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="cancel-btn"  onclick="closeLogoutModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <footer><p>© 2026 FreshZone – Clear Air Monitoring System</p></footer>
+
+    <script src="utils.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (user) {
+                document.getElementById('contact-name').value  = user.full_name || user.name || '';
+                document.getElementById('contact-email').value = user.email || '';
+            }
+            if (user?.position === 'Administrator') {
+                document.getElementById('admin-inbox').style.display = 'block';
+                renderInbox();
+            }
+        });
+
+        function validateForm() {
+            let valid = true;
+            const name    = document.getElementById('contact-name').value.trim();
+            const email   = document.getElementById('contact-email').value.trim();
+            const subject = document.getElementById('contact-subject').value;
+            const message = document.getElementById('contact-message').value.trim();
+
+            ['contact-name','contact-email','contact-subject','contact-message'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('field-error');
+                const err = el.parentElement.querySelector('.field-error-msg');
+                if (err) err.remove();
+            });
+
+            function addError(id, msg) {
+                const el = document.getElementById(id);
+                el.classList.add('field-error');
+                const span = document.createElement('span');
+                span.className = 'field-error-msg'; span.textContent = msg;
+                el.parentElement.appendChild(span);
+                valid = false;
+            }
+
+            if (!name)    addError('contact-name',    'Name is required.');
+            if (!email)   addError('contact-email',   'Email is required.');
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) addError('contact-email','Enter a valid email.');
+            if (!subject) addError('contact-subject', 'Please select a subject.');
+            if (!message) addError('contact-message', 'Message cannot be empty.');
+            else if (message.length < 10) addError('contact-message', 'Message is too short (min 10 characters).');
+            return valid;
+        }
+
+        async function submitReport() {
+            if (!validateForm()) return;
+
+            const subject = document.getElementById('contact-subject').value;
+            const message = document.getElementById('contact-message').value.trim();
+            const name    = document.getElementById('contact-name').value.trim();
+            const email   = document.getElementById('contact-email').value.trim();
+
+            try {
+                const data = await apiFetch('/contact', {
+                    method: 'POST',
+                    body: JSON.stringify({ subject, message, name, email })
+                });
+
+                if (data && data.success) {
+                    const confirm = document.getElementById('ticket-confirm');
+                    confirm.textContent = `✅ Report submitted! Ticket ID: ${data.ticket_ref}. We'll get back to you soon.`;
+                    confirm.style.display = 'block';
+
+                    document.getElementById('contact-subject').value = '';
+                    document.getElementById('contact-message').value = '';
+                    document.getElementById('char-counter').textContent = '0';
+
+                    showNotification('Report submitted successfully!', 'success');
+                    if (user?.position === 'Administrator') renderInbox();
+                } else {
+                    showNotification(data?.message || 'Failed to submit report.', 'error');
+                }
+            } catch(err) {
+                showNotification('Cannot connect to server.', 'error');
+            }
+        }
+
+        async function renderInbox() {
+            try {
+                const data = await apiFetch('/contact');
+                const list = document.getElementById('inbox-list');
+                if (!data || !data.success || data.data.length === 0) {
+                    list.innerHTML = '<p class="no-tickets">No reports submitted yet.</p>';
+                    return;
+                }
+                list.innerHTML = data.data.map(t => `
+                    <div class="ticket-item ${t.ticket_status === 'Resolved' ? 'resolved' : ''}" id="ticket-${t.id}">
+                        <div class="ticket-meta">${new Date(t.created_at).toLocaleString()} · ${t.submitter_email} · <b>${t.ticket_ref}</b></div>
+                        <div class="ticket-subject">${t.subject}</div>
+                        <div class="ticket-msg">${t.message}</div>
+                        ${t.ticket_status !== 'Resolved'
+                            ? `<button class="ticket-resolve" onclick="resolveTicket(${t.id})">✔ Mark Resolved</button>`
+                            : '<small style="color:var(--success);display:block;margin-top:0.4rem;">✔ Resolved</small>'}
+                    </div>
+                `).join('');
+            } catch(err) {
+                console.error('Inbox error:', err);
+            }
+        }
+
+        async function resolveTicket(id) {
+            try {
+                const data = await apiFetch(`/contact/${id}/resolve`, { method: 'POST' });
+                if (data && data.success) {
+                    renderInbox();
+                    showNotification('Ticket marked as resolved.', 'success');
+                }
+            } catch(err) {
+                showNotification('Failed to resolve ticket.', 'error');
+            }
+        }
+
+        initHotkeys('contact');
+    </script>
+</body>
+</html>
