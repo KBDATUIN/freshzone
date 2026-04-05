@@ -153,6 +153,8 @@
             </div>
             <button onclick="clearFilters()" style="width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:var(--gray) !important;">Clear</button>
             <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+            <button id="clear-all-btn" onclick="clearAllHistory()" style="width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:#e74c3c !important;color:white;">🗑 Clear All</button>
+            <button id="clear-all-btn" onclick="clearAllHistory()" style="width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:#e74c3c !important;color:white;">🗑 Clear All History</button>
         </div>
 
         <div class="log-container">
@@ -294,7 +296,25 @@
             showNotification('CSV exported successfully.', 'success');
         }
 
-        loadHistory();
+
+        async function clearAllHistory() {
+            if (!confirm('⚠️ Are you sure you want to delete ALL history? This cannot be undone.')) return;
+            try {
+                const data = await apiFetch('/history/clear-all', { method: 'DELETE' });
+                if (data && data.success) {
+                    allRecords = [];
+                    renderTable();
+                    loadStats();
+                    showNotification('All history cleared successfully.', 'success');
+                } else {
+                    showNotification(data?.message || 'Failed to clear history.', 'error');
+                }
+            } catch(err) {
+                showNotification('Connection error.', 'error');
+            }
+        }
+
+                loadHistory();
         initHotkeys('history');
     </script>
 </body>
