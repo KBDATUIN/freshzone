@@ -3,15 +3,17 @@
 // ============================================================
 const nodemailer = require('nodemailer');
 
-// Do NOT call dotenv here — Railway injects env vars directly.
-// dotenv is loaded once in server.js before anything else.
-
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // SSL
     auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD,
     },
+    tls: {
+        rejectUnauthorized: false
+    }
 });
 
 // Verify connection on startup
@@ -23,7 +25,6 @@ transporter.verify((error) => {
         console.log('[mailer] Gmail ready to send emails as', process.env.GMAIL_USER);
     }
 });
-
 
 async function sendAlertEmail(to, name, location, pm25, category) {
     const html = `
@@ -56,7 +57,6 @@ async function sendAlertEmail(to, name, location, pm25, category) {
     });
 }
 
-// ── SIGNUP / RESET OTP ────────────────────────────────────────
 async function sendOTPEmail(to, name, otp, type) {
     const isReset  = type === 'reset';
     const subject  = isReset ? 'FreshZone — Password Reset Code' : 'FreshZone — Email Verification Code';
