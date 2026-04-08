@@ -124,7 +124,7 @@ router.post('/', async (req, res) => {
 });
 
 // ── GET /api/readings/live ────────────────────────────────────
-// node_active = 1 only if last_seen within 30 seconds
+// node_active = 1 only if last_seen within 15 seconds (ESP32 sends every 5s)
 router.get('/live', authMiddleware, async (req, res) => {
     try {
         const [rows] = await db.query(`
@@ -132,7 +132,7 @@ router.get('/live', authMiddleware, async (req, res) => {
                 sn.node_code,
                 sn.location_name,
                 sn.last_seen,
-                CASE WHEN sn.last_seen >= NOW() - INTERVAL 30 SECOND THEN 1 ELSE 0 END AS node_active,
+                CASE WHEN sn.last_seen >= NOW() - INTERVAL 15 SECOND THEN 1 ELSE 0 END AS node_active,
                 sr.pm1_0,
                 sr.pm2_5,
                 sr.pm10,

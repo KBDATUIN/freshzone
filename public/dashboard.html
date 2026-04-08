@@ -297,7 +297,13 @@
                 aqiBadge.textContent   = 'AQI: —';
                 aqiBadge.className     = 'aqi-badge aqi-offline';
                 pmDiv.innerHTML        = '';
-                ts.textContent         = 'No data received';
+                if (data && data.last_seen) {
+                    const lastSeen = new Date(data.last_seen).toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' });
+                    const secAgo = Math.floor((Date.now() - new Date(data.last_seen).getTime()) / 1000);
+                    ts.textContent = `Last seen: ${lastSeen} (${secAgo}s ago)`;
+                } else {
+                    ts.textContent = 'No data received';
+                }
                 if (ackBtn) ackBtn.style.display = 'none';
                 return;
             }
@@ -366,7 +372,11 @@
                 <span class="pm-chip">PM10: ${parseFloat(data.pm10 || 0).toFixed(1)} µg/m³</span>
             `;
 
-            ts.textContent = `Last reading: ${recordedAt}`;
+            const secondsAgo = data.recorded_at
+                ? Math.floor((Date.now() - new Date(data.recorded_at).getTime()) / 1000)
+                : null;
+            const freshness = secondsAgo === null ? '' : secondsAgo < 15 ? ' ✅' : secondsAgo < 30 ? ' ⚠️' : ' ❌';
+            ts.textContent = `Last reading: ${recordedAt}${freshness}`;
         }
 
         // ── FETCH LIVE SENSOR DATA ─────────────────────────────
@@ -380,7 +390,7 @@
                 });
 
                 document.getElementById('last-updated-bar').textContent =
-                    `Last updated: ${new Date().toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' })} — Auto-refreshes every 10 seconds`;
+                    `Last updated: ${new Date().toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' })} — Auto-refreshes every 5 seconds`;
 
             } catch(err) {
                 document.getElementById('last-updated-bar').textContent = 'Connection error — retrying…';
@@ -394,11 +404,13 @@
                 if (!data || !data.success) return;
 
                 data.data.forEach(event => {
-                    // Only show staff modal for new events they haven't seen
-                    if (isStaff && !seenEventIds.has(event.id)) {
+                    // Show staff modal for new events (staff AND admin see alerts)
+                    if (!seenEventIds.has(event.id)) {
                         seenEventIds.add(event.id);
                         localStorage.setItem('fz-seen-events', JSON.stringify([...seenEventIds]));
-                        showStaffModal(event.location_name, event.id);
+                        if (isStaff) {
+                            showStaffModal(event.location_name, event.id);
+                        }
                     }
                 });
 
@@ -501,21 +513,12 @@
         // ── START POLLING ──────────────────────────────────────
         fetchLiveData();
 
-        // Single interval — 5s for Admin, 10s for Staff/others. No duplicate calls.
-        const pollInterval = isAdmin ? 5000 : 10000;
-        setInterval(fetchLiveData, pollInterval);
+        // All users poll every 5 seconds for fast response
+        setInterval(fetchLiveData, 5000);
 
-        // Staff: poll for open events every 8 seconds
-        if (isStaff) {
-            fetchOpenEvents();
-            setInterval(fetchOpenEvents, 8000);
-        }
-
-        // Admin: poll open events at same rate as live data
-        if (isAdmin) {
-            fetchOpenEvents();
-            setInterval(fetchOpenEvents, 5000);
-        }
+        // All roles poll open events every 5 seconds
+        fetchOpenEvents();
+        setInterval(fetchOpenEvents, 5000);
 
         // ── HOTKEYS ────────────────────────────────────────────
         initHotkeys('dashboard');
