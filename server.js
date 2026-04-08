@@ -49,6 +49,7 @@ app.use('/api/readings', require('./api/readings'));
 app.use('/api/history',  require('./api/history'));
 app.use('/api/profile',  require('./api/profile'));
 app.use('/api/contact',  require('./api/contact'));
+app.use('/api/push',     require('./api/push'));
 
 // Fix for the 404 on Dashboard Stats
 app.get('/api/stats/dashboard', async (req, res) => {

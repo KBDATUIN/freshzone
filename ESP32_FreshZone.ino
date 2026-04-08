@@ -33,7 +33,7 @@ HardwareSerial pmsSerial(2);
 #define GREEN_PIN 32
 
 // ── Timing ───────────────────────────────────────────────────
-#define SEND_INTERVAL_MS  10000   // Send to server every 10 seconds
+#define SEND_INTERVAL_MS  5000    // Send to server every 5 seconds
 #define READ_INTERVAL_MS   1000   // Read sensor every 1 second
 
 unsigned long lastSendTime = 0;

@@ -6,6 +6,7 @@ const router   = express.Router();
 const db       = require('../db');
 const { authMiddleware, adminOnly } = require('../middleware/auth');
 const { sendAlertEmail } = require('../mailer');
+const { sendPushToAll } = require('./push');
 
 // ── Helper: calculate AQI from PM2.5 (US EPA formula) ────────
 function calculateAQI(pm25) {
@@ -105,6 +106,17 @@ router.post('/', async (req, res) => {
                         );
                     }
                 }
+            }
+
+            // Send Web Push to all subscribed users
+            try {
+                await sendPushToAll(
+                    '🚨 Vape/Smoke Detected!',
+                    `Alert at ${node.location_name} — PM2.5: ${pm2_5} µg/m³ (${category})`,
+                    '/dashboard.html'
+                );
+            } catch (pushErr) {
+                console.warn('[push] Web push failed:', pushErr.message);
             }
         }
 
