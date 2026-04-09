@@ -338,6 +338,52 @@
 
     loadProfile();
     initHotkeys('profile');
+
+    // ── PUSH NOTIFICATION STATE ────────────────────────────
+    function updatePushBtn(subscribed) {
+        const toggle = document.getElementById('push-btn');
+        const label  = document.getElementById('push-label');
+        if (toggle) { subscribed ? toggle.classList.add('active') : toggle.classList.remove('active'); }
+        if (label)  { label.textContent = subscribed ? 'ON' : 'OFF'; label.style.color = subscribed ? 'var(--secondary)' : '#999'; }
+    }
+
+    async function togglePushNotifications() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            alert('Push notifications are not supported in this browser.'); return;
+        }
+        const reg = await navigator.serviceWorker.ready;
+        const existing = await reg.pushManager.getSubscription();
+        if (existing) {
+            await existing.unsubscribe();
+            await fetch('/push/unsubscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ endpoint: existing.endpoint }) });
+            updatePushBtn(false);
+        } else {
+            const keyData = await fetch('/push/vapid-public-key').then(r => r.json());
+            const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) });
+            await fetch('/push/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ subscription: sub }) });
+            updatePushBtn(true);
+        }
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const output = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; i++) output[i] = rawData.charCodeAt(i);
+        return output;
+    }
+
+    // Check existing subscription on load
+    (async () => {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            try {
+                const reg = await navigator.serviceWorker.ready;
+                const sub = await reg.pushManager.getSubscription();
+                if (sub) updatePushBtn(true);
+            } catch(e) {}
+        }
+    })();
 </script>
 </body>
 </html>
