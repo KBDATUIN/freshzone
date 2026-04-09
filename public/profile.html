@@ -20,7 +20,8 @@
             <a href="profile.html" class="active">Profile</a>
             <a href="contact.html">Contact</a>
             <a href="#" onclick="openLogoutModal();return false;">Logout</a>
-            <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+                <button id="push-btn" onclick="togglePushNotifications()" title="Toggle push notifications" style="display:flex;align-items:center;gap:5px;background:transparent;border:1.5px solid var(--secondary);border-radius:20px;padding:4px 12px;cursor:pointer;font-size:0.78rem;color:var(--secondary);font-weight:500;white-space:nowrap;transition:all 0.2s;">🔔 <span id="push-label">Notify Me</span></button>
         </div>
         <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
             <span></span><span></span><span></span>

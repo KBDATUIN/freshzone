@@ -89,7 +89,8 @@
                 <a href="profile.html">Profile</a>
                 <a href="contact.html">Contact</a>
                 <a href="#" onclick="openLogoutModal();return false;">Logout</a>
-                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">⏾</button>
+                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+                <button id="push-btn" onclick="togglePushNotifications()" title="Toggle push notifications" style="display:flex;align-items:center;gap:5px;background:transparent;border:1.5px solid var(--secondary);border-radius:20px;padding:4px 12px;cursor:pointer;font-size:0.78rem;color:var(--secondary);font-weight:500;white-space:nowrap;transition:all 0.2s;">🔔 <span id="push-label">Notify Me</span></button>
             </div>
             <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
                 <span></span><span></span><span></span>
@@ -105,6 +106,7 @@
             <a href="profile.html">👤 Profile</a>
             <a href="contact.html">✉️ Contact</a>
             <a href="#" onclick="openLogoutModal();closeMobileNav();return false;">🚪 Logout</a>
+            <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn">🔔 Notify Me</a>
         </div>
     </div>
 
@@ -315,6 +317,67 @@
         }
 
                 loadHistory();
+        
+        // ── WEB PUSH NOTIFICATIONS ────────────────────────────
+        let pushSubscription = null;
+
+        async function initPushNotifications() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+            try {
+                const reg = await navigator.serviceWorker.register('/sw.js');
+                const existing = await reg.pushManager.getSubscription();
+                if (existing) { pushSubscription = existing; updatePushBtn(true); }
+            } catch (err) { console.warn('[push] SW registration failed:', err.message); }
+        }
+
+        async function togglePushNotifications() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                showNotification('Push notifications not supported in this browser.', 'error'); return;
+            }
+            const reg = await navigator.serviceWorker.ready;
+            if (pushSubscription) {
+                await pushSubscription.unsubscribe();
+                try { await apiFetch('/push/unsubscribe', { method: 'DELETE', body: JSON.stringify({ endpoint: pushSubscription.endpoint }) }); } catch(e){}
+                pushSubscription = null; updatePushBtn(false);
+                showNotification('Push notifications disabled.', 'info');
+            } else {
+                try {
+                    const keyData = await apiFetch('/push/vapid-public-key');
+                    if (!keyData || !keyData.publicKey) { showNotification('Push service not configured.', 'error'); return; }
+                    const permission = await Notification.requestPermission();
+                    if (permission !== 'granted') { showNotification('Please allow notifications in your browser settings.', 'error'); return; }
+                    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) });
+                    pushSubscription = sub;
+                    await apiFetch('/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription: sub }) });
+                    updatePushBtn(true);
+                    showNotification('🔔 Notifications enabled! You will be alerted when vape is detected.', 'success', 5000);
+                } catch (err) { showNotification('Failed to enable notifications. Try again.', 'error'); }
+            }
+        }
+
+        function updatePushBtn(subscribed) {
+            const btn = document.getElementById('push-btn');
+            const lbl = document.getElementById('push-label');
+            const mobileBtn = document.getElementById('mobile-push-btn');
+            if (btn) {
+                btn.style.background = subscribed ? 'var(--secondary)' : 'transparent';
+                btn.style.color = subscribed ? 'white' : 'var(--secondary)';
+            }
+            if (lbl) lbl.textContent = subscribed ? 'ON' : 'Notify Me';
+            if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+            return outputArray;
+        }
+
+        initPushNotifications();
+
         initHotkeys('history');
     </script>
 </body>
