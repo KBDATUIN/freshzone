@@ -276,15 +276,28 @@ async function togglePushNotifications() {
 }
 
 function updatePushBtn(subscribed) {
-    const btn      = document.getElementById('push-btn');
-    const lbl      = document.getElementById('push-label');
+    const btn       = document.getElementById('push-btn');
+    const lbl       = document.getElementById('push-label');
     const mobileBtn = document.getElementById('mobile-push-btn');
+
     if (btn) {
-        btn.style.background = subscribed ? 'var(--secondary)' : 'transparent';
-        btn.style.color      = subscribed ? 'white' : 'var(--secondary)';
+        // Toggle the .active class — CSS handles knob animation and color
+        if (subscribed) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+        // Clear any inline styles that override the CSS
+        btn.style.background = '';
+        btn.style.color = '';
     }
-    if (lbl) lbl.textContent = subscribed ? 'ON' : 'Notify Me';
-    if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
+    if (lbl) {
+        lbl.textContent = subscribed ? 'ON' : 'OFF';
+        lbl.style.color = subscribed ? 'var(--secondary)' : '#aaa';
+    }
+    if (mobileBtn) {
+        mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
+    }
 }
 
 function urlBase64ToUint8Array(base64String) {
