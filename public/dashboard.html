@@ -143,6 +143,7 @@
                 <a href="contact.html">Contact</a>
                 <a href="#" onclick="openLogoutModal();return false;">Logout</a>
                 <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+                <button id="push-btn" onclick="togglePushNotifications()" title="Enable push notifications" style="background:transparent;border:1.5px solid var(--secondary);border-radius:8px;padding:0.3rem 0.75rem;cursor:pointer;font-size:0.82rem;color:var(--secondary);font-weight:500;transition:all 0.2s;">🔔 Notify Me</button>
             </div>
             <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false">
                 <span></span><span></span><span></span>
@@ -158,6 +159,7 @@
             <a href="profile.html">👤 Profile</a>
             <a href="contact.html">✉️ Contact</a>
             <a href="#" onclick="openLogoutModal();closeMobileNav();return false;">🚪 Logout</a>
+            <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn">🔔 Notify Me</a>
         </div>
     </div>
 
@@ -605,15 +607,21 @@
 
         function updatePushBtn(subscribed) {
             const btn = document.getElementById('push-btn');
-            if (!btn) return;
-            if (subscribed) {
-                btn.textContent = '🔔 Notifications ON';
-                btn.style.background = 'var(--secondary)';
-                btn.style.color = 'white';
-            } else {
-                btn.textContent = '🔔 Notify Me';
-                btn.style.background = 'transparent';
-                btn.style.color = 'var(--secondary)';
+            const mobileBtn = document.getElementById('mobile-push-btn');
+            if (btn) {
+                if (subscribed) {
+                    btn.textContent = '🔔 ON';
+                    btn.style.background = 'var(--secondary)';
+                    btn.style.color = 'white';
+                    btn.style.border = '1.5px solid var(--secondary)';
+                } else {
+                    btn.textContent = '🔔 Notify Me';
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--secondary)';
+                }
+            }
+            if (mobileBtn) {
+                mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
             }
         }
 
