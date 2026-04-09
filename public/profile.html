@@ -21,7 +21,13 @@
             <a href="contact.html">Contact</a>
             <a href="#" onclick="openLogoutModal();return false;">Logout</a>
                 <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
-                <button id="push-btn" onclick="togglePushNotifications()" title="Toggle push notifications" style="display:flex;align-items:center;gap:5px;background:transparent;border:1.5px solid var(--secondary);border-radius:20px;padding:4px 12px;cursor:pointer;font-size:0.78rem;color:var(--secondary);font-weight:500;white-space:nowrap;transition:all 0.2s;">🔔 <span id="push-label">Notify Me</span></button>
+                <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
+                    <span class="push-toggle-icon">🔔</span>
+                    <div class="push-toggle-switch" id="push-btn" onclick="togglePushNotifications()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')togglePushNotifications()">
+                        <div class="push-toggle-knob"></div>
+                    </div>
+                    <span class="push-toggle-label" id="push-label">OFF</span>
+                </label>
         </div>
         <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
             <span></span><span></span><span></span>
