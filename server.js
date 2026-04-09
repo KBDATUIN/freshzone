@@ -6,30 +6,62 @@ const express    = require('express');
 const cors       = require('cors');
 const path       = require('path');
 const cron       = require('node-cron');
-const db         = require('./db'); // Database import at the top
+const rateLimit  = require('express-rate-limit');
+const db         = require('./db');
 const { sendAlertEmail } = require('./mailer');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ── MIDDLEWARE ────────────────────────────────────────────────
-// Required: ngrok intercepts requests and shows a browser warning page
-// unless we set this header — this bypasses it for all responses.
+// ── SECURITY HEADERS ─────────────────────────────────────────
 app.use((req, res, next) => {
     res.setHeader('ngrok-skip-browser-warning', 'true');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     next();
 });
 
+// ── RATE LIMITING ────────────────────────────────────────────
+const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 200,
+    message: { success: false, message: 'Too many requests, please try again later.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: { success: false, message: 'Too many login attempts, please try again later.' },
+});
+
+const pushLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 5,
+    message: { success: false, message: 'Too many subscription requests.' },
+});
+
+const esp32Limiter = rateLimit({
+    windowMs: 10 * 1000, // 10 seconds
+    max: 10,
+    message: { success: false, message: 'Too many readings.' },
+});
+
+app.use(generalLimiter);
+
+// ── CORS ─────────────────────────────────────────────────────
 app.use(cors({
     origin: function(origin, callback) {
         const allowed = [
             process.env.FRONTEND_URL,
-            'https://unreceptive-pseudocharitable-jorge.ngrok-free.dev',
             'http://localhost:3000',
             'http://localhost:5500',
             'http://127.0.0.1:5500',
         ].filter(Boolean);
-        if (!origin || allowed.includes(origin) || /ngrok/.test(origin)) {
+        if (!origin || allowed.includes(origin) || /ngrok/.test(origin) || /railway\.app/.test(origin)) {
             callback(null, true);
         } else {
             callback(null, true); // dev fallback
@@ -37,50 +69,46 @@ app.use(cors({
     },
     credentials: true,
 }));
-app.use(express.json({ limit: '5mb' }));
+
+app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from /public
+// ── STATIC FILES ─────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── API ROUTES ────────────────────────────────────────────────
-app.use('/api/auth',     require('./api/auth'));
-app.use('/api/readings', require('./api/readings'));
-app.use('/api/history',  require('./api/history'));
-app.use('/api/profile',  require('./api/profile'));
-app.use('/api/contact',  require('./api/contact'));
-app.use('/api/push',     require('./api/push'));
+app.use('/api/auth',     authLimiter,  require('./api/auth'));
+app.use('/api/readings', esp32Limiter, require('./api/readings'));
+app.use('/api/history',               require('./api/history'));
+app.use('/api/profile',               require('./api/profile'));
+app.use('/api/contact',               require('./api/contact'));
+app.use('/api/push',     pushLimiter,  require('./api/push'));
 
-// Fix for the 404 on Dashboard Stats
+// ── DASHBOARD STATS ───────────────────────────────────────────
 app.get('/api/stats/dashboard', async (req, res) => {
     try {
-        const [nodes] = await db.query("SELECT COUNT(*) as count FROM sensor_nodes");
+        const [nodes]  = await db.query("SELECT COUNT(*) as count FROM sensor_nodes");
         const [events] = await db.query("SELECT COUNT(*) as count FROM detection_events WHERE event_status = 'Detected'");
         const [recent] = await db.query("SELECT * FROM v_open_events LIMIT 5");
-
-        res.json({
-            success: true,
-            totalNodes: nodes[0].count,
-            activeAlerts: events[0].count,
-            recentEvents: recent
-        });
+        res.json({ success: true, totalNodes: nodes[0].count, activeAlerts: events[0].count, recentEvents: recent });
     } catch (err) {
         console.error('Stats error:', err);
         res.status(500).json({ success: false, message: 'Database error' });
     }
 });
 
-// Health Check
+// ── HEALTH CHECK ─────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// ── FALLBACK (Keep this BELOW all API routes) ────────────────
+// ── FALLBACK ─────────────────────────────────────────────────
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'auth.html'));
 });
 
 // ── SCHEDULED JOBS ────────────────────────────────────────────
+// Send pending email notifications every 5 minutes
 cron.schedule('*/5 * * * *', async () => {
     try {
         const [pending] = await db.query(
@@ -100,8 +128,34 @@ cron.schedule('*/5 * * * *', async () => {
     } catch (err) { console.error('Cron fail:', err); }
 });
 
+// Escalation: Re-notify if alert unacknowledged for 5+ minutes
+cron.schedule('*/5 * * * *', async () => {
+    try {
+        const [unacked] = await db.query(
+            `SELECT de.*, sn.location_name FROM detection_events de
+             JOIN sensor_nodes sn ON sn.id = de.node_id
+             WHERE de.event_status = 'Detected'
+             AND de.detected_at < DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+             AND (de.last_escalated_at IS NULL OR de.last_escalated_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE))`
+        );
+        for (const event of unacked) {
+            try {
+                const [admins] = await db.query(
+                    "SELECT full_name, email FROM accounts WHERE position = 'Administrator' AND is_active = 1"
+                );
+                for (const admin of admins) {
+                    await sendAlertEmail(admin.email, admin.full_name, event.location_name, event.pm2_5_value, event.aqi_category);
+                }
+                await db.query("UPDATE detection_events SET last_escalated_at=NOW() WHERE id=?", [event.id]);
+                console.log(`[escalation] Re-notified for event #${event.id}`);
+            } catch(e) { console.error('[escalation] Error:', e.message); }
+        }
+    } catch (err) { console.error('Escalation cron fail:', err); }
+});
+
+// Cleanup old login attempts every hour
 cron.schedule('0 * * * *', async () => {
-    try { await db.query("DELETE FROM login_attempts WHERE attempted_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)"); } 
+    try { await db.query("DELETE FROM login_attempts WHERE attempted_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)"); }
     catch (err) { console.error('Cleanup fail:', err); }
 });
 

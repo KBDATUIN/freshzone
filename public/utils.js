@@ -223,3 +223,101 @@ document.addEventListener('DOMContentLoaded', () => {
     initSessionTimeout();
     runEntranceAnimations();
 });
+
+// ── WEB PUSH NOTIFICATIONS (shared across all pages) ─────────
+let _pushSubscription = null;
+
+async function initPushNotifications() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    try {
+        const reg = await navigator.serviceWorker.register('/sw.js');
+        const existing = await reg.pushManager.getSubscription();
+        if (existing) { _pushSubscription = existing; updatePushBtn(true); }
+    } catch (err) { console.warn('[push] SW init failed:', err.message); }
+}
+
+async function togglePushNotifications() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        showNotification('Push notifications not supported in this browser.', 'error'); return;
+    }
+    const reg = await navigator.serviceWorker.ready;
+    if (_pushSubscription) {
+        try {
+            await _pushSubscription.unsubscribe();
+            await apiFetch('/push/unsubscribe', { method: 'DELETE', body: JSON.stringify({ endpoint: _pushSubscription.endpoint }) });
+        } catch(e) {}
+        _pushSubscription = null;
+        updatePushBtn(false);
+        showNotification('Push notifications disabled.', 'info');
+    } else {
+        try {
+            // Check if previously blocked
+            if (Notification.permission === 'denied') {
+                showNotification('Notifications are blocked. Please enable them in your browser settings (🔒 icon in address bar).', 'error', 6000);
+                return;
+            }
+            const keyData = await apiFetch('/push/vapid-public-key');
+            if (!keyData || !keyData.publicKey) { showNotification('Push service not configured.', 'error'); return; }
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                showNotification('Notification permission denied. Click the 🔒 icon in your browser address bar to allow.', 'error', 6000);
+                return;
+            }
+            const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) });
+            _pushSubscription = sub;
+            await apiFetch('/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription: sub }) });
+            updatePushBtn(true);
+            showNotification('🔔 Notifications enabled! You will be alerted when vape is detected.', 'success', 5000);
+        } catch (err) {
+            console.error('[push] Error:', err);
+            showNotification('Failed to enable notifications. Try again.', 'error');
+        }
+    }
+}
+
+function updatePushBtn(subscribed) {
+    const btn      = document.getElementById('push-btn');
+    const lbl      = document.getElementById('push-label');
+    const mobileBtn = document.getElementById('mobile-push-btn');
+    if (btn) {
+        btn.style.background = subscribed ? 'var(--secondary)' : 'transparent';
+        btn.style.color      = subscribed ? 'white' : 'var(--secondary)';
+    }
+    if (lbl) lbl.textContent = subscribed ? 'ON' : 'Notify Me';
+    if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
+}
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const output  = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) output[i] = rawData.charCodeAt(i);
+    return output;
+}
+
+// ── LOADING STATE HELPERS ─────────────────────────────────────
+function showCardLoading(cardId) {
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;padding:1rem;">
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--gray);opacity:0.5;animation:pulse-dot 1.2s infinite;"></div>
+            <span style="color:var(--gray);font-size:0.9rem;">Loading sensor data…</span>
+        </div>`;
+}
+
+function showAPIError(message = 'Connection error. Retrying…') {
+    const bar = document.getElementById('last-updated-bar');
+    if (bar) { bar.textContent = '⚠️ ' + message; bar.style.color = 'var(--danger)'; }
+}
+
+function clearAPIError() {
+    const bar = document.getElementById('last-updated-bar');
+    if (bar) { bar.style.color = ''; }
+}
+
+// Auto-init push on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    initPushNotifications();
+});
