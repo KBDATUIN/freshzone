@@ -75,7 +75,7 @@
         .push-toggle-switch.active { background:var(--secondary,#00c896); }
         .push-toggle-knob { position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left 0.25s; }
         .push-toggle-switch.active .push-toggle-knob { left:20px; }
-        .push-toggle-label { font-size:0.72rem;font-weight:700;color:var(--secondary,#00c896);letter-spacing:0.04em;min-width:22px; }
+        .push-toggle-label { display:none; }
     </style>
 </head>
 <body>
@@ -334,6 +334,66 @@
 
                 loadHistory();
         
+        // ── WEB PUSH NOTIFICATIONS ────────────────────────────
+        let pushSubscription = null;
+
+        async function initPushNotifications() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+            try {
+                const reg = await navigator.serviceWorker.register('/sw.js');
+                const existing = await reg.pushManager.getSubscription();
+                if (existing) { pushSubscription = existing; updatePushBtn(true); }
+            } catch (err) { console.warn('[push] SW registration failed:', err.message); }
+        }
+
+        async function togglePushNotifications() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                showNotification('Push notifications not supported in this browser.', 'error'); return;
+            }
+            const reg = await navigator.serviceWorker.ready;
+            if (pushSubscription) {
+                await pushSubscription.unsubscribe();
+                try { await apiFetch('/push/unsubscribe', { method: 'DELETE', body: JSON.stringify({ endpoint: pushSubscription.endpoint }) }); } catch(e){}
+                pushSubscription = null; updatePushBtn(false);
+                showNotification('Push notifications disabled.', 'info');
+            } else {
+                try {
+                    const keyData = await apiFetch('/push/vapid-public-key');
+                    if (!keyData || !keyData.publicKey) { showNotification('Push service not configured.', 'error'); return; }
+                    const permission = await Notification.requestPermission();
+                    if (permission !== 'granted') { showNotification('Please allow notifications in your browser settings.', 'error'); return; }
+                    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) });
+                    pushSubscription = sub;
+                    await apiFetch('/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription: sub }) });
+                    updatePushBtn(true);
+                    showNotification('🔔 Notifications enabled! You will be alerted when vape is detected.', 'success', 5000);
+                } catch (err) { showNotification('Failed to enable notifications. Try again.', 'error'); }
+            }
+        }
+
+        function updatePushBtn(subscribed) {
+            const btn = document.getElementById('push-btn');
+            const lbl = document.getElementById('push-label');
+            const mobileBtn = document.getElementById('mobile-push-btn');
+            if (btn) { subscribed ? btn.classList.add('active') : btn.classList.remove('active'); }
+            if (btn) {
+                btn.style.background = subscribed ? 'var(--secondary)' : 'transparent';
+                btn.style.color = subscribed ? 'white' : 'var(--secondary)';
+            }
+            if (lbl) { lbl.textContent = subscribed ? 'ON' : 'OFF'; lbl.style.color = subscribed ? 'var(--secondary)' : '#999'; }
+            if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+            return outputArray;
+        }
+
+        initPushNotifications();
 
         initHotkeys('history');
     </script>
