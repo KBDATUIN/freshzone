@@ -15,8 +15,9 @@ async function apiFetch(endpoint, options = {}) {
     };
     const res = await fetch(`${API}/api${endpoint}`, { ...options, headers });
 
-    // If 401/403 → token expired, redirect to login
-    if (res.status === 401 || res.status === 403) {
+    // Only logout on 401 (token expired/missing) — NOT on 403 (permission denied)
+    // 403 means the user is logged in but lacks permission (e.g. staff trying admin action)
+    if (res.status === 401) {
         localStorage.removeItem('fz-token');
         localStorage.removeItem('currentUser');
         window.location.href = 'auth.html';
@@ -279,15 +280,9 @@ function updatePushBtn(subscribed) {
     const btn       = document.getElementById('push-btn');
     const lbl       = document.getElementById('push-label');
     const mobileBtn = document.getElementById('mobile-push-btn');
-
     if (btn) {
-        // Toggle the .active class — CSS handles knob animation and color
-        if (subscribed) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-        // Clear any inline styles that override the CSS
+        if (subscribed) btn.classList.add('active');
+        else btn.classList.remove('active');
         btn.style.background = '';
         btn.style.color = '';
     }
@@ -295,9 +290,7 @@ function updatePushBtn(subscribed) {
         lbl.textContent = subscribed ? 'ON' : 'OFF';
         lbl.style.color = subscribed ? 'var(--secondary)' : '#aaa';
     }
-    if (mobileBtn) {
-        mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
-    }
+    if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
 }
 
 function urlBase64ToUint8Array(base64String) {

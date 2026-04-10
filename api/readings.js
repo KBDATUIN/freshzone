@@ -192,3 +192,37 @@ router.post('/acknowledge/:eventId', authMiddleware, adminOnly, async (req, res)
 });
 
 module.exports = router;
+
+// ── POST /api/readings/resolve/:eventId ──────────────────────
+// Staff or Admin marks alert as fully resolved/success
+router.post('/resolve/:eventId', authMiddleware, async (req, res) => {
+    const { eventId } = req.params;
+    const { notes }   = req.body;
+
+    if (!Number.isInteger(Number(eventId))) {
+        return res.status(400).json({ success: false, message: 'Invalid event ID.' });
+    }
+
+    try {
+        await db.query(
+            `UPDATE detection_events
+             SET event_status = 'Cleared',
+                 acknowledged_at = COALESCE(acknowledged_at, NOW()),
+                 acknowledged_by = COALESCE(acknowledged_by, ?),
+                 notes = COALESCE(notes, ?)
+             WHERE id = ?`,
+            [req.user.id, notes || null, eventId]
+        );
+
+        await db.query(
+            `INSERT INTO system_logs (account_id, action, description, ip_address)
+             VALUES (?, 'Alert Resolved', ?, ?)`,
+            [req.user.id, `Event #${eventId} resolved/cleared by ${req.user.name}`, req.ip]
+        );
+
+        res.json({ success: true, message: 'Alert marked as resolved.' });
+    } catch (err) {
+        console.error('[resolve] Error:', err.message);
+        res.status(500).json({ success: false, message: 'Server error.' });
+    }
+});

@@ -50,6 +50,14 @@
         }
         .ack-btn:hover { background:#c0392b; transform:scale(1.02); }
 
+        /* ── RESOLVE BUTTON (staff + admin) ───────────────── */
+        .resolve-btn {
+            margin-top:8px; padding:8px 20px; background:#27ae60; color:white;
+            border:none; border-radius:8px; font-weight:600; cursor:pointer;
+            font-size:0.85rem; transition:all 0.2s; width:100%;
+        }
+        .resolve-btn:hover { background:#1e8449; transform:scale(1.02); }
+
         /* ── STAFF VIEW ONLY INDICATOR ────────────────────── */
         .staff-alert-bar {
             display:none; background:#fff3cd; border:1px solid #ffc107;
@@ -248,6 +256,10 @@
                 <button class="ack-btn" id="ack-zone1" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE1','4th Floor Male CR')">
                     ✔ Acknowledge Alert
                 </button>
+                <!-- Resolve button — shown to staff AND admin after acknowledged -->
+                <button class="resolve-btn" id="resolve-zone1" style="display:none;" onclick="resolveAlert('ESP32-ZONE1','4th Floor Male CR')">
+                    ✅ Mark as Resolved
+                </button>
             </div>
 
             <!-- ZONE 2: 4th Floor Female CR -->
@@ -264,6 +276,10 @@
                 <button class="ack-btn" id="ack-zone2" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE2','4th Floor Female CR')">
                     ✔ Acknowledge Alert
                 </button>
+                <!-- Resolve button — shown to staff AND admin after acknowledged -->
+                <button class="resolve-btn" id="resolve-zone2" style="display:none;" onclick="resolveAlert('ESP32-ZONE2','4th Floor Female CR')">
+                    ✅ Mark as Resolved
+                </button>
             </div>
 
         </div>
@@ -275,8 +291,8 @@
             <h3 id="staff-modal-title">🚨 Vape / Smoke Detected</h3>
             <span class="location-tag" id="staff-modal-location">—</span>
             <p id="staff-modal-text">An alert has been detected in your area. Please proceed to the location for inspection immediately.</p>
-            <button class="staff-respond-btn" onclick="staffRespond()">✅ I Understand — On My Way</button>
-            <button class="staff-dismiss-btn" onclick="dismissStaffModal()">Dismiss</button>
+            <button class="staff-respond-btn" onclick="staffRespond()">✅ On My Way — Mark Responded</button>
+            <button class="staff-dismiss-btn" onclick="dismissStaffModal()">✕ Dismiss (Alert stays open)</button>
         </div>
     </div>
 
@@ -314,9 +330,11 @@
 
         // Zone code → card element mapping
         const ZONES = {
-            'ESP32-ZONE1': { card:'card-zone1', dot:'dot-zone1', statusText:'status-text-zone1', aqi:'aqi-zone1', pm:'pm-zone1', ts:'ts-zone1', ackBtn:'ack-zone1' },
-            'ESP32-ZONE2': { card:'card-zone2', dot:'dot-zone2', statusText:'status-text-zone2', aqi:'aqi-zone2', pm:'pm-zone2', ts:'ts-zone2', ackBtn:'ack-zone2' },
+            'ESP32-ZONE1': { card:'card-zone1', dot:'dot-zone1', statusText:'status-text-zone1', aqi:'aqi-zone1', pm:'pm-zone1', ts:'ts-zone1', ackBtn:'ack-zone1', resolveBtn:'resolve-zone1' },
+            'ESP32-ZONE2': { card:'card-zone2', dot:'dot-zone2', statusText:'status-text-zone2', aqi:'aqi-zone2', pm:'pm-zone2', ts:'ts-zone2', ackBtn:'ack-zone2', resolveBtn:'resolve-zone2' },
         };
+        // Track event IDs per zone for resolve
+        const zoneEventIds = {};
 
         // Track which zones currently have active alerts
         const activeAlerts = {};
@@ -366,6 +384,8 @@
             const recordedAt = data.recorded_at ? new Date(data.recorded_at).toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' }) : '—';
 
             // Update status
+            const resolveBtn = z.resolveBtn ? document.getElementById(z.resolveBtn) : null;
+
             if (smoke && !acknowledgedZones.has(zoneCode)) {
                 card.className = 'location-card detecting';
                 dot.className  = 'status-dot dot-detecting';
@@ -375,24 +395,25 @@
                 aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
 
                 // Show acknowledge button for admin only
-                if (isAdmin && ackBtn) {
-                    ackBtn.style.display = 'block';
-                    ackBtn.disabled = false;
-                }
-
+                if (isAdmin && ackBtn) { ackBtn.style.display = 'block'; ackBtn.disabled = false; }
+                if (resolveBtn) resolveBtn.style.display = 'none';
                 activeAlerts[zoneCode] = true;
+
             } else if (smoke && acknowledgedZones.has(zoneCode)) {
-                // Already acknowledged — show as clear even if ESP32 still reading high
+                // Acknowledged — show resolve button for everyone
                 card.className = 'location-card clear';
                 dot.className  = 'status-dot dot-clear';
-                statusText.innerHTML = '● Acknowledged';
-                statusText.style.color = 'var(--success)';
+                statusText.innerHTML = '● Acknowledged — Awaiting Resolution';
+                statusText.style.color = '#f39c12';
                 aqiBadge.className = 'aqi-badge aqi-moderate';
                 aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
                 if (ackBtn) ackBtn.style.display = 'none';
+                // Show resolve button for ALL logged-in users
+                if (resolveBtn) resolveBtn.style.display = 'block';
                 activeAlerts[zoneCode] = false;
+
             } else {
-                // Sensor is genuinely clear or offline — remove from acknowledged set
+                // Sensor is genuinely clear — remove from acknowledged set
                 if (acknowledgedZones.has(zoneCode)) {
                     acknowledgedZones.delete(zoneCode);
                     sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
@@ -402,17 +423,13 @@
                 statusText.innerHTML = '● Clear';
                 statusText.style.color = 'var(--success)';
 
-                // AQI color
-                if (aqi <= 50) {
-                    aqiBadge.className = 'aqi-badge aqi-good';
-                } else if (aqi <= 100) {
-                    aqiBadge.className = 'aqi-badge aqi-moderate';
-                } else {
-                    aqiBadge.className = 'aqi-badge aqi-alert';
-                }
+                if (aqi <= 50) aqiBadge.className = 'aqi-badge aqi-good';
+                else if (aqi <= 100) aqiBadge.className = 'aqi-badge aqi-moderate';
+                else aqiBadge.className = 'aqi-badge aqi-alert';
                 aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
 
                 if (ackBtn) ackBtn.style.display = 'none';
+                if (resolveBtn) resolveBtn.style.display = 'none';
                 activeAlerts[zoneCode] = false;
             }
 
@@ -434,17 +451,21 @@
         async function fetchLiveData() {
             try {
                 const data = await apiFetch('/readings/live');
-                if (!data || !data.success) return;
+                if (!data || !data.success) {
+                    showAPIError('Could not load sensor data.');
+                    return;
+                }
 
-                data.data.forEach(zone => {
-                    renderZone(zone.node_code, zone);
-                });
+                clearAPIError();
+                data.data.forEach(zone => renderZone(zone.node_code, zone));
 
-                document.getElementById('last-updated-bar').textContent =
-                    `Last updated: ${new Date().toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' })} — Auto-refreshes every 5 seconds`;
-
+                const bar = document.getElementById('last-updated-bar');
+                if (bar) {
+                    bar.textContent = `Last updated: ${new Date().toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' })} — Auto-refreshes every 5 seconds`;
+                    bar.style.color = '';
+                }
             } catch(err) {
-                document.getElementById('last-updated-bar').textContent = 'Connection error — retrying…';
+                showAPIError('Server unreachable — retrying in 5 seconds…');
             }
         }
 
@@ -454,14 +475,15 @@
                 const data = await apiFetch('/readings/open-events');
                 if (!data || !data.success) return;
 
+                // Store event IDs per zone for resolve
                 data.data.forEach(event => {
-                    // Show staff modal for new events (staff AND admin see alerts)
+                    if (event.node_code) zoneEventIds[event.node_code] = event.id;
+
+                    // Show staff modal for new events
                     if (!seenEventIds.has(event.id)) {
                         seenEventIds.add(event.id);
                         localStorage.setItem('fz-seen-events', JSON.stringify([...seenEventIds]));
-                        if (isStaff) {
-                            showStaffModal(event.location_name, event.id);
-                        }
+                        if (isStaff) showStaffModal(event.location_name, event.id);
                     }
                 });
 
@@ -502,18 +524,20 @@
                     acknowledgedZones.add(nodeCode);
                     sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
 
-                    // Update card immediately
+                    // Update card immediately — show resolve button
                     if (z) {
                         const card = document.getElementById(z.card);
                         const dot = document.getElementById(z.dot);
                         const statusText = document.getElementById(z.statusText);
+                        const resolveBtn = z.resolveBtn ? document.getElementById(z.resolveBtn) : null;
                         if (card) card.className = 'location-card clear';
                         if (dot) dot.className = 'status-dot dot-clear';
                         if (statusText) {
-                            statusText.innerHTML = '● Acknowledged';
-                            statusText.style.color = 'var(--success)';
+                            statusText.innerHTML = '● Acknowledged — Awaiting Resolution';
+                            statusText.style.color = '#f39c12';
                         }
                         if (ackBtn) ackBtn.style.display = 'none';
+                        if (resolveBtn) resolveBtn.style.display = 'block';
                     }
 
                     // Refresh after short delay
@@ -544,21 +568,85 @@
 
         async function staffRespond() {
             document.getElementById('staff-response-modal').classList.remove('open');
-            showNotification('Response recorded. Thank you for your quick action.', 'success');
+            showNotification('Response recorded. Thank you for your quick action!', 'success');
 
-            // Log response via API if event ID available
+            // Log that staff acknowledged — use acknowledge endpoint
+            // This does NOT require admin — staff can log their response
             if (currentStaffEventId) {
                 try {
-                    await apiFetch(`/readings/acknowledge/${currentStaffEventId}`, {
+                    // Use resolve endpoint which allows any authenticated user
+                    const result = await apiFetch(`/readings/resolve/${currentStaffEventId}`, {
                         method: 'POST',
                         body: JSON.stringify({ notes: `Staff responded: ${user.full_name || user.name}` })
                     });
-                } catch(err) {}
+                    if (result && result.success) {
+                        // Mark zone as acknowledged so resolve button appears
+                        for (const [nodeCode, eventId] of Object.entries(zoneEventIds)) {
+                            if (eventId === currentStaffEventId) {
+                                acknowledgedZones.add(nodeCode);
+                                sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
+                            }
+                        }
+                        setTimeout(() => { fetchLiveData(); fetchOpenEvents(); }, 1000);
+                    }
+                } catch(err) {
+                    console.warn('[staffRespond] Error:', err.message);
+                }
             }
         }
 
         function dismissStaffModal() {
+            // Just close modal — do NOT logout, do NOT redirect
             document.getElementById('staff-response-modal').classList.remove('open');
+        }
+
+        // ── RESOLVE ALERT (staff + admin) ─────────────────────
+        async function resolveAlert(nodeCode, locationName) {
+            const z = ZONES[nodeCode];
+            const resolveBtn = z ? document.getElementById(z.resolveBtn) : null;
+            const eventId = zoneEventIds[nodeCode];
+
+            if (!eventId) {
+                showNotification('No event ID found. Refresh and try again.', 'error');
+                return;
+            }
+
+            if (resolveBtn) { resolveBtn.disabled = true; resolveBtn.textContent = 'Resolving…'; }
+
+            try {
+                const result = await apiFetch(`/readings/resolve/${eventId}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ notes: `Resolved by ${user.full_name || user.name}` })
+                });
+
+                if (result && result.success) {
+                    showNotification(`✅ ${locationName} marked as resolved!`, 'success', 4000);
+
+                    // Remove from acknowledged set — zone is now fully clear
+                    acknowledgedZones.delete(nodeCode);
+                    sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
+                    delete zoneEventIds[nodeCode];
+
+                    // Update card to clear
+                    if (z) {
+                        const card = document.getElementById(z.card);
+                        const dot = document.getElementById(z.dot);
+                        const statusText = document.getElementById(z.statusText);
+                        if (card) card.className = 'location-card clear';
+                        if (dot) dot.className = 'status-dot dot-clear';
+                        if (statusText) { statusText.innerHTML = '● Resolved'; statusText.style.color = 'var(--success)'; }
+                        if (resolveBtn) resolveBtn.style.display = 'none';
+                    }
+
+                    setTimeout(() => { fetchLiveData(); fetchOpenEvents(); }, 1500);
+                } else {
+                    showNotification(result?.message || 'Failed to resolve. Try again.', 'error');
+                    if (resolveBtn) { resolveBtn.disabled = false; resolveBtn.textContent = '✅ Mark as Resolved'; }
+                }
+            } catch(err) {
+                showNotification('Connection error. Try again.', 'error');
+                if (resolveBtn) { resolveBtn.disabled = false; resolveBtn.textContent = '✅ Mark as Resolved'; }
+            }
         }
 
         // ── START POLLING ──────────────────────────────────────
@@ -573,120 +661,6 @@
 
         // ── HOTKEYS ────────────────────────────────────────────
 
-        // ── WEB PUSH NOTIFICATIONS ────────────────────────────
-        let pushSubscription = null;
-
-        async function initPushNotifications() {
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                console.log('Push notifications not supported');
-                return;
-            }
-
-            try {
-                // Register service worker
-                const reg = await navigator.serviceWorker.register('/sw.js');
-                console.log('[push] Service worker registered');
-
-                // Check if already subscribed
-                const existing = await reg.pushManager.getSubscription();
-                if (existing) {
-                    pushSubscription = existing;
-                    updatePushBtn(true);
-                    console.log('[push] Already subscribed');
-                }
-            } catch (err) {
-                console.warn('[push] SW registration failed:', err.message);
-            }
-        }
-
-        async function togglePushNotifications() {
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                showNotification('Push notifications are not supported in this browser.', 'error');
-                return;
-            }
-
-            const reg = await navigator.serviceWorker.ready;
-
-            if (pushSubscription) {
-                // Unsubscribe
-                await pushSubscription.unsubscribe();
-                await apiFetch('/push/unsubscribe', {
-                    method: 'DELETE',
-                    body: JSON.stringify({ endpoint: pushSubscription.endpoint })
-                });
-                pushSubscription = null;
-                updatePushBtn(false);
-                showNotification('Push notifications disabled.', 'info');
-            } else {
-                // Subscribe
-                try {
-                    // Get VAPID public key
-                    const keyData = await apiFetch('/push/vapid-public-key');
-                    if (!keyData || !keyData.publicKey) {
-                        showNotification('Push service not configured.', 'error');
-                        return;
-                    }
-
-                    const permission = await Notification.requestPermission();
-                    if (permission !== 'granted') {
-                        showNotification('Notification permission denied. Please allow in browser settings.', 'error');
-                        return;
-                    }
-
-                    const sub = await reg.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
-                    });
-
-                    pushSubscription = sub;
-
-                    await apiFetch('/push/subscribe', {
-                        method: 'POST',
-                        body: JSON.stringify({ subscription: sub })
-                    });
-
-                    updatePushBtn(true);
-                    showNotification('🔔 Push notifications enabled! You will be alerted when vape is detected.', 'success', 5000);
-                } catch (err) {
-                    console.error('[push] Subscribe error:', err);
-                    showNotification('Failed to enable notifications. Try again.', 'error');
-                }
-            }
-        }
-
-        function updatePushBtn(subscribed) {
-            const toggle = document.getElementById('push-btn');
-            const label  = document.getElementById('push-label');
-            const mobileBtn = document.getElementById('mobile-push-btn');
-            if (toggle) {
-                if (subscribed) {
-                    toggle.classList.add('active');
-                } else {
-                    toggle.classList.remove('active');
-                }
-            }
-            if (label) {
-                label.textContent = subscribed ? 'ON' : 'OFF';
-                label.style.color = subscribed ? 'var(--secondary)' : '#999';
-            }
-            if (mobileBtn) {
-                mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
-            }
-        }
-
-        function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
-            for (let i = 0; i < rawData.length; ++i) {
-                outputArray[i] = rawData.charCodeAt(i);
-            }
-            return outputArray;
-        }
-
-        // Initialize push on page load
-        initPushNotifications();
 
         initHotkeys('dashboard');
     </script>
