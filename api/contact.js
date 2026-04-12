@@ -9,14 +9,19 @@ const { authMiddleware, adminOnly } = require('../middleware/auth');
 // ── POST /api/contact ─────────────────────────────────────────
 // Any logged-in user can submit a ticket
 router.post('/', authMiddleware, async (req, res) => {
-    const { subject, message } = req.body;
-    const name  = req.body.name  || req.user.full_name || req.user.name;
-    const email = req.body.email || req.user.email;
+    const subject = typeof req.body.subject === 'string' ? req.body.subject.trim().slice(0, 200) : '';
+    const message = typeof req.body.message === 'string' ? req.body.message.trim().slice(0, 2000) : '';
+    const name    = (req.body.name || req.user.full_name || req.user.name || '').toString().slice(0, 100);
+    const email   = (req.body.email || req.user.email || '').toString().slice(0, 255);
 
-    if (!subject || !message)
-        return res.status(400).json({ success: false, message: 'Subject and message are required.' });
+    const validSubjects = ['Smoke Alert Feedback', 'Device Maintenance', 'General Suggestion', 'Bug Report', 'Other'];
+    if (!subject || !validSubjects.includes(subject))
+        return res.status(400).json({ success: false, message: 'Please select a valid subject.' });
 
-    if (message.trim().length < 10)
+    if (!message)
+        return res.status(400).json({ success: false, message: 'Message is required.' });
+
+    if (message.length < 10)
         return res.status(400).json({ success: false, message: 'Message is too short (min 10 characters).' });
 
     const ticketRef = 'TK-' + Date.now().toString().slice(-6);

@@ -8,29 +8,33 @@ const { authMiddleware, adminOnly } = require('../middleware/auth');
 
 // ── GET /api/history ──────────────────────────────────────────
 router.get('/', authMiddleware, async (req, res) => {
-    const { search, status, date, limit = 200 } = req.query;
+    const search = req.query.search ? String(req.query.search).slice(0, 100) : '';
+    const status = req.query.status ? String(req.query.status).slice(0, 30) : '';
+    const date   = req.query.date   ? String(req.query.date).slice(0, 10) : '';
+    const limit  = req.query.limit  || 200;
 
     try {
         let query = 'SELECT * FROM v_history_log WHERE 1=1';
         const params = [];
 
-        if (search) {
+        if (search.length > 0) {
             query += ' AND (location LIKE ? OR action LIKE ? OR handled_by LIKE ?)';
             const like = `%${search}%`;
             params.push(like, like, like);
         }
 
-        if (status) {
+        if (status.length > 0) {
             query += ' AND status = ?';
             params.push(status);
         }
 
-        if (date) {
+        if (date.length > 0) {
             query += ' AND DATE(datetime) = ?';
             params.push(date);
         }
 
-        query += ` ORDER BY datetime DESC LIMIT ${parseInt(limit)}`;
+        const safeLimit = Math.min(Math.max(parseInt(limit) || 200, 1), 500);
+        query += ` ORDER BY datetime DESC LIMIT ${safeLimit}`;
 
         const [rows] = await db.query(query, params);
         res.json({ success: true, data: rows });

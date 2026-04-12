@@ -48,7 +48,7 @@ function clearAllErrors() {
     document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
     document.querySelectorAll('.field-error-msg').forEach(el => el.textContent = '');
 }
-function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+function isValidEmail(email) { return /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/.test(email) && email.length <= 320; }
 
 // ── PASSWORD STRENGTH ─────────────────────────────────────────
 function updateStrengthUI(inputId, barId, labelId) {
@@ -157,11 +157,14 @@ async function sendOTP(type) {
         let valid = true;
         if (!name)                          { setError('signup-name',       'Full name is required.');       valid=false; }
         if (!employeeId)                    { setError('signup-employeeid', 'Employee ID is required.');     valid=false; }
+        else if (employeeId.length < 5)         { setError('signup-employeeid', 'Employee ID must be at least 5 characters.'); valid=false; }
         if (!email)                         { setError('signup-email',      'Email is required.');           valid=false; }
         else if (!isValidEmail(email))      { setError('signup-email',      'Enter a valid email.');         valid=false; }
         if (!contact)                       { setError('signup-contact',    'Contact number is required.');  valid=false; }
+        else if (!/^[0-9+\-\s()]{7,20}$/.test(contact)) { setError('signup-contact', 'Enter a valid contact number.'); valid=false; }
         if (!position)                      { setError('signup-position',   'Please select your position.'); valid=false; }
         if (!password || password.length < 8) { setError('signup-password', 'Min. 8 characters.');          valid=false; }
+        else if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) { setError('signup-password', 'Password must have at least one letter and one number.'); valid=false; }
         if (!valid) return;
 
         currentEmail = email;
