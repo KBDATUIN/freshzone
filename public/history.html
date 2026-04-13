@@ -171,8 +171,7 @@
             </div>
             <button onclick="clearFilters()" style="width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:var(--gray) !important;">Clear</button>
             <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
-            <button id="clear-all-btn" onclick="clearAllHistory()" style="width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:#e74c3c !important;color:white;">🗑 Clear All</button>
-            <button id="clear-all-btn" onclick="clearAllHistory()" style="width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:#e74c3c !important;color:white;">🗑 Clear All History</button>
+            <button id="clear-all-btn" onclick="clearAllHistory()" style="display:none;width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:#e74c3c !important;color:white;">🗑 Clear All History</button>
         </div>
 
         <div class="log-container">
@@ -215,6 +214,11 @@
         // Auth guard
         const user = JSON.parse(localStorage.getItem('currentUser'));
         if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; }
+
+        // Show "Clear All History" only for Administrators
+        if (user && user.position === 'Administrator') {
+            document.getElementById('clear-all-btn').style.display = '';
+        }
 
         let allRecords = [];
 
