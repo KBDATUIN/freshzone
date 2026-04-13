@@ -1,406 +1,266 @@
 // ============================================================
-//  auth.js (UPDATED) — 60s OTP, resend support, Node.js API
+//  api/auth.js — Login, Register, OTP, Password Reset
 // ============================================================
+const express  = require('express');
+const bcrypt   = require('bcryptjs');
+const jwt      = require('jsonwebtoken');
+const router   = express.Router();
+const db       = require('../db');
+const { sendOTPEmail } = require('../mailer');
 
-let otpExpiry    = null;
-let otpCountdown = null;
-let currentEmail = "";
-const OTP_TTL    = 60 * 1000; // 60 seconds
+const otpStore   = new Map();
+const otpAttempts = new Map(); // Track OTP guessing attempts
 
-// ── NOTIFICATION ──────────────────────────────────────────────
-function showNotification(message, type = 'info', duration = 3500) {
-    const n = document.getElementById('notification');
-    if (!n) return;
-    n.textContent = message;
-    n.className = `notification show ${type}`;
-    setTimeout(() => { n.className = 'notification hidden'; }, duration);
+// ── Input sanitizers ─────────────────────────────────────────
+function sanitizeStr(val, maxLen = 100) {
+    if (typeof val !== 'string') return '';
+    return val.trim().slice(0, maxLen);
 }
 
-// ── VIEW SWITCH ───────────────────────────────────────────────
-function showView(viewId) {
-    ['login-view','signup-view','forgot-view'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-    });
-    document.getElementById(viewId).classList.remove('hidden');
+function isValidEmail(email) {
+    return /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/.test(email);
 }
 
-// ── FIELD VALIDATION HELPERS ──────────────────────────────────
-function setError(inputId, msg) {
-    const el = document.getElementById(inputId);
-    if (!el) return;
-    el.classList.add('field-error');
-    let errSpan = el.parentElement.querySelector('.field-error-msg');
-    if (!errSpan) {
-        errSpan = document.createElement('span');
-        errSpan.className = 'field-error-msg';
-        el.parentElement.appendChild(errSpan);
-    }
-    errSpan.textContent = msg;
-}
-function clearError(inputId) {
-    const el = document.getElementById(inputId);
-    if (!el) return;
-    el.classList.remove('field-error');
-    const e = el.parentElement.querySelector('.field-error-msg');
-    if (e) e.textContent = '';
-}
-function clearAllErrors() {
-    document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
-    document.querySelectorAll('.field-error-msg').forEach(el => el.textContent = '');
-}
-function isValidEmail(email) { return /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/.test(email) && email.length <= 320; }
-
-// ── PASSWORD STRENGTH ─────────────────────────────────────────
-function updateStrengthUI(inputId, barId, labelId) {
-    const pw = document.getElementById(inputId)?.value || '';
-    let score = 0;
-    if (pw.length >= 8)  score++;
-    if (pw.length >= 12) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    const levels = [
-        { pct:'0%',  color:'#ddd',    text:'' },
-        { pct:'20%', color:'#e74c3c', text:'Very Weak' },
-        { pct:'40%', color:'#e67e22', text:'Weak' },
-        { pct:'60%', color:'#f39c12', text:'Fair' },
-        { pct:'80%', color:'#2ecc71', text:'Strong' },
-        { pct:'100%',color:'#27ae60', text:'Very Strong' },
-    ];
-    const level = levels[Math.min(score, 5)];
-    const bar = document.getElementById(barId);
-    const lbl = document.getElementById(labelId);
-    if (bar) { bar.style.width = level.pct; bar.style.background = level.color; }
-    if (lbl) { lbl.textContent = level.text; lbl.style.color = level.color; }
+function isValidPassword(pw) {
+    // Min 8 chars, at least one letter and one number
+    return typeof pw === 'string' && pw.length >= 8 && pw.length <= 128
+        && /[a-zA-Z]/.test(pw) && /[0-9]/.test(pw);
 }
 
-// ── OTP COUNTDOWN (60 seconds) ────────────────────────────────
-function startOTPCountdown(displayId, resendBtnId, type) {
-    clearInterval(otpCountdown);
-    otpExpiry = Date.now() + OTP_TTL;
-
-    const display   = document.getElementById(displayId);
-    const resendBtn = document.getElementById(resendBtnId);
-    if (resendBtn) resendBtn.style.display = 'none';
-
-    otpCountdown = setInterval(() => {
-        const remaining = otpExpiry - Date.now();
-        if (remaining <= 0) {
-            clearInterval(otpCountdown);
-            if (display) {
-                display.textContent = 'OTP expired.';
-                display.style.color = 'var(--danger)';
-            }
-            if (resendBtn) resendBtn.style.display = 'inline-block';
-        } else {
-            const s = Math.ceil(remaining / 1000);
-            if (display) {
-                display.textContent = `OTP expires in ${s}s`;
-                display.style.color = s <= 15 ? 'var(--danger)' : 'var(--gray)';
-            }
-        }
-    }, 500);
+function isValidPhone(phone) {
+    if (!phone) return true; // optional — for signup
+    return /^[0-9+\-\s()]{7,20}$/.test(phone);
 }
 
-// ── LOGIN ─────────────────────────────────────────────────────
-async function login() {
-    clearAllErrors();
-    const email    = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value.trim();
-    const remember = document.getElementById('remember-me').checked;
+// Strict phone check — for login identifier detection (must not be empty)
+function looksLikePhone(val) {
+    return val.length >= 7 && /^[0-9+\-\s()]+$/.test(val);
+}
 
-    if (!email)    { setError('login-email',    'Email or phone number is required.'); return; }
-    if (!password) { setError('login-password', 'Password is required.'); return; }
-    // Accept email OR phone — only reject if it looks like neither
-    const looksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const looksLikePhone = /^[0-9+\-\s()]{7,20}$/.test(email);
-    if (!looksLikeEmail && !looksLikePhone) {
-        setError('login-email', 'Enter a valid email address or phone number.');
-        return;
-    }
+function generateCode() {
+    // Cryptographically random 6-digit OTP
+    const buf = require('crypto').randomBytes(3);
+    return (parseInt(buf.toString('hex'), 16) % 900000 + 100000).toString();
+}
 
-    const btn = document.querySelector('#login-view .btn-primary');
-    btn.textContent = 'Signing in…'; btn.disabled = true;
+async function getFailedAttempts(email) {
+    const [rows] = await db.query(
+        `SELECT COUNT(*) AS count FROM login_attempts
+         WHERE email = ? AND success = 0
+         AND attempted_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)`,
+        [email]
+    );
+    return rows[0].count;
+}
+
+// ── POST /api/auth/login ──────────────────────────────────────
+router.post('/login', async (req, res) => {
+    const identifier = sanitizeStr(req.body.email, 255); // accepts email or phone
+    const password   = typeof req.body.password === 'string' ? req.body.password.slice(0, 128) : '';
+
+    if (!identifier || !password)
+        return res.status(400).json({ success: false, message: 'Email/phone and password are required.' });
+
+    // Detect whether identifier is email or phone number
+    const isEmail = isValidEmail(identifier);
+    const isPhone = looksLikePhone(identifier) && !isEmail;
+
+    if (!isEmail && !isPhone)
+        return res.status(400).json({ success: false, message: 'Enter a valid email address or phone number.' });
 
     try {
-        const res  = await fetch(`${API}/api/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
+        const fails = await getFailedAttempts(identifier);
+        if (fails >= 5)
+            return res.status(429).json({ success: false, message: 'Too many failed attempts. Try again in 15 minutes.' });
 
-        if (data.success) {
-            localStorage.setItem('fz-token', data.token);
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
-            if (remember) localStorage.setItem('fz-remember', email);
-            else          localStorage.removeItem('fz-remember');
-            showNotification('Login successful! Redirecting…', 'success');
-            setTimeout(() => location.href = 'dashboard.html', 1400);
+        // Look up by email OR phone number
+        const [rows] = await db.query(
+            'SELECT * FROM accounts WHERE (email = ? OR contact_number = ?) AND is_active = 1',
+            [identifier, identifier]
+        );
+        const user  = rows[0];
+        const valid = user && await bcrypt.compare(password, user.password_hash);
 
-        } else {
-            setError('login-password', data.message || 'Invalid credentials.');
-        }
+        await db.query(
+            'INSERT INTO login_attempts (email, ip_address, success) VALUES (?, ?, ?)',
+            [user ? user.email : identifier, req.ip, valid ? 1 : 0]
+        );
+
+        if (!valid)
+            return res.status(401).json({ success: false, message: 'Invalid email/phone or password.' });
+
+        if (!user.is_active)
+            return res.status(403).json({ success: false, message: 'Your account has been deactivated. Contact an administrator.' });
+
+        await db.query('UPDATE accounts SET last_login = NOW() WHERE id = ?', [user.id]);
+
+        const token = jwt.sign(
+            { id: user.id, email: user.email, position: user.position, name: user.full_name },
+            process.env.JWT_SECRET,
+            { expiresIn: '8h' }
+        );
+
+        const { password_hash, ...safeUser } = user;
+        return res.json({ success: true, token, user: safeUser });
+
     } catch (err) {
-        showNotification('Cannot connect to server. Is the backend running?', 'error');
-    } finally {
-        btn.textContent = 'Sign In'; btn.disabled = false;
-    }
-}
-
-// ── SEND OTP ──────────────────────────────────────────────────
-async function sendOTP(type) {
-    clearAllErrors();
-    let payload = { type };
-
-    if (type === 'signup') {
-        const name       = document.getElementById('signup-name').value.trim();
-        const employeeId = document.getElementById('signup-employeeid').value.trim();
-        const email      = document.getElementById('signup-email').value.trim();
-        const contact    = document.getElementById('signup-contact').value.trim();
-        const position   = document.getElementById('signup-position').value;
-        const password   = document.getElementById('signup-password').value.trim();
-
-        let valid = true;
-        if (!name)                          { setError('signup-name',       'Full name is required.');       valid=false; }
-        if (!employeeId)                    { setError('signup-employeeid', 'Employee ID is required.');     valid=false; }
-        else if (employeeId.length < 5)         { setError('signup-employeeid', 'Employee ID must be at least 5 characters.'); valid=false; }
-        if (!email)                         { setError('signup-email',      'Email is required.');           valid=false; }
-        else if (!isValidEmail(email))      { setError('signup-email',      'Enter a valid email.');         valid=false; }
-        if (!contact)                       { setError('signup-contact',    'Contact number is required.');  valid=false; }
-        else if (!/^[0-9+\-\s()]{7,20}$/.test(contact)) { setError('signup-contact', 'Enter a valid contact number.'); valid=false; }
-        if (!position)                      { setError('signup-position',   'Please select your position.'); valid=false; }
-        if (!password || password.length < 8) { setError('signup-password', 'Min. 8 characters.');          valid=false; }
-        else if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) { setError('signup-password', 'Password must have at least one letter and one number.'); valid=false; }
-        if (!valid) return;
-
-        currentEmail = email;
-        payload = { ...payload, email, name, employeeId, contact, position, password };
-
-    } else if (type === 'reset') {
-        const email = document.getElementById('reset-email').value.trim();
-        if (!email)              { setError('reset-email', 'Email is required.'); return; }
-        if (!isValidEmail(email)){ setError('reset-email', 'Enter a valid email.'); return; }
-        currentEmail = email;
-        payload = { ...payload, email };
-    }
-
-    const btnId = type === 'signup' ? 'signup-btn' : 'reset-btn';
-    const btn   = document.getElementById(btnId);
-    if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
-
-    try {
-        const res  = await fetch(`${API}/api/auth/send-otp`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            showNotification('OTP sent to your email! Valid for 60 seconds.', 'success', 4000);
-
-            if (type === 'signup') {
-                document.getElementById('signup-otp-section').classList.remove('hidden');
-                document.getElementById('signup-btn').classList.add('hidden');
-                // Show mobile email banner with the email address
-                const signupEmailDisplay = document.getElementById('signup-email-display');
-                if (signupEmailDisplay) signupEmailDisplay.textContent = currentEmail;
-                startOTPCountdown('signup-otp-timer', 'signup-resend-btn', 'signup');
-            } else {
-                document.getElementById('reset-otp-section').classList.remove('hidden');
-                document.getElementById('reset-btn').classList.add('hidden');
-                // Show mobile email banner with the email address
-                const resetEmailDisplay = document.getElementById('reset-email-display');
-                if (resetEmailDisplay) resetEmailDisplay.textContent = currentEmail;
-                startOTPCountdown('reset-otp-timer', 'reset-resend-btn', 'reset');
-            }
-        } else {
-            const errField = type === 'signup' ? 'signup-email' : 'reset-email';
-            setError(errField, data.message || 'Failed to send OTP.');
-            if (btn) { btn.textContent = type === 'signup' ? 'Send Verification OTP' : 'Send Reset Code'; btn.disabled = false; }
-        }
-    } catch (err) {
-        showNotification('Cannot connect to server. Is the backend running?', 'error');
-        if (btn) { btn.textContent = type === 'signup' ? 'Send Verification OTP' : 'Send Reset Code'; btn.disabled = false; }
-    }
-}
-
-// ── RESEND OTP ────────────────────────────────────────────────
-async function resendOTP(type) {
-    const resendBtnId = type === 'signup' ? 'signup-resend-btn' : 'reset-resend-btn';
-    const resendBtn   = document.getElementById(resendBtnId);
-    if (resendBtn) { resendBtn.textContent = 'Resending…'; resendBtn.disabled = true; }
-
-    try {
-        const payload = { type, email: currentEmail };
-        if (type === 'signup') {
-            payload.name       = document.getElementById('signup-name').value.trim();
-            payload.employeeId = document.getElementById('signup-employeeid').value.trim();
-            payload.contact    = document.getElementById('signup-contact').value.trim();
-            payload.position   = document.getElementById('signup-position').value;
-            payload.password   = document.getElementById('signup-password').value.trim();
-        }
-
-        const res  = await fetch(`${API}/api/auth/send-otp`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            showNotification('New OTP sent! Valid for 60 seconds.', 'success', 4000);
-            const otpInputId = type === 'signup' ? 'signup-otp-input' : 'reset-otp-input';
-            document.getElementById(otpInputId).value = '';
-            startOTPCountdown(
-                type === 'signup' ? 'signup-otp-timer' : 'reset-otp-timer',
-                resendBtnId,
-                type
-            );
-        } else {
-            showNotification(data.message || 'Failed to resend OTP.', 'error');
-            if (resendBtn) { resendBtn.textContent = 'Resend OTP'; resendBtn.disabled = false; }
-        }
-    } catch (err) {
-        showNotification('Cannot connect to server.', 'error');
-        if (resendBtn) { resendBtn.textContent = 'Resend OTP'; resendBtn.disabled = false; }
-    }
-}
-
-// ── VERIFY OTP ────────────────────────────────────────────────
-async function verifyOTP(type) {
-    const otpInput    = document.getElementById(type === 'signup' ? 'signup-otp-input' : 'reset-otp-input');
-    const otp         = otpInput.value.trim();
-    const newPassword = type === 'reset' ? document.getElementById('reset-new-password').value.trim() : undefined;
-
-    if (!otp || otp.length !== 6) {
-        showNotification('Enter the 6-digit OTP code.', 'error');
-        return;
-    }
-
-    try {
-        const res  = await fetch(`${API}/api/auth/verify-otp`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: currentEmail, otp, newPassword })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-            clearInterval(otpCountdown);
-            showNotification(data.message, 'success', 4000);
-            setTimeout(() => showView('login-view'), 2000);
-        } else {
-            showNotification(data.message || 'Verification failed.', 'error');
-        }
-    } catch (err) {
-        showNotification('Cannot connect to server.', 'error');
-    }
-}
-
-// ── PASSWORD TOGGLE ───────────────────────────────────────────
-function togglePassword(inputId, btn) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    const isPassword = input.type === 'password';
-    input.type = isPassword ? 'text' : 'password';
-    const wrap   = btn.closest('.input-password-wrap') || btn.parentElement;
-    const eyeOn  = wrap.querySelector('.eye-icon');
-    const eyeOff = wrap.querySelector('.eye-off-icon');
-    if (!eyeOn || !eyeOff) return;
-    if (isPassword) {
-        eyeOn.style.setProperty('display', 'none',  'important');
-        eyeOff.style.setProperty('display', 'block', 'important');
-    } else {
-        eyeOn.style.setProperty('display', 'block', 'important');
-        eyeOff.style.setProperty('display', 'none',  'important');
-    }
-}
-
-
-
-
-// ── INIT ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-
-    // ── Restore remembered email ──────────────────────────────
-    const remembered = localStorage.getItem('fz-remember');
-    if (remembered) {
-        const emailField = document.getElementById('login-email');
-        if (emailField) {
-            emailField.value = remembered;
-            const cb = document.getElementById('remember-me');
-            if (cb) cb.checked = true;
-        }
-    }
-
-    // ── Password strength meters ──────────────────────────────
-    document.getElementById('signup-password')?.addEventListener('input', function() {
-        updateStrengthUI('signup-password', 'signup-pw-bar', 'signup-pw-label');
-    });
-    document.getElementById('reset-new-password')?.addEventListener('input', function() {
-        updateStrengthUI('reset-new-password', 'reset-pw-bar', 'reset-pw-label');
-    });
-
-    // ── Enter key support for every input field ───────────────
-    // LOGIN VIEW — any field → Sign In
-    ['login-email', 'login-password'].forEach(id => {
-        document.getElementById(id)?.addEventListener('keydown', e => {
-            if (e.key === 'Enter') { e.preventDefault(); login(); }
-        });
-    });
-
-    // SIGNUP VIEW — all fields → Send OTP (or Verify if OTP shown)
-    ['signup-name','signup-employeeid','signup-email','signup-contact','signup-password'].forEach(id => {
-        document.getElementById(id)?.addEventListener('keydown', e => {
-            if (e.key !== 'Enter') return;
-            e.preventDefault();
-            const otpSection = document.getElementById('signup-otp-section');
-            if (otpSection && !otpSection.classList.contains('hidden')) {
-                verifyOTP('signup');
-            } else {
-                sendOTP('signup');
-            }
-        });
-    });
-
-    // SIGNUP OTP input → Verify & Register
-    document.getElementById('signup-otp-input')?.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); verifyOTP('signup'); }
-    });
-
-    // FORGOT VIEW — email field → Send Reset Code
-    document.getElementById('reset-email')?.addEventListener('keydown', e => {
-        if (e.key !== 'Enter') return;
-        e.preventDefault();
-        const otpSection = document.getElementById('reset-otp-section');
-        if (otpSection && !otpSection.classList.contains('hidden')) {
-            verifyOTP('reset');
-        } else {
-            sendOTP('reset');
-        }
-    });
-
-    // FORGOT OTP input → Update Password
-    document.getElementById('reset-otp-input')?.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); verifyOTP('reset'); }
-    });
-
-    // FORGOT new password field → Update Password
-    document.getElementById('reset-new-password')?.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); verifyOTP('reset'); }
-    });
-
-    // ── Dark mode toggle ──────────────────────────────────────
-    const authDarkBtn = document.getElementById('auth-dark-toggle');
-    if (authDarkBtn) {
-        const saved = localStorage.getItem('fz-theme') || 'light';
-        authDarkBtn.textContent = saved === 'dark' ? '☀️' : '🌙';
-        authDarkBtn.addEventListener('click', () => {
-            toggleDarkMode();
-            const theme = document.documentElement.getAttribute('data-theme');
-            authDarkBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
-        });
+        console.error('[login] Error:', err.message);
+        res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
+
+// ── POST /api/auth/send-otp ───────────────────────────────────
+router.post('/send-otp', async (req, res) => {
+    const email    = sanitizeStr(req.body.email, 255);
+    const type     = sanitizeStr(req.body.type, 20);
+    const name     = sanitizeStr(req.body.name, 100);
+    const employeeId = sanitizeStr(req.body.employeeId, 30);
+    const contact  = sanitizeStr(req.body.contact, 20);
+    const position = sanitizeStr(req.body.position, 50);
+    const password = typeof req.body.password === 'string' ? req.body.password.slice(0, 128) : '';
+
+    if (!email || !type)
+        return res.status(400).json({ success: false, message: 'Email and type are required.' });
+
+    if (!isValidEmail(email))
+        return res.status(400).json({ success: false, message: 'Invalid email format.' });
+
+    if (!['signup', 'reset'].includes(type))
+        return res.status(400).json({ success: false, message: 'Invalid OTP type.' });
+
+    // Validate signup fields
+    if (type === 'signup') {
+        if (!name || name.length < 2)
+            return res.status(400).json({ success: false, message: 'Full name must be at least 2 characters.' });
+        if (!employeeId || employeeId.length < 5)
+            return res.status(400).json({ success: false, message: 'Invalid employee ID.' });
+        if (contact && !isValidPhone(contact))
+            return res.status(400).json({ success: false, message: 'Invalid contact number format.' });
+        if (!['Administrator', 'Staff / Teachers'].includes(position))
+            return res.status(400).json({ success: false, message: 'Invalid position.' });
+        if (!isValidPassword(password))
+            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters with at least one letter and one number.' });
+
+        // Check if email already registered
+        const [existing] = await db.query('SELECT id FROM accounts WHERE email = ? OR employee_id = ?', [email, employeeId]);
+        if (existing.length)
+            return res.status(409).json({ success: false, message: 'An account with this email or employee ID already exists.' });
+    }
+
+    if (type === 'reset') {
+        // Verify email exists before sending reset OTP
+        const [existing] = await db.query('SELECT id FROM accounts WHERE email = ? AND is_active = 1', [email]);
+        if (!existing.length)
+            return res.status(404).json({ success: false, message: 'No active account found with this email.' });
+    }
+
+    // Rate limit OTP sends per email (max 3 per 10 minutes)
+    const now = Date.now();
+    const key = `otp_send_${email}`;
+    const attempts = otpAttempts.get(key) || [];
+    const recent = attempts.filter(t => now - t < 10 * 60 * 1000);
+    if (recent.length >= 3) {
+        return res.status(429).json({ success: false, message: 'Too many OTP requests. Please wait 10 minutes.' });
+    }
+    otpAttempts.set(key, [...recent, now]);
+
+    try {
+        const otp     = generateCode();
+        const expires = Date.now() + 60 * 1000;
+
+        otpStore.set(email, {
+            otp, expires, type,
+            attempts: 0, // Track wrong OTP attempts
+            userData: type === 'signup' ? { name, employeeId, contact, position, password } : null
+        });
+
+        try {
+            await sendOTPEmail(email, name || 'User', otp, type);
+            console.log(`[send-otp] Email sent to ${email}`);
+        } catch (mailErr) {
+            console.error('[send-otp] Email failed:', mailErr.message);
+            return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again later.' });
+        }
+
+        res.json({ success: true, message: `OTP sent to ${email}` });
+
+    } catch (err) {
+        console.error('[send-otp] Error:', err.message);
+        res.status(500).json({ success: false, message: 'Server error.' });
+    }
+});
+
+// ── POST /api/auth/verify-otp ─────────────────────────────────
+router.post('/verify-otp', async (req, res) => {
+    const email       = sanitizeStr(req.body.email, 255);
+    const otp         = sanitizeStr(req.body.otp, 10);
+    const newPassword = typeof req.body.newPassword === 'string' ? req.body.newPassword.slice(0, 128) : '';
+
+    if (!email || !otp)
+        return res.status(400).json({ success: false, message: 'Email and OTP are required.' });
+
+    if (!isValidEmail(email))
+        return res.status(400).json({ success: false, message: 'Invalid email.' });
+
+    if (!/^\d{6}$/.test(otp))
+        return res.status(400).json({ success: false, message: 'OTP must be a 6-digit number.' });
+
+    const stored = otpStore.get(email);
+    if (!stored)
+        return res.status(400).json({ success: false, message: 'No OTP found. Please request a new one.' });
+
+    if (Date.now() > stored.expires) {
+        otpStore.delete(email);
+        return res.status(400).json({ success: false, message: 'OTP expired. Please request a new one.' });
+    }
+
+    // Lock out after 5 wrong OTP attempts
+    stored.attempts = (stored.attempts || 0) + 1;
+    if (stored.attempts > 5) {
+        otpStore.delete(email);
+        return res.status(429).json({ success: false, message: 'Too many incorrect attempts. Please request a new OTP.' });
+    }
+
+    if (stored.otp !== otp)
+        return res.status(400).json({ success: false, message: `Incorrect OTP code. ${5 - stored.attempts} attempts remaining.` });
+
+    otpStore.delete(email);
+
+    try {
+        if (stored.type === 'signup') {
+            const { name, employeeId, contact, position, password } = stored.userData;
+
+            // Final duplicate check before insert
+            const [dup] = await db.query('SELECT id FROM accounts WHERE email = ? OR employee_id = ?', [email, employeeId]);
+            if (dup.length)
+                return res.status(409).json({ success: false, message: 'Account already exists.' });
+
+            const hash = await bcrypt.hash(password, 12);
+            await db.query(
+                `INSERT INTO accounts (employee_id, full_name, email, contact_number, position, password_hash, date_joined)
+                 VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+                [employeeId, name, email, contact || null, position, hash]
+            );
+            return res.json({ success: true, message: 'Account created successfully! You can now log in.' });
+        }
+
+        if (stored.type === 'reset') {
+            if (!newPassword)
+                return res.status(400).json({ success: false, message: 'New password is required.' });
+            if (!isValidPassword(newPassword))
+                return res.status(400).json({ success: false, message: 'Password must be at least 8 characters with at least one letter and one number.' });
+
+            const hash = await bcrypt.hash(newPassword, 12);
+            await db.query('UPDATE accounts SET password_hash = ?, updated_at = NOW() WHERE email = ?', [hash, email]);
+            return res.json({ success: true, message: 'Password updated successfully! You can now log in.' });
+        }
+
+    } catch (err) {
+        console.error('[verify-otp] DB error:', err.message, err.code || '');
+        let message = 'Server error.';
+        if (err.code === 'ER_DUP_ENTRY') message = 'An account with this email or employee ID already exists.';
+        res.status(500).json({ success: false, message });
+    }
+});
+
+module.exports = router;
