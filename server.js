@@ -88,8 +88,8 @@ app.use('/api/push',     pushLimiter,  require('./api/push'));
 app.get('/api/stats/dashboard', async (req, res) => {
     try {
         const [nodes]  = await db.query("SELECT COUNT(*) as count FROM sensor_nodes");
-        const [events] = await db.query("SELECT COUNT(*) as count FROM detection_events WHERE event_status = 'Detected'");
-        const [recent] = await db.query("SELECT * FROM v_open_events LIMIT 5");
+        const [events] = await db.query("SELECT COUNT(*) as count FROM detection_events WHERE event_status IN ('Detected','Acknowledged')");
+        const [recent] = await db.query("SELECT de.id, de.location_name, de.event_status, de.detected_at, sn.node_code FROM detection_events de JOIN sensor_nodes sn ON sn.id=de.node_id WHERE de.event_status IN ('Detected','Acknowledged') ORDER BY de.detected_at DESC LIMIT 5");
         res.json({ success: true, totalNodes: nodes[0].count, activeAlerts: events[0].count, recentEvents: recent });
     } catch (err) {
         console.error('Stats error:', err);

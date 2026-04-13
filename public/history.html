@@ -155,14 +155,15 @@
         <div class="filter-bar">
             <div class="filter-group">
                 <label for="filter-search">Search</label>
-                <input type="text" id="filter-search" placeholder="Location or action…" oninput="renderTable()">
+                <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable()">
             </div>
             <div class="filter-group">
                 <label for="filter-status">Status</label>
                 <select id="filter-status" onchange="renderTable()">
                     <option value="">All</option>
                     <option value="Detected">Detected</option>
-                    <option value="Success">Success</option>
+                    <option value="Acknowledged">Acknowledged</option>
+                    <option value="Cleared">Cleared</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -203,6 +204,18 @@
             <div class="modal-btn-group">
                 <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
                 <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Confirm Modal -->
+    <div id="clearAllModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="clear-title" style="display:none;">
+        <div class="modal-content-custom">
+            <h3 id="clear-title" style="color:#e74c3c;">⚠️ Delete All History</h3>
+            <p>This will permanently delete <strong>all</strong> detection events, sensor readings, push notifications, system logs, and login attempts. This cannot be undone.</p>
+            <div class="modal-btn-group">
+                <button class="confirm-btn" style="background:#e74c3c;" onclick="confirmClearAll()">Yes, Delete Everything</button>
+                <button class="cancel-btn" onclick="document.getElementById('clearAllModal').style.display='none'">Cancel</button>
             </div>
         </div>
     </div>
@@ -319,8 +332,12 @@
         }
 
 
-        async function clearAllHistory() {
-            if (!confirm('⚠️ Are you sure you want to delete ALL history? This cannot be undone.')) return;
+        function clearAllHistory() {
+            document.getElementById('clearAllModal').style.display = 'flex';
+        }
+
+        async function confirmClearAll() {
+            document.getElementById('clearAllModal').style.display = 'none';
             try {
                 const data = await apiFetch('/history/clear-all', { method: 'DELETE' });
                 if (data && data.success) {
@@ -338,67 +355,6 @@
 
                 loadHistory();
         
-        // ── WEB PUSH NOTIFICATIONS ────────────────────────────
-        let pushSubscription = null;
-
-        async function initPushNotifications() {
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-            try {
-                const reg = await navigator.serviceWorker.register('/sw.js');
-                const existing = await reg.pushManager.getSubscription();
-                if (existing) { pushSubscription = existing; updatePushBtn(true); }
-            } catch (err) { console.warn('[push] SW registration failed:', err.message); }
-        }
-
-        async function togglePushNotifications() {
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                showNotification('Push notifications not supported in this browser.', 'error'); return;
-            }
-            const reg = await navigator.serviceWorker.ready;
-            if (pushSubscription) {
-                await pushSubscription.unsubscribe();
-                try { await apiFetch('/push/unsubscribe', { method: 'DELETE', body: JSON.stringify({ endpoint: pushSubscription.endpoint }) }); } catch(e){}
-                pushSubscription = null; updatePushBtn(false);
-                showNotification('Push notifications disabled.', 'info');
-            } else {
-                try {
-                    const keyData = await apiFetch('/push/vapid-public-key');
-                    if (!keyData || !keyData.publicKey) { showNotification('Push service not configured.', 'error'); return; }
-                    const permission = await Notification.requestPermission();
-                    if (permission !== 'granted') { showNotification('Please allow notifications in your browser settings.', 'error'); return; }
-                    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) });
-                    pushSubscription = sub;
-                    await apiFetch('/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription: sub }) });
-                    updatePushBtn(true);
-                    showNotification('🔔 Notifications enabled! You will be alerted when vape is detected.', 'success', 5000);
-                } catch (err) { showNotification('Failed to enable notifications. Try again.', 'error'); }
-            }
-        }
-
-        function updatePushBtn(subscribed) {
-            const btn = document.getElementById('push-btn');
-            const lbl = document.getElementById('push-label');
-            const mobileBtn = document.getElementById('mobile-push-btn');
-            if (btn) { subscribed ? btn.classList.add('active') : btn.classList.remove('active'); }
-            if (btn) {
-                btn.style.background = subscribed ? 'var(--secondary)' : 'transparent';
-                btn.style.color = subscribed ? 'white' : 'var(--secondary)';
-            }
-            if (lbl) { lbl.textContent = subscribed ? 'ON' : 'OFF'; lbl.style.color = subscribed ? 'var(--secondary)' : '#999'; }
-            if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
-        }
-
-        function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
-            for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
-            return outputArray;
-        }
-
-        initPushNotifications();
-
         initHotkeys('history');
     </script>
 </body>
