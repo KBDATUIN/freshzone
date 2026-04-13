@@ -156,7 +156,15 @@ router.get('/live', authMiddleware, async (req, res) => {
 // ── GET /api/readings/open-events ─────────────────────────────
 router.get('/open-events', authMiddleware, async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM v_open_events');
+        const [rows] = await db.query(`
+            SELECT de.id, de.location_name, de.pm2_5_value,
+                   de.aqi_value, de.aqi_category, de.event_status, de.detected_at,
+                   sn.node_code
+            FROM detection_events de
+            JOIN sensor_nodes sn ON sn.id = de.node_id
+            WHERE de.event_status IN ('Detected', 'Acknowledged')
+            ORDER BY de.detected_at DESC
+        `);
         res.json({ success: true, data: rows });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error.' });

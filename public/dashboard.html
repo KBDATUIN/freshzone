@@ -333,17 +333,16 @@
             'ESP32-ZONE1': { card:'card-zone1', dot:'dot-zone1', statusText:'status-text-zone1', aqi:'aqi-zone1', pm:'pm-zone1', ts:'ts-zone1', ackBtn:'ack-zone1', resolveBtn:'resolve-zone1' },
             'ESP32-ZONE2': { card:'card-zone2', dot:'dot-zone2', statusText:'status-text-zone2', aqi:'aqi-zone2', pm:'pm-zone2', ts:'ts-zone2', ackBtn:'ack-zone2', resolveBtn:'resolve-zone2' },
         };
-        // Track event IDs per zone for resolve
+        // Track event IDs per zone for resolve (populated from DB via fetchOpenEvents)
         const zoneEventIds = {};
+
+        // Track acknowledged zones — driven from DB event_status, not sessionStorage
+        const acknowledgedZones = new Set();
 
         // Track which zones currently have active alerts
         const activeAlerts = {};
         // Track last event IDs seen to avoid double-notifying
         const seenEventIds = new Set(JSON.parse(localStorage.getItem('fz-seen-events') || '[]'));
-
-        // Track acknowledged zones locally so the card stays green
-        // even if ESP32 is still sending high readings
-        const acknowledgedZones = new Set(JSON.parse(sessionStorage.getItem('fz-acked-zones') || '[]'));
 
         // ── RENDER ZONE CARD ───────────────────────────────────
         function renderZone(zoneCode, data) {
@@ -413,11 +412,8 @@
                 activeAlerts[zoneCode] = false;
 
             } else {
-                // Sensor is genuinely clear — remove from acknowledged set
-                if (acknowledgedZones.has(zoneCode)) {
-                    acknowledgedZones.delete(zoneCode);
-                    sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
-                }
+                // Sensor is genuinely clear
+                acknowledgedZones.delete(zoneCode);
                 card.className = 'location-card clear';
                 dot.className  = 'status-dot dot-clear';
                 statusText.innerHTML = '● Clear';
@@ -469,18 +465,27 @@
             }
         }
 
-        // ── FETCH OPEN EVENTS (for staff notification) ─────────
+        // ── FETCH OPEN EVENTS (for staff notification + acknowledged state) ─────────
         async function fetchOpenEvents() {
             try {
                 const data = await apiFetch('/readings/open-events');
                 if (!data || !data.success) return;
 
-                // Store event IDs per zone for resolve
+                // Rebuild acknowledged state from DB — this is the source of truth
+                acknowledgedZones.clear();
                 data.data.forEach(event => {
-                    if (event.node_code) zoneEventIds[event.node_code] = event.id;
+                    if (!event.node_code) return;
 
-                    // Show staff modal for new events
-                    if (!seenEventIds.has(event.id)) {
+                    // Store event ID for resolve button
+                    zoneEventIds[event.node_code] = event.id;
+
+                    // If DB says Acknowledged, mark zone locally so renderZone shows resolve btn
+                    if (event.event_status === 'Acknowledged') {
+                        acknowledgedZones.add(event.node_code);
+                    }
+
+                    // Show staff modal for brand-new Detected events only
+                    if (event.event_status === 'Detected' && !seenEventIds.has(event.id)) {
                         seenEventIds.add(event.id);
                         localStorage.setItem('fz-seen-events', JSON.stringify([...seenEventIds]));
                         if (isStaff) showStaffModal(event.location_name, event.id);
@@ -520,9 +525,8 @@
                 if (result && result.success) {
                     showNotification(`Alert acknowledged for ${locationName}. Staff notified.`, 'success');
 
-                    // Mark zone as acknowledged in sessionStorage
+                    // Update local state immediately (DB will confirm on next fetchOpenEvents poll)
                     acknowledgedZones.add(nodeCode);
-                    sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
 
                     // Update card immediately — show resolve button
                     if (z) {
@@ -580,13 +584,7 @@
                         body: JSON.stringify({ notes: `Staff responded: ${user.full_name || user.name}` })
                     });
                     if (result && result.success) {
-                        // Mark zone as acknowledged so resolve button appears
-                        for (const [nodeCode, eventId] of Object.entries(zoneEventIds)) {
-                            if (eventId === currentStaffEventId) {
-                                acknowledgedZones.add(nodeCode);
-                                sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
-                            }
-                        }
+                        // fetchOpenEvents will update acknowledgedZones from DB on next poll
                         setTimeout(() => { fetchLiveData(); fetchOpenEvents(); }, 1000);
                     }
                 } catch(err) {
@@ -622,9 +620,8 @@
                 if (result && result.success) {
                     showNotification(`✅ ${locationName} marked as resolved!`, 'success', 4000);
 
-                    // Remove from acknowledged set — zone is now fully clear
+                    // Remove from local acknowledged set — DB is now Cleared
                     acknowledgedZones.delete(nodeCode);
-                    sessionStorage.setItem('fz-acked-zones', JSON.stringify([...acknowledgedZones]));
                     delete zoneEventIds[nodeCode];
 
                     // Update card to clear
