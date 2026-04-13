@@ -37,12 +37,12 @@
         /* ── PUSH NOTIFICATION TOGGLE ──────────────────────── */
         .push-toggle-wrap { display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;margin-left:4px; }
         .push-toggle-icon { font-size:0.9rem;line-height:1; }
-        .push-toggle-switch { position:relative;width:44px;height:24px;background:#ccc;border-radius:10px;cursor:pointer;transition:background 0.25s;outline:none;flex-shrink:0; }
+        .push-toggle-switch { position:relative;width:44px;height:24px;background:#ccc;border-radius:12px;cursor:pointer;transition:background 0.25s;outline:none;flex-shrink:0; }
         .push-toggle-switch:focus-visible { box-shadow:0 0 0 3px rgba(0,200,150,0.4); }
         .push-toggle-switch.active { background:var(--secondary,#00c896); }
-        .push-toggle-knob { position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left 0.25s; }
-        .push-toggle-switch.active .push-toggle-knob { left:20px; }
-        .push-toggle-label { display:none; }
+        .push-toggle-knob { position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);will-change:transform; }
+        .push-toggle-switch.active .push-toggle-knob { transform:translateX(20px); }
+        .push-toggle-label { font-size:0.72rem;font-weight:700;color:var(--secondary,#00c896);letter-spacing:0.04em;min-width:22px; }
     </style>
 </head>
 <body>
