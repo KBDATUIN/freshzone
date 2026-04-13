@@ -130,16 +130,7 @@
             border:1px solid var(--gray); border-radius:10px; font-size:0.85rem;
             cursor:pointer; margin-top:8px; font-family:sans-serif;
         }
-
-        /* ── PUSH NOTIFICATION TOGGLE ──────────────────────── */
-        .push-toggle-wrap {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            user-select: none;
-            margin-left: 4px;
-        }
+        
         .push-toggle-icon { font-size: 0.9rem; line-height: 1; }
         .push-toggle-switch {
             position: relative;
@@ -195,6 +186,10 @@
                 <a href="profile.html">Profile</a>
                 <a href="contact.html">Contact</a>
                 <a href="#" onclick="openLogoutModal();return false;">Logout</a>
+                <div class="nav-user" id="nav-user-display">
+                    <span class="nav-user-dot"></span>
+                    <span id="nav-user-name">—</span>
+                </div>
                 <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
                 <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
                     <span class="push-toggle-icon">🔔</span>
@@ -225,7 +220,7 @@
     <div class="container" style="position:relative;z-index:10;">
         <div class="hero">
             <h1>Campus Smoke Monitor <span class="live-badge"><span class="live-dot"></span>LIVE</span></h1>
-            <p>Real-time air quality monitoring — 4th Floor Comfort Rooms</p>
+            <p id="hero-subtitle">Real-time air quality monitoring — 4th Floor Comfort Rooms</p>
             <div class="flex-btn-container">
                 <button onclick="location.href='history.html'"
                     style="width:auto;padding:12px 30px;background:var(--secondary);font-size:1rem;">
@@ -246,7 +241,10 @@
 
             <!-- ZONE 1: 4th Floor Male CR -->
             <div class="location-card" id="card-zone1" role="region" aria-label="4th Floor Male CR status">
-                <h3 id="name-zone1">4th Floor Male CR</h3>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                    <span style="font-size:1.1rem;">🚻</span>
+                    <h3 id="name-zone1" style="margin:0;font-size:1rem;">4th Floor Male CR</h3>
+                </div>
                 <p id="status-zone1" style="font-weight:bold;">
                     <span class="status-dot dot-offline" id="dot-zone1"></span>
                     <span id="status-text-zone1">Loading…</span>
@@ -266,7 +264,10 @@
 
             <!-- ZONE 2: 4th Floor Female CR -->
             <div class="location-card" id="card-zone2" role="region" aria-label="4th Floor Female CR status">
-                <h3 id="name-zone2">4th Floor Female CR</h3>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                    <span style="font-size:1.1rem;">🚺</span>
+                    <h3 id="name-zone2" style="margin:0;font-size:1rem;">4th Floor Female CR</h3>
+                </div>
                 <p id="status-zone2" style="font-weight:bold;">
                     <span class="status-dot dot-offline" id="dot-zone2"></span>
                     <span id="status-text-zone2">Loading…</span>
@@ -661,6 +662,14 @@
 
         // ── HOTKEYS ────────────────────────────────────────────
 
+
+        // Show user name in nav
+        if (user) {
+            const nameEl = document.getElementById('nav-user-name');
+            if (nameEl) nameEl.textContent = user.full_name || user.name || 'User';
+            const subtitleEl = document.getElementById('hero-subtitle');
+            if (subtitleEl) subtitleEl.textContent = `Logged in as ${user.full_name || user.name} — ${user.position || 'User'}`;
+        }
 
         initHotkeys('dashboard');
     </script>
