@@ -116,7 +116,7 @@
             </label>
             <textarea id="contact-message" rows="5" placeholder="Describe the issue or suggestion…" maxlength="2000" oninput="const n=this.value.length; const el=document.getElementById('char-counter'); el.textContent=n; el.style.color=n>1800?'#e74c3c':n>1500?'#f39c12':'';"></textarea>
 
-            <button onclick="submitReport()" style="margin-top:1.25rem;">✉️ Submit Report</button>
+            <button onclick="submitReport()">✉️ Submit Report</button>
 
             <!-- Confirmation box -->
             <div class="ticket-success" id="ticket-confirm"></div>
