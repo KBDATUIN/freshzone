@@ -38,6 +38,13 @@
         th,td { padding:1.1rem 1.2rem; text-align:left; border-bottom:1px solid #eee; font-size:0.95rem; }
         th { background:#f8f9fa; color:var(--gray); font-size:0.85rem; font-weight:600; }
         tbody tr { transition:background 0.22s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1); }
+        tbody tr:nth-child(even) td { background: rgba(0,180,216,0.03); }
+        th { cursor:pointer; user-select:none; position:relative; }
+        th:hover { background:#edf2f7 !important; color:var(--primary) !important; }
+        th.sort-asc::after  { content:' ↑'; font-size:0.75rem; color:var(--secondary); }
+        th.sort-desc::after { content:' ↓'; font-size:0.75rem; color:var(--secondary); }
+        [data-theme='dark'] th:hover { background:#0d2035 !important; }
+        [data-theme='dark'] tbody tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
         tbody tr:hover td { background:rgba(0,180,216,0.06); }
         tbody tr:hover    { transform:translateX(5px); }
         tbody tr.row-animate { opacity:0; animation:rowSlideIn 0.42s cubic-bezier(0.4,0,0.2,1) forwards; }
@@ -179,12 +186,12 @@
             <table role="table" aria-label="Detection history log">
                 <thead>
                     <tr>
-                        <th>Date &amp; Time</th>
-                        <th>Location</th>
-                        <th>Action</th>
-                        <th>Status</th>
+                        <th onclick="sortTable(0)" title="Sort by date">Date &amp; Time</th>
+                        <th onclick="sortTable(1)" title="Sort by location">Location</th>
+                        <th onclick="sortTable(2)" title="Sort by action">Action</th>
+                        <th onclick="sortTable(3)" title="Sort by status">Status</th>
                         <th>Response</th>
-                        <th>By</th>
+                        <th onclick="sortTable(5)" title="Sort by staff">By</th>
                     </tr>
                 </thead>
                 <tbody id="history-tbody">
@@ -219,6 +226,13 @@
             </div>
         </div>
     </div>
+
+    <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        title="Back to top" aria-label="Back to top"
+        style="position:fixed;bottom:70px;right:20px;width:42px;height:42px;border-radius:50%;
+               background:var(--primary);color:white;border:none;font-size:1.2rem;cursor:pointer;
+               display:none;align-items:center;justify-content:center;z-index:900;
+               box-shadow:0 4px 14px rgba(0,0,0,0.2);margin:0;padding:0;text-transform:none;">↑</button>
 
     <footer><p>© 2026 FreshZone – Clear Air Monitoring System</p></footer>
 
@@ -355,6 +369,32 @@
 
                 loadHistory();
         
+        // ── SORT TABLE ─────────────────────────────────────
+        let sortCol = 0; let sortAsc = false;
+        const COLS = ['datetime','location','action','status','response','handled_by'];
+
+        function sortTable(colIdx) {
+            const key = COLS[colIdx];
+            if (sortCol === colIdx) { sortAsc = !sortAsc; } else { sortCol = colIdx; sortAsc = true; }
+            allRecords = [...allRecords].sort((a, b) => {
+                const va = (a[key] || '').toString().toLowerCase();
+                const vb = (b[key] || '').toString().toLowerCase();
+                return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+            });
+            // Update header indicators
+            document.querySelectorAll('th').forEach((th, i) => {
+                th.classList.remove('sort-asc','sort-desc');
+                if (i === colIdx) th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+            });
+            renderTable();
+        }
+
+        // ── BACK TO TOP ────────────────────────────────────
+        const btt = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (btt) btt.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        }, { passive: true });
+
         initHotkeys('history');
     </script>
 </body>

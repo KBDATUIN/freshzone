@@ -43,12 +43,14 @@ function generateCode() {
     return (parseInt(buf.toString('hex'), 16) % 900000 + 100000).toString();
 }
 
-async function getFailedAttempts(email) {
+async function getFailedAttempts(identifier) {
+    // identifier can be email or phone — login_attempts stores the account email
+    // so we look up the account first to get the canonical email
     const [rows] = await db.query(
         `SELECT COUNT(*) AS count FROM login_attempts
          WHERE email = ? AND success = 0
          AND attempted_at > DATE_SUB(NOW(), INTERVAL 15 MINUTE)`,
-        [email]
+        [identifier]
     );
     return rows[0].count;
 }

@@ -368,7 +368,8 @@
                 if (data && data.last_seen) {
                     const lastSeen = new Date(data.last_seen).toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' });
                     const secAgo = Math.floor((Date.now() - new Date(data.last_seen).getTime()) / 1000);
-                    ts.textContent = `Last seen: ${lastSeen} (${secAgo}s ago)`;
+                    const durStr = secAgo < 60 ? `${secAgo}s ago` : secAgo < 3600 ? `${Math.floor(secAgo/60)}m ago` : `${Math.floor(secAgo/3600)}h ago`;
+                    ts.textContent = `Last seen: ${lastSeen} (${durStr})`;
                 } else {
                     ts.textContent = 'No data received';
                 }
