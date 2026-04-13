@@ -112,9 +112,9 @@
 
             <label for="contact-message">
                 Message
-                <span class="char-count"><span id="char-counter">0</span>/500</span>
+                <span class="char-count"><span id="char-counter">0</span>/2000</span>
             </label>
-            <textarea id="contact-message" rows="5" placeholder="Describe the issue or suggestion…" maxlength="500" oninput="document.getElementById('char-counter').textContent=this.value.length;"></textarea>
+            <textarea id="contact-message" rows="5" placeholder="Describe the issue or suggestion…" maxlength="2000" oninput="document.getElementById('char-counter').textContent=this.value.length;"></textarea>
 
             <button onclick="submitReport()">✉️ Submit Report</button>
 
