@@ -230,22 +230,26 @@
 
         async function renderInbox() {
             try {
-                const data = await apiFetch('/contact');
                 const list = document.getElementById('inbox-list');
+                list.innerHTML = '<p style="text-align:center;color:var(--gray);padding:1rem;">Loading…</p>';
+                const data = await apiFetch('/contact');
                 if (!data || !data.success || data.data.length === 0) {
                     list.innerHTML = '<p class="no-tickets">No reports submitted yet.</p>';
                     return;
                 }
-                list.innerHTML = data.data.map(t => `
-                    <div class="ticket-item ${t.ticket_status === 'Resolved' ? 'resolved' : ''}" id="ticket-${t.id}">
-                        <div class="ticket-meta">${new Date(t.created_at).toLocaleString()} · ${t.submitter_email} · <b>${t.ticket_ref}</b></div>
+                list.innerHTML = data.data.map(t => {
+                    const date = new Date(t.created_at).toLocaleString('en-PH', {timeZone:'Asia/Manila',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
+                    const msg = t.message.length > 200 ? t.message.slice(0,200) + '…' : t.message;
+                    const isResolved = t.ticket_status === 'Resolved';
+                    return `<div class="ticket-item ${isResolved ? 'resolved' : ''}" id="ticket-${t.id}">
+                        <div class="ticket-meta">${date} · <b>${t.submitter_name || t.submitter_email}</b> · <span style="font-family:monospace;background:rgba(0,180,216,0.1);padding:1px 6px;border-radius:4px;">${t.ticket_ref}</span></div>
                         <div class="ticket-subject">${t.subject}</div>
-                        <div class="ticket-msg">${t.message}</div>
-                        ${t.ticket_status !== 'Resolved'
+                        <div class="ticket-msg">${msg}</div>
+                        ${!isResolved
                             ? `<button class="ticket-resolve" onclick="resolveTicket(${t.id})">✔ Mark Resolved</button>`
-                            : '<small style="color:var(--success);display:block;margin-top:0.4rem;">✔ Resolved</small>'}
-                    </div>
-                `).join('');
+                            : `<small style="color:var(--success);display:block;margin-top:0.4rem;">✔ Resolved${t.resolved_by_name ? ' by ' + t.resolved_by_name : ''}</small>`}
+                    </div>`;
+                }).join('');
             } catch(err) {
                 console.error('Inbox error:', err);
             }

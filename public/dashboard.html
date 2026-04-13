@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | Dashboard</title>
+    <meta name="description" content="FreshZone live dashboard — real-time campus vape and smoke detection monitoring.">
+    <meta name="theme-color" content="#004e7a">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
     <style>
@@ -361,7 +363,7 @@
                 // Offline
                 card.className = 'location-card offline';
                 dot.className  = 'status-dot dot-offline';
-                statusText.textContent = 'Sensor Offline';
+                statusText.innerHTML = '⚫ Sensor Offline';
                 aqiBadge.textContent   = 'AQI: —';
                 aqiBadge.className     = 'aqi-badge aqi-offline';
                 pmDiv.innerHTML        = '';
@@ -417,7 +419,7 @@
                 acknowledgedZones.delete(zoneCode);
                 card.className = 'location-card clear';
                 dot.className  = 'status-dot dot-clear';
-                statusText.innerHTML = '● Clear';
+                statusText.innerHTML = '● Air Clear';
                 statusText.style.color = 'var(--success)';
 
                 if (aqi <= 50) aqiBadge.className = 'aqi-badge aqi-good';
