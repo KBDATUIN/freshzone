@@ -43,6 +43,7 @@
         <a href="profile.html" class="active">👤 Profile</a>
         <a href="contact.html">✉️ Contact</a>
         <a href="#" onclick="openLogoutModal();closeMobileNav();return false;">🚪 Logout</a>
+        <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn">🔔 Notify Me</a>
     </div>
 </div>
 
@@ -343,50 +344,25 @@
     initHotkeys('profile');
 
     // ── PUSH NOTIFICATION STATE ────────────────────────────
+    // Uses utils.js apiFetch so JWT token is included and subscribe works
     function updatePushBtn(subscribed) {
-        const toggle = document.getElementById('push-btn');
-        const label  = document.getElementById('push-label');
-        if (toggle) { subscribed ? toggle.classList.add('active') : toggle.classList.remove('active'); }
-        if (label)  { label.textContent = subscribed ? 'ON' : 'OFF'; label.style.color = subscribed ? 'var(--secondary)' : '#999'; }
+        const toggle    = document.getElementById('push-btn');
+        const label     = document.getElementById('push-label');
+        const mobileBtn = document.getElementById('mobile-push-btn');
+        if (toggle) {
+            subscribed ? toggle.classList.add('active') : toggle.classList.remove('active');
+            toggle.style.background = '';
+            toggle.style.color = '';
+        }
+        if (label) {
+            label.textContent = subscribed ? 'ON' : 'OFF';
+            label.style.color = subscribed ? 'var(--secondary)' : '#94a3b8';
+        }
+        if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
     }
 
-    async function togglePushNotifications() {
-        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-            alert('Push notifications are not supported in this browser.'); return;
-        }
-        const reg = await navigator.serviceWorker.ready;
-        const existing = await reg.pushManager.getSubscription();
-        if (existing) {
-            await existing.unsubscribe();
-            await fetch('/push/unsubscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ endpoint: existing.endpoint }) });
-            updatePushBtn(false);
-        } else {
-            const keyData = await fetch('/push/vapid-public-key').then(r => r.json());
-            const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) });
-            await fetch('/push/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ subscription: sub }) });
-            updatePushBtn(true);
-        }
-    }
-
-    function urlBase64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-        const rawData = window.atob(base64);
-        const output = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; i++) output[i] = rawData.charCodeAt(i);
-        return output;
-    }
-
-    // Check existing subscription on load
-    (async () => {
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
-            try {
-                const reg = await navigator.serviceWorker.ready;
-                const sub = await reg.pushManager.getSubscription();
-                if (sub) updatePushBtn(true);
-            } catch(e) {}
-        }
-    })();
+    // Auto-initialize push state on load
+    initPushNotifications();
 </script>
 </body>
 </html>
