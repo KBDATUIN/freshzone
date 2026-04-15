@@ -670,9 +670,13 @@ footer { text-align:center; padding:2rem; color:var(--footer-color); font-size:0
     .modal-btn-group button { width:100%; margin-top:0.5rem; }
     .profile-edit-form .btn-row { flex-direction:column; }
     .profile-edit-form .btn-row button { width:100%; }
-    .stats-grid { grid-template-columns:1fr; gap:0.75rem; }
-    .filter-bar { flex-direction:column; }
+    .stats-grid { grid-template-columns:repeat(3,1fr); gap:0.6rem; }
+    .stat-box { padding:1rem 0.75rem; }
+    .stat-box h3 { font-size:1.4rem; }
+    .stat-box p { font-size:0.68rem; }
+    .filter-bar { flex-direction:column; gap:0.5rem; padding:1rem; }
     .filter-group { min-width:auto; }
+    .page-hero img { display:none; }
 }
 @media (max-width:480px) {
     .auth-container { padding:1.5rem 1rem; }

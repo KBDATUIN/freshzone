@@ -85,7 +85,61 @@
         .push-toggle-knob { position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);will-change:transform; }
         .push-toggle-switch.active .push-toggle-knob { transform:translateX(20px); }
         .push-toggle-label { font-size:0.72rem;font-weight:700;color:var(--secondary,#00c896);letter-spacing:0.04em;min-width:22px; }
-    </style>
+    
+        /* ── FILTER BAR MOBILE FIX ───────────────────── */
+        .filter-inputs-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            flex: 1;
+            width: 100%;
+        }
+        .filter-inputs-row .filter-group {
+            flex: 1;
+            min-width: 130px;
+        }
+        .filter-actions-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            width: 100%;
+            margin-top: 0.25rem;
+        }
+        .filter-action-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.6rem 0.75rem !important;
+            margin: 0 !important;
+            font-size: 0.8rem !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            cursor: pointer;
+            border: none;
+            color: white;
+            box-shadow: none !important;
+            text-transform: none !important;
+            width: auto !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+        }
+        .filter-action-btn::after { display: none !important; }
+        .filter-clear-btn  { background: var(--gray) !important; }
+        .filter-export-btn { background: var(--success) !important; }
+        .filter-danger-btn { background: #e74c3c !important; }
+        .filter-clear-btn:hover  { background: #5a6268 !important; }
+        .filter-export-btn:hover { background: #218838 !important; }
+        .filter-danger-btn:hover { background: #c0392b !important; }
+
+        @media (max-width: 480px) {
+            .filter-inputs-row { flex-direction: column; gap: 0.6rem; }
+            .filter-inputs-row .filter-group { min-width: auto; }
+            .filter-actions-row { gap: 0.5rem; }
+            .filter-action-btn { flex: 1; min-width: 0; font-size: 0.78rem !important; padding: 0.6rem 0.5rem !important; }
+        }
+</style>
 </head>
 <body>
 
@@ -162,26 +216,30 @@
 
         <!-- Filter bar -->
         <div class="filter-bar">
-            <div class="filter-group">
-                <label for="filter-search">Search</label>
-                <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable()">
+            <div class="filter-inputs-row">
+                <div class="filter-group">
+                    <label for="filter-search">🔍 Search</label>
+                    <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable()">
+                </div>
+                <div class="filter-group">
+                    <label for="filter-status">Status</label>
+                    <select id="filter-status" onchange="renderTable()">
+                        <option value="">All</option>
+                        <option value="Detected">Detected</option>
+                        <option value="Acknowledged">Acknowledged</option>
+                        <option value="Cleared">Cleared</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-date">📅 Date</label>
+                    <input type="date" id="filter-date" onchange="renderTable()">
+                </div>
             </div>
-            <div class="filter-group">
-                <label for="filter-status">Status</label>
-                <select id="filter-status" onchange="renderTable()">
-                    <option value="">All</option>
-                    <option value="Detected">Detected</option>
-                    <option value="Acknowledged">Acknowledged</option>
-                    <option value="Cleared">Cleared</option>
-                </select>
+            <div class="filter-actions-row">
+                <button class="filter-action-btn filter-clear-btn" onclick="clearFilters()">✕ Clear</button>
+                <button class="filter-action-btn filter-export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+                <button id="clear-all-btn" class="filter-action-btn filter-danger-btn" onclick="clearAllHistory()" style="display:none;">🗑 Clear All</button>
             </div>
-            <div class="filter-group">
-                <label for="filter-date">Date</label>
-                <input type="date" id="filter-date" onchange="renderTable()">
-            </div>
-            <button onclick="clearFilters()" style="width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:var(--gray) !important;">Clear</button>
-            <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
-            <button id="clear-all-btn" onclick="clearAllHistory()" style="display:none;width:auto;padding:0.52rem 1rem;margin-top:0;font-size:0.82rem;border-radius:8px;background:#e74c3c !important;color:white;">🗑 Clear All History</button>
         </div>
 
         <div class="log-container">
