@@ -1,5 +1,5 @@
 // ============================================================
-//  server.js — FreshZone Node.js + Express Backend
+//   server.js — FreshZone Node.js + Express Backend
 // ============================================================
 require('dotenv').config();
 const express    = require('express');
@@ -12,6 +12,9 @@ const { sendAlertEmail } = require('./mailer');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// FIX: Trust Railway's Proxy for Rate Limiting
+app.set('trust proxy', 1);
 
 // ── SECURITY HEADERS ─────────────────────────────────────────
 app.use((req, res, next) => {
@@ -108,7 +111,6 @@ app.get('*', (req, res) => {
 });
 
 // ── SCHEDULED JOBS ────────────────────────────────────────────
-// Send pending email notifications every 5 minutes
 cron.schedule('*/5 * * * *', async () => {
     try {
         const [pending] = await db.query(
@@ -128,7 +130,6 @@ cron.schedule('*/5 * * * *', async () => {
     } catch (err) { console.error('Cron fail:', err); }
 });
 
-// Escalation: Re-notify if alert unacknowledged for 5+ minutes
 cron.schedule('*/5 * * * *', async () => {
     try {
         const [unacked] = await db.query(
@@ -153,7 +154,6 @@ cron.schedule('*/5 * * * *', async () => {
     } catch (err) { console.error('Escalation cron fail:', err); }
 });
 
-// Cleanup old login attempts every hour
 cron.schedule('0 * * * *', async () => {
     try { await db.query("DELETE FROM login_attempts WHERE attempted_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)"); }
     catch (err) { console.error('Cleanup fail:', err); }
