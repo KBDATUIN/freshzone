@@ -131,6 +131,8 @@ cron.schedule('*/5 * * * *', async () => {
 });
 
 cron.schedule('*/5 * * * *', async () => {
+    // Only escalate events still in 'Detected' status (not yet acknowledged).
+    // Once staff clicks Acknowledge, escalation stops automatically.
     try {
         const [unacked] = await db.query(
             `SELECT de.*, sn.location_name FROM detection_events de
