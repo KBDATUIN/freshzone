@@ -30,7 +30,6 @@ function isValidReading(val, min, max) {
 
 // ── POST /api/readings — ESP32 pushes sensor data ─────────────
 router.post('/', async (req, res) => {
-    // Validate API key
     const apiKey = req.headers['x-api-key'];
     if (!apiKey || apiKey !== process.env.ESP32_API_KEY) {
         return res.status(401).json({ success: false, message: 'Invalid API key.' });
@@ -38,7 +37,6 @@ router.post('/', async (req, res) => {
 
     const { node_code, pm1_0, pm2_5, pm10 } = req.body;
 
-    // Strict input validation
     if (!node_code || typeof node_code !== 'string' || node_code.length > 50) {
         return res.status(400).json({ success: false, message: 'Invalid node_code.' });
     }
@@ -60,6 +58,7 @@ router.post('/', async (req, res) => {
 
         const node = nodes[0];
         const { aqi, category } = calculateAQI(pm2_5);
+        // EPA threshold: smoke detected at PM2.5 > 35.4 µg/m³
         const smokeDetected = pm2_5 > 35.4;
         const ledColor = smokeDetected ? 'red' : 'green';
 
@@ -72,12 +71,18 @@ router.post('/', async (req, res) => {
         await db.query('UPDATE sensor_nodes SET last_seen = NOW() WHERE id = ?', [node.id]);
 
         if (smokeDetected) {
-            // Only create one open event per node
+            // FIX: Check for ANY open event — Detected OR Acknowledged.
+            // Previously only checked 'Detected', so an Acknowledged event would
+            // be ignored and a brand-new event created, making the banner reappear.
             const [openEvents] = await db.query(
-                "SELECT id FROM detection_events WHERE node_id = ? AND event_status = 'Detected'", [node.id]
+                `SELECT id, event_status FROM detection_events
+                 WHERE node_id = ? AND event_status IN ('Detected', 'Acknowledged')
+                 ORDER BY detected_at DESC LIMIT 1`,
+                [node.id]
             );
 
             if (!openEvents.length) {
+                // No open event at all — create a fresh one and alert admins
                 const [eventResult] = await db.query(
                     `INSERT INTO detection_events (node_id, reading_id, location_name, pm2_5_value, aqi_value, aqi_category)
                      VALUES (?, ?, ?, ?, ?, ?)`,
@@ -102,7 +107,6 @@ router.post('/', async (req, res) => {
                     }
                 }
 
-                // Web push to all subscribed users
                 try {
                     await sendPushToAll(
                         '🚨 Vape/Smoke Detected!',
@@ -113,12 +117,25 @@ router.post('/', async (req, res) => {
                     console.warn('[push] Web push failed:', pushErr.message);
                 }
             } else {
-                // Update existing event's latest reading
+                // FIX: Event already open (Detected or Acknowledged) — only update
+                // the sensor readings, NEVER touch event_status. This preserves the
+                // Acknowledged state even while the ESP32 keeps sending high readings.
                 await db.query(
-                    "UPDATE detection_events SET pm2_5_value=?, aqi_value=?, aqi_category=? WHERE id=?",
-                    [pm2_5, aqi, category, openEvents[0].id]
+                    `UPDATE detection_events
+                     SET pm2_5_value = ?, aqi_value = ?, aqi_category = ?, reading_id = ?
+                     WHERE id = ?`,
+                    [pm2_5, aqi, category, result.insertId, openEvents[0].id]
                 );
             }
+        } else {
+            // Air is clean — auto-clear any still-'Detected' events for this node.
+            // Leave 'Acknowledged' alone; staff may still be writing notes.
+            await db.query(
+                `UPDATE detection_events
+                 SET event_status = 'Cleared', resolved_at = NOW()
+                 WHERE node_id = ? AND event_status = 'Detected'`,
+                [node.id]
+            );
         }
 
         res.json({ success: true, node: node.location_name, aqi, category, smoke_detected: smokeDetected, led_color: ledColor });
@@ -129,7 +146,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// ── GET /api/readings/live — node_active within 15s ───────────
+// ── GET /api/readings/live ─────────────────────────────────────
 router.get('/live', authMiddleware, async (req, res) => {
     try {
         const [rows] = await db.query(`
@@ -158,7 +175,8 @@ router.get('/open-events', authMiddleware, async (req, res) => {
     try {
         const [rows] = await db.query(`
             SELECT de.id, de.location_name, de.pm2_5_value,
-                   de.aqi_value, de.aqi_category, de.event_status, de.detected_at,
+                   de.aqi_value, de.aqi_category, de.event_status,
+                   de.detected_at, de.acknowledged_at,
                    sn.node_code
             FROM detection_events de
             JOIN sensor_nodes sn ON sn.id = de.node_id
@@ -176,18 +194,24 @@ router.post('/acknowledge/:eventId', authMiddleware, adminOnly, async (req, res)
     const { eventId } = req.params;
     const { notes }   = req.body;
 
-    // Validate eventId is a number
     if (!Number.isInteger(Number(eventId))) {
         return res.status(400).json({ success: false, message: 'Invalid event ID.' });
     }
 
     try {
-        await db.query(
+        // FIX: Guard with WHERE event_status = 'Detected' so this is idempotent.
+        // If already acknowledged, affectedRows = 0 and we return success quietly.
+        const [updated] = await db.query(
             `UPDATE detection_events
-             SET event_status='Acknowledged', acknowledged_at=NOW(), acknowledged_by=?, notes=?
-             WHERE id=?`,
+             SET event_status = 'Acknowledged', acknowledged_at = NOW(), acknowledged_by = ?, notes = ?
+             WHERE id = ? AND event_status = 'Detected'`,
             [req.user.id, notes || null, eventId]
         );
+
+        if (updated.affectedRows === 0) {
+            return res.json({ success: true, message: 'Alert already acknowledged or resolved.' });
+        }
+
         await db.query(
             `INSERT INTO system_logs (account_id, action, description, ip_address)
              VALUES (?, 'Alert Acknowledged', ?, ?)`,
@@ -199,10 +223,7 @@ router.post('/acknowledge/:eventId', authMiddleware, adminOnly, async (req, res)
     }
 });
 
-module.exports = router;
-
 // ── POST /api/readings/resolve/:eventId ──────────────────────
-// Staff or Admin marks alert as fully resolved/success
 router.post('/resolve/:eventId', authMiddleware, async (req, res) => {
     const { eventId } = req.params;
     const { notes }   = req.body;
@@ -212,15 +233,22 @@ router.post('/resolve/:eventId', authMiddleware, async (req, res) => {
     }
 
     try {
-        await db.query(
+        // FIX: Guard with WHERE event_status IN (...) so already-cleared events
+        // don't generate duplicate system_logs entries.
+        const [updated] = await db.query(
             `UPDATE detection_events
-             SET event_status = 'Cleared',
+             SET event_status    = 'Cleared',
+                 resolved_at     = NOW(),
                  acknowledged_at = COALESCE(acknowledged_at, NOW()),
                  acknowledged_by = COALESCE(acknowledged_by, ?),
-                 notes = COALESCE(notes, ?)
-             WHERE id = ?`,
+                 notes           = COALESCE(notes, ?)
+             WHERE id = ? AND event_status IN ('Detected', 'Acknowledged')`,
             [req.user.id, notes || null, eventId]
         );
+
+        if (updated.affectedRows === 0) {
+            return res.json({ success: true, message: 'Alert already resolved.' });
+        }
 
         await db.query(
             `INSERT INTO system_logs (account_id, action, description, ip_address)
@@ -234,3 +262,5 @@ router.post('/resolve/:eventId', authMiddleware, async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
+
+module.exports = router;
