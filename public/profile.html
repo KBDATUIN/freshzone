@@ -188,6 +188,9 @@
             const u = data.user;
 
             document.getElementById('userName').textContent       = u.full_name || '—';
+            // Also update nav user name pill
+            const navName = document.getElementById('nav-user-name');
+            if (navName && u.full_name) navName.textContent = u.full_name;
             document.getElementById('userEmail').textContent      = u.email || '—';
             document.getElementById('userContact').textContent    = u.contact_number || '—';
             document.getElementById('userPosition').textContent   = u.position || '—';
