@@ -21,111 +21,81 @@
 
     <style>
         /* ── CROP MODAL OVERLAY ─────────────────────────────── */
+        /* ── CROP MODAL ──────────────────────────────────────── */
         #crop-modal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.88);
+            backdrop-filter: blur(6px);
             z-index: 99999;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
+            box-sizing: border-box;
         }
         #crop-modal.open { display: flex; }
 
         .crop-modal-card {
             background: #fff;
-            border-radius: 20px;
-            padding: 24px;
+            border-radius: 18px;
+            padding: 20px 20px 18px;
             width: 100%;
-            max-width: 460px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            max-width: 440px;
+            /* KEY FIX: limit height so card never taller than viewport */
+            max-height: calc(100vh - 24px);
+            overflow-y: auto;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.55);
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            animation: cropSlideUp 0.35s cubic-bezier(0.175,0.885,0.32,1.1);
+            gap: 12px;
+            box-sizing: border-box;
+            animation: cropSlideUp 0.3s cubic-bezier(0.175,0.885,0.32,1.1);
         }
-        [data-theme="dark"] .crop-modal-card {
-            background: #1a2a3a;
-        }
+        [data-theme="dark"] .crop-modal-card { background: #1a2a3a; }
+
         @keyframes cropSlideUp {
-            from { transform: translateY(40px); opacity: 0; }
+            from { transform: translateY(30px); opacity: 0; }
             to   { transform: translateY(0);    opacity: 1; }
         }
 
         .crop-modal-title {
             margin: 0;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--primary, #004e7a);
             font-family: Lexend, sans-serif;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-shrink: 0;
         }
 
-        /* Cropper container — fixed height so it doesn't overflow on mobile */
+        /* Cropper container */
         .crop-container {
             width: 100%;
-            height: 300px;
-            background: #0a0a0a;
-            border-radius: 12px;
+            /* Responsive height — smaller on short screens */
+            height: min(280px, 42vh);
+            background: #111;
+            border-radius: 10px;
             overflow: hidden;
             position: relative;
+            flex-shrink: 0;
         }
-        .crop-container img {
-            display: block;
-            max-width: 100%;
-        }
+        .crop-container img { display: block; max-width: 100%; }
 
-        /* Crop hint */
         .crop-hint {
-            font-size: 0.78rem;
+            font-size: 0.74rem;
             color: var(--gray, #888);
             text-align: center;
-            margin: -6px 0 0;
+            line-height: 1.4;
+            margin: 0;
             font-family: sans-serif;
+            flex-shrink: 0;
         }
 
-        /* Action buttons row */
-        .crop-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .crop-btn-apply {
-            flex: 1;
-            padding: 12px;
-            background: var(--primary, #004e7a);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.92rem;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: Lexend, sans-serif;
-        }
-        .crop-btn-apply:hover { filter: brightness(1.15); transform: scale(1.02); }
-        .crop-btn-cancel {
-            flex: 0 0 auto;
-            padding: 12px 18px;
-            background: transparent;
-            color: var(--gray, #888);
-            border: 1.5px solid var(--gray, #ccc);
-            border-radius: 12px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-family: sans-serif;
-            transition: 0.2s;
-        }
-        .crop-btn-cancel:hover { background: rgba(0,0,0,0.05); }
-
-        /* Zoom controls */
         .crop-zoom-row {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0;
         }
         .crop-zoom-row label {
             font-size: 0.78rem;
@@ -136,16 +106,49 @@
         .crop-zoom-row input[type=range] {
             flex: 1;
             accent-color: var(--primary, #004e7a);
+            height: 4px;
         }
 
-        /* Loading spinner inside button */
-        .crop-btn-apply.loading {
-            opacity: 0.7;
-            pointer-events: none;
+        /* KEY FIX: buttons side by side, both fully visible */
+        .crop-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
         }
-        .crop-btn-apply.loading::after {
-            content: " ⏳";
+        .crop-btn-apply {
+            flex: 1;
+            min-width: 0;
+            padding: 11px 8px;
+            background: var(--primary, #004e7a);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: Lexend, sans-serif;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        .crop-btn-apply:hover { filter: brightness(1.12); }
+        .crop-btn-apply.loading { opacity: 0.65; pointer-events: none; }
+
+        .crop-btn-cancel {
+            flex: 0 0 90px;
+            padding: 11px 8px;
+            background: transparent;
+            color: var(--gray, #666);
+            border: 1.5px solid #ccc;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: sans-serif;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .crop-btn-cancel:hover { background: rgba(0,0,0,0.06); }
     </style>
 </head>
 <body>
@@ -368,22 +371,36 @@
                 cropperInstance = null;
             }
 
-            // Init Cropper.js — square aspect ratio locked, round crop box style
+            // Init Cropper.js — image moves, crop box stays fixed & square
             cropperInstance = new Cropper(cropImg, {
-                aspectRatio: 1,           // Always square (circle preview)
-                viewMode: 1,              // Crop box can't go outside the image
-                dragMode: 'move',         // Move image, not crop box
-                autoCropArea: 0.8,        // Use 80% of image by default
-                cropBoxMovable: false,    // Box is fixed — only image moves
-                cropBoxResizable: false,  // Keep it square locked
+                aspectRatio: 1,              // Locked square
+                viewMode: 0,                 // Image can move freely under the box
+                dragMode: 'move',            // Dragging moves the IMAGE, not the box
+                autoCropArea: 0.9,           // Crop box takes 90% of view by default
+                cropBoxMovable: false,       // Box stays centered — user moves image
+                cropBoxResizable: false,     // No resizing — keeps square lock
                 toggleDragModeOnDblclick: false,
-                background: true,
-                guides: true,
+                background: false,           // Hide checkerboard — cleaner look
+                guides: false,               // No inner grid lines
                 center: true,
-                highlight: true,
+                highlight: false,            // No overlay highlight border
+                movable: true,               // Image is draggable
+                rotatable: false,
+                scalable: false,
+                zoomable: true,
+                zoomOnTouch: true,
+                zoomOnWheel: true,
+                minCropBoxWidth: 10,
+                minCropBoxHeight: 10,
                 ready() {
-                    // Reset zoom slider on new image
                     document.getElementById('zoom-slider').value = 0;
+                    // Zoom to fit image nicely on open
+                    const cd = cropperInstance.getCanvasData();
+                    const scale = Math.max(
+                        cropperInstance.getCropBoxData().width / cd.naturalWidth,
+                        cropperInstance.getCropBoxData().height / cd.naturalHeight
+                    );
+                    cropperInstance.zoomTo(Math.min(scale * 1.05, 1));
                 }
             });
 
