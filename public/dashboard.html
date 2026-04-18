@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | Dashboard</title>
-    <meta name="description" content="FreshZone live dashboard — real-time campus vape and smoke detection monitoring.">
+    <meta name="description" content="FreshZone — real-time on-campus vape aerosol detection monitoring.">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
     <!-- PWA -->
@@ -228,8 +228,8 @@
 
     <div class="container" style="position:relative;z-index:10;">
         <div class="hero">
-            <h1>Campus Smoke Monitor <span class="live-badge"><span class="live-dot"></span>LIVE</span></h1>
-            <p id="hero-subtitle">Real-time air quality monitoring — 4th Floor Comfort Rooms</p>
+            <h1>Campus Vape Aerosol Detector <span class="live-badge"><span class="live-dot"></span>LIVE</span></h1>
+            <p id="hero-subtitle">Real-time vape aerosol detection — 4th Floor Comfort Rooms</p>
             <div class="flex-btn-container">
                 <button onclick="location.href='history.html'"
                     style="width:auto;padding:12px 30px;background:var(--secondary);font-size:1rem;">
@@ -241,7 +241,7 @@
         <!-- Staff info bar — only shown to staff -->
         <div class="staff-alert-bar" id="staff-info-bar">
             <span style="font-size:1.2rem;">ℹ️</span>
-            <span>You are logged in as <strong>Staff</strong>. Only Administrators can acknowledge alerts. You will be notified when action is required.</span>
+            <span>You are logged in as <strong>Staff</strong>. Only Administrators can acknowledge vape alerts. You will be notified when a vape aerosol is detected on campus.</span>
         </div>
 
         <div class="last-updated-bar" id="last-updated-bar">Fetching sensor data…</div>
@@ -300,9 +300,9 @@
     <!-- Staff Response Modal — shown to staff when admin acknowledges -->
     <div class="staff-response-modal" id="staff-response-modal" role="alertdialog" aria-modal="true" aria-labelledby="staff-modal-title">
         <div class="staff-response-card">
-            <h3 id="staff-modal-title">🚨 Vape / Smoke Detected</h3>
+            <h3 id="staff-modal-title">🚨 Vape Aerosol Detected</h3>
             <span class="location-tag" id="staff-modal-location">—</span>
-            <p id="staff-modal-text">An alert has been detected in your area. Please proceed to the location for inspection immediately.</p>
+            <p id="staff-modal-text">A vape aerosol has been detected on campus. Please proceed to the location immediately for inspection.</p>
             <button class="staff-respond-btn" onclick="staffRespond()">✅ On My Way — Mark Responded</button>
             <button class="staff-dismiss-btn" onclick="dismissStaffModal()">✕ Dismiss (Alert stays open)</button>
         </div>
@@ -323,7 +323,7 @@
     </div>
 
     <footer>
-        <p>© 2026 FreshZone – Clear Air Monitoring System</p>
+        <p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p>
     </footer>
 
     <script src="utils.js"></script>
@@ -401,7 +401,7 @@
             if (smoke && !acknowledgedZones.has(zoneCode)) {
                 card.className = 'location-card detecting';
                 dot.className  = 'status-dot dot-detecting';
-                statusText.innerHTML = '<strong>● VAPE / SMOKE DETECTED</strong>';
+                statusText.innerHTML = '<strong>● VAPE AEROSOL DETECTED</strong>';
                 statusText.style.color = 'var(--danger)';
                 aqiBadge.className = 'aqi-badge aqi-alert';
                 aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
@@ -584,11 +584,11 @@
             currentStaffEventId = eventId;
             document.getElementById('staff-modal-location').textContent = locationName;
             document.getElementById('staff-modal-text').textContent =
-                `Vape or smoke has been detected at ${locationName}. Please proceed to the location for inspection immediately.`;
+                `Vape aerosol has been detected at ${locationName}. Please proceed to the location for inspection immediately.`;
             document.getElementById('staff-response-modal').classList.add('open');
 
             // Also play a subtle notification
-            showNotification(`⚠️ Alert: Vape detected at ${locationName}`, 'error', 5000);
+            showNotification(`⚠️ Vape aerosol detected at ${locationName}`, 'error', 5000);
         }
 
         async function staffRespond() {

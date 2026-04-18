@@ -113,7 +113,7 @@
             <label for="contact-subject">Subject</label>
             <select id="contact-subject">
                 <option value="" disabled selected>Select a subject</option>
-                <option value="Smoke Alert Feedback">Smoke Alert Feedback</option>
+                <option value="Vape Alert Feedback">Vape Alert Feedback</option>
                 <option value="Device Maintenance">Device Maintenance</option>
                 <option value="General Suggestion">General Suggestion</option>
                 <option value="Bug Report">Bug Report</option>
@@ -154,7 +154,7 @@
         </div>
     </div>
 
-    <footer><p>© 2026 FreshZone – Clear Air Monitoring System</p></footer>
+    <footer><p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p></footer>
 
     <script src="utils.js"></script>
     <script>
@@ -198,7 +198,7 @@
             if (!name)    addError('contact-name',    'Name is required.');
             if (!email)   addError('contact-email',   'Email is required.');
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) addError('contact-email','Enter a valid email.');
-            const validSubjects = ['Smoke Alert Feedback','Device Maintenance','General Suggestion','Bug Report','Other'];
+            const validSubjects = ['Vape Alert Feedback','Device Maintenance','General Suggestion','Bug Report','Other'];
             if (!subject || !validSubjects.includes(subject)) addError('contact-subject', 'Please select a valid subject.');
             if (!message) addError('contact-message', 'Message cannot be empty.');
             else if (message.length < 10) addError('contact-message', 'Message is too short (min 10 characters).');
