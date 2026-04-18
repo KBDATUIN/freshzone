@@ -1,20 +1,27 @@
 // ============================================================
-//  pwa.js — FreshZone PWA: Install prompt + Splash + Bottom Nav
+//  pwa.js — FreshZone PWA
+//  Splash (once only) + Install Prompt + Page Transitions
 // ============================================================
 
-// ── SPLASH SCREEN ─────────────────────────────────────────────
+// ── SPLASH SCREEN — only on very first app open ───────────────
 (function showSplash() {
-    // Only show on mobile standalone or first load
-    const isMobile = window.innerWidth <= 768;
+    const isMobile = window.innerWidth <= 900;
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-        || window.navigator.standalone;
+        || window.navigator.standalone === true;
 
-    if (!isMobile && !isStandalone) return;
-
-    // Don't show on auth page (login screen IS the splash)
+    // Skip on auth page
     if (window.location.pathname.includes('auth.html') ||
         window.location.pathname === '/' ||
         window.location.pathname === '') return;
+
+    // Only show if this is the FIRST page load this session (not navigation between pages)
+    const alreadyShown = sessionStorage.getItem('fz-splash-shown');
+    if (alreadyShown) return;
+
+    // Only show on mobile or installed PWA
+    if (!isMobile && !isStandalone) return;
+
+    sessionStorage.setItem('fz-splash-shown', '1');
 
     const splash = document.createElement('div');
     splash.id = 'fz-splash';
@@ -23,54 +30,45 @@
             <img src="/logo1.png" alt="FreshZone" class="fz-splash-logo">
             <div class="fz-splash-name">FreshZone</div>
             <div class="fz-splash-tagline">Vape &amp; Smoke Detection</div>
-            <div class="fz-splash-spinner">
-                <div class="fz-spinner-ring"></div>
-            </div>
+            <div class="fz-splash-spinner"><div class="fz-spinner-ring"></div></div>
         </div>
     `;
     document.body.appendChild(splash);
 
-    // Fade out after 1.2s
     setTimeout(() => {
         splash.classList.add('fz-splash-hide');
         setTimeout(() => splash.remove(), 500);
-    }, 1200);
+    }, 1400);
 })();
 
-// ── BOTTOM NAVIGATION BAR (mobile only) ───────────────────────
-(function buildBottomNav() {
-    if (window.innerWidth > 768) return;
+// ── INSTANT PAGE TRANSITIONS (no full reload feel) ────────────
+(function initPageTransitions() {
+    // Add fade-in on every page load
+    document.documentElement.classList.add('fz-page-enter');
+    window.addEventListener('DOMContentLoaded', () => {
+        requestAnimationFrame(() => {
+            document.documentElement.classList.add('fz-page-visible');
+        });
+    });
 
-    // Don't show on auth page
-    if (window.location.pathname.includes('auth.html') ||
-        window.location.pathname === '/' ||
-        window.location.pathname === '') return;
+    // Intercept same-origin link clicks for instant feel
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
 
-    const pages = [
-        { href: 'dashboard.html', icon: '📡', label: 'Monitor' },
-        { href: 'history.html',   icon: '📋', label: 'History' },
-        { href: 'profile.html',   icon: '👤', label: 'Profile' },
-        { href: 'contact.html',   icon: '✉️', label: 'Contact' },
-    ];
+        const href = link.getAttribute('href');
+        // Only handle internal page links, not # anchors or external
+        if (!href || href.startsWith('#') || href.startsWith('http') ||
+            href.startsWith('mailto') || href.startsWith('tel')) return;
+        if (link.getAttribute('onclick')) return; // has JS handler, skip
+        if (link.target === '_blank') return;
 
-    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+        e.preventDefault();
 
-    const nav = document.createElement('nav');
-    nav.id = 'fz-bottom-nav';
-    nav.setAttribute('role', 'navigation');
-    nav.setAttribute('aria-label', 'Bottom navigation');
-
-    nav.innerHTML = pages.map(p => `
-        <a href="${p.href}" class="fz-bottom-nav-item ${currentPage === p.href ? 'active' : ''}" aria-label="${p.label}">
-            <span class="fz-bottom-nav-icon">${p.icon}</span>
-            <span class="fz-bottom-nav-label">${p.label}</span>
-        </a>
-    `).join('');
-
-    document.body.appendChild(nav);
-
-    // Add padding to body so content isn't hidden behind bottom nav
-    document.body.style.paddingBottom = '70px';
+        // Fade out then navigate
+        document.documentElement.classList.remove('fz-page-visible');
+        setTimeout(() => { window.location.href = href; }, 180);
+    });
 })();
 
 // ── INSTALL PROMPT ─────────────────────────────────────────────
@@ -80,14 +78,13 @@ window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
 
-    // Only show banner if not already installed and on mobile
-    const isMobile = window.innerWidth <= 768;
+    const isMobile = window.innerWidth <= 900;
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-        || window.navigator.standalone;
+        || window.navigator.standalone === true;
     const dismissed = sessionStorage.getItem('fz-install-dismissed');
 
     if (!isStandalone && isMobile && !dismissed) {
-        setTimeout(showInstallBanner, 3000);
+        setTimeout(showInstallBanner, 4000);
     }
 });
 
@@ -110,50 +107,82 @@ function showInstallBanner() {
         </div>
     `;
     document.body.appendChild(banner);
-
-    // Animate in
     requestAnimationFrame(() => banner.classList.add('fz-install-show'));
 }
 
 function triggerInstall() {
     if (!deferredInstallPrompt) return;
     deferredInstallPrompt.prompt();
-    deferredInstallPrompt.userChoice.then(choice => {
+    deferredInstallPrompt.userChoice.then(() => {
         deferredInstallPrompt = null;
-        const banner = document.getElementById('fz-install-banner');
-        if (banner) banner.remove();
+        const b = document.getElementById('fz-install-banner');
+        if (b) b.remove();
     });
 }
 
 function dismissInstall() {
     sessionStorage.setItem('fz-install-dismissed', '1');
-    const banner = document.getElementById('fz-install-banner');
-    if (banner) {
-        banner.classList.remove('fz-install-show');
-        setTimeout(() => banner.remove(), 400);
+    const b = document.getElementById('fz-install-banner');
+    if (b) {
+        b.classList.remove('fz-install-show');
+        setTimeout(() => b.remove(), 400);
     }
 }
 
-// ── STATUS BAR COLOR (iOS) ────────────────────────────────────
+// ── LOADING INDICATOR — only when network is slow ─────────────
+(function initSlowNetworkLoader() {
+    let loadingTimer = null;
+    let loaderEl = null;
+
+    function showLoader() {
+        if (loaderEl) return;
+        loaderEl = document.createElement('div');
+        loaderEl.id = 'fz-page-loader';
+        loaderEl.innerHTML = `<div class="fz-loader-bar"></div>`;
+        document.body.appendChild(loaderEl);
+    }
+
+    function hideLoader() {
+        clearTimeout(loadingTimer);
+        if (loaderEl) {
+            loaderEl.classList.add('fz-loader-done');
+            setTimeout(() => { if (loaderEl) { loaderEl.remove(); loaderEl = null; } }, 400);
+        }
+    }
+
+    // Only show loader if navigation takes longer than 400ms (slow network)
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.getAttribute?.('onclick')) return;
+
+        loadingTimer = setTimeout(showLoader, 400);
+    });
+
+    window.addEventListener('pageshow', hideLoader);
+    window.addEventListener('load', hideLoader);
+})();
+
+// ── THEME-COLOR META ──────────────────────────────────────────
 (function setStatusBar() {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     let meta = document.querySelector('meta[name="theme-color"]');
     if (!meta) {
         meta = document.createElement('meta');
         meta.name = 'theme-color';
         document.head.appendChild(meta);
     }
-    meta.content = isDark ? '#071018' : '#004e7a';
-
-    // Update on dark mode toggle
-    const observer = new MutationObserver(() => {
+    const update = () => {
         const dark = document.documentElement.getAttribute('data-theme') === 'dark';
         meta.content = dark ? '#071018' : '#004e7a';
+    };
+    update();
+    new MutationObserver(update).observe(document.documentElement, {
+        attributes: true, attributeFilter: ['data-theme']
     });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 })();
 
-// ── REGISTER SERVICE WORKER ───────────────────────────────────
+// ── SERVICE WORKER ────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').catch(() => {});

@@ -655,6 +655,25 @@ footer { text-align:center; padding:2rem; color:var(--footer-color); font-size:0
 }
 .hotkey-badge:hover { background:rgba(52,152,219,0.22); }
 
+
+/* Mobile nav divider + logout style */
+.mobile-nav-divider {
+    height: 1px;
+    background: var(--border, rgba(0,78,122,0.1));
+    margin: 0.5rem 0.5rem;
+}
+.mobile-nav-logout {
+    color: var(--danger, #dc3545) !important;
+    font-weight: 600 !important;
+}
+.mobile-nav-logout:hover {
+    background: rgba(220,53,69,0.08) !important;
+    color: var(--danger, #dc3545) !important;
+}
+[data-theme="dark"] .mobile-nav-divider {
+    background: rgba(0,180,216,0.12);
+}
+
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width:900px) { .nav-links { display:none; } .hamburger { display:flex; } .nav-user { display:none; } }
 @media (max-width:768px) {

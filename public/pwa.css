@@ -1,6 +1,16 @@
 /* ============================================================
-   pwa.css — FreshZone PWA: Splash + Bottom Nav + Install Banner
+   pwa.css — FreshZone PWA Styles
+   Splash + Page Transitions + Install Banner + Loader
    ============================================================ */
+
+/* ── PAGE TRANSITION ───────────────────────────────────────── */
+html.fz-page-enter {
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+html.fz-page-enter.fz-page-visible {
+    opacity: 1;
+}
 
 /* ── SPLASH SCREEN ─────────────────────────────────────────── */
 #fz-splash {
@@ -14,25 +24,28 @@
     opacity: 1;
     transition: opacity 0.5s ease;
 }
-#fz-splash.fz-splash-hide { opacity: 0; pointer-events: none; }
+#fz-splash.fz-splash-hide {
+    opacity: 0;
+    pointer-events: none;
+}
 
 .fz-splash-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    animation: splashIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1) both;
+    gap: 14px;
+    animation: splashIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1) both;
 }
 @keyframes splashIn {
-    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    from { opacity: 0; transform: scale(0.82) translateY(16px); }
     to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .fz-splash-logo {
-    width: 100px;
-    height: 100px;
-    border-radius: 24px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
     background: white;
     padding: 8px;
     object-fit: contain;
@@ -44,146 +57,67 @@
     font-weight: 800;
     color: white;
     letter-spacing: -0.03em;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.15);
 }
 
 .fz-splash-tagline {
-    font-size: 0.88rem;
-    color: rgba(255,255,255,0.8);
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.75);
     font-weight: 500;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
-.fz-splash-spinner {
-    margin-top: 8px;
-}
+.fz-splash-spinner { margin-top: 6px; }
 .fz-spinner-ring {
     width: 28px;
     height: 28px;
     border: 3px solid rgba(255,255,255,0.3);
     border-top-color: white;
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.75s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── BOTTOM NAVIGATION BAR ─────────────────────────────────── */
-#fz-bottom-nav {
+/* ── TOP LOADING BAR (slow network only) ───────────────────── */
+#fz-page-loader {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(0,78,122,0.1);
-    display: flex;
-    align-items: stretch;
-    z-index: 9000;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-    /* Safe area for phones with home indicator */
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    top: 0; left: 0; right: 0;
+    z-index: 99998;
+    height: 3px;
 }
-
-[data-theme="dark"] #fz-bottom-nav {
-    background: rgba(13,26,38,0.97);
-    border-top-color: rgba(0,180,216,0.12);
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+.fz-loader-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00b4d8, #90e0ef, #00b4d8);
+    background-size: 200% 100%;
+    animation: loaderSlide 1.2s ease-in-out infinite;
+    border-radius: 0 3px 3px 0;
+    width: 0;
+    animation: loaderGrow 2s ease forwards, loaderShimmer 1s linear infinite;
 }
-
-.fz-bottom-nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    text-decoration: none;
-    color: #94a3b8;
-    padding: 8px 4px;
-    position: relative;
-    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
-    -webkit-tap-highlight-color: transparent;
+@keyframes loaderGrow {
+    0%  { width: 0%; opacity: 1; }
+    70% { width: 85%; opacity: 1; }
+    100%{ width: 92%; opacity: 1; }
 }
-
-.fz-bottom-nav-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 20%;
-    right: 20%;
-    height: 2px;
-    border-radius: 0 0 4px 4px;
-    background: var(--secondary, #00b4d8);
-    transform: scaleX(0);
-    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+@keyframes loaderShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
-
-.fz-bottom-nav-item.active {
-    color: var(--primary, #004e7a);
-}
-[data-theme="dark"] .fz-bottom-nav-item.active {
-    color: var(--secondary, #00b4d8);
-}
-.fz-bottom-nav-item.active::before {
-    transform: scaleX(1);
-    background: var(--primary, #004e7a);
-}
-[data-theme="dark"] .fz-bottom-nav-item.active::before {
-    background: var(--secondary, #00b4d8);
-}
-
-.fz-bottom-nav-item:active {
-    transform: scale(0.9);
-}
-
-.fz-bottom-nav-icon {
-    font-size: 1.25rem;
-    line-height: 1;
-    transition: transform 0.2s;
-}
-.fz-bottom-nav-item.active .fz-bottom-nav-icon {
-    transform: translateY(-2px) scale(1.1);
-}
-
-.fz-bottom-nav-label {
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    font-family: 'DM Sans', 'Inter', sans-serif;
-}
-
-/* Alert badge on monitor icon when detecting */
-.fz-bottom-nav-item[href="dashboard.html"] .fz-nav-badge {
-    position: absolute;
-    top: 6px;
-    right: calc(50% - 22px);
-    width: 8px;
-    height: 8px;
-    background: #ef4444;
-    border-radius: 50%;
-    border: 2px solid white;
-    animation: pulseBadge 1.5s ease-in-out infinite;
-    display: none;
-}
-.fz-bottom-nav-item[href="dashboard.html"].has-alert .fz-nav-badge {
-    display: block;
-}
-@keyframes pulseBadge {
-    0%,100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.8; }
+#fz-page-loader.fz-loader-done .fz-loader-bar {
+    width: 100% !important;
+    opacity: 0;
+    transition: width 0.2s ease, opacity 0.3s ease 0.1s;
 }
 
 /* ── INSTALL BANNER ────────────────────────────────────────── */
 #fz-install-banner {
     position: fixed;
-    bottom: 70px; /* above bottom nav */
+    bottom: 16px;
     left: 12px;
     right: 12px;
     background: white;
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 12px 14px;
     display: flex;
     align-items: center;
@@ -192,13 +126,14 @@
     box-shadow: 0 8px 32px rgba(0,0,0,0.18);
     border: 1px solid rgba(0,78,122,0.1);
     z-index: 9500;
-    transform: translateY(20px);
+    transform: translateY(24px);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.1);
 }
 [data-theme="dark"] #fz-install-banner {
     background: #0f1e2c;
-    border-color: rgba(0,180,216,0.15);
+    border-color: rgba(0,180,216,0.18);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 #fz-install-banner.fz-install-show {
     transform: translateY(0);
@@ -212,14 +147,12 @@
     flex: 1;
     min-width: 0;
 }
-
 .fz-install-icon {
     width: 44px;
     height: 44px;
     border-radius: 10px;
     flex-shrink: 0;
 }
-
 .fz-install-text {
     display: flex;
     flex-direction: column;
@@ -241,6 +174,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+[data-theme="dark"] .fz-install-text span { color: #94a3b8; }
 
 .fz-install-actions {
     display: flex;
@@ -248,13 +182,12 @@
     gap: 8px;
     flex-shrink: 0;
 }
-
 .fz-install-btn {
     background: #004e7a !important;
     color: white !important;
     border: none !important;
     border-radius: 10px !important;
-    padding: 8px 18px !important;
+    padding: 8px 16px !important;
     font-size: 0.82rem !important;
     font-weight: 700 !important;
     cursor: pointer !important;
@@ -262,6 +195,9 @@
     margin: 0 !important;
     box-shadow: 0 3px 10px rgba(0,78,122,0.3) !important;
     text-transform: none !important;
+    min-width: unset !important;
+    display: inline-flex !important;
+    align-items: center !important;
 }
 .fz-install-btn:hover { background: #00b4d8 !important; }
 .fz-install-btn::after { display: none !important; }
@@ -273,6 +209,7 @@
     border-radius: 50% !important;
     width: 28px !important;
     height: 28px !important;
+    min-width: unset !important;
     padding: 0 !important;
     margin: 0 !important;
     font-size: 0.85rem !important;
@@ -282,28 +219,21 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-width: unset !important;
 }
-.fz-install-dismiss:hover { background: rgba(0,0,0,0.06) !important; color: #64748b !important; }
+.fz-install-dismiss:hover { background: rgba(0,0,0,0.06) !important; }
 .fz-install-dismiss::after { display: none !important; }
 
 /* ── STANDALONE MODE TWEAKS ────────────────────────────────── */
 @media (display-mode: standalone) {
-    /* Hide browser-specific UI hints */
     .hotkey-badge { display: none !important; }
-    /* Add top safe area padding for notch phones */
-    nav { padding-top: calc(0.7rem + env(safe-area-inset-top, 0)); }
+    nav {
+        padding-top: calc(0.7rem + env(safe-area-inset-top, 0px));
+    }
 }
 
-/* ── HIDE BOTTOM NAV ON DESKTOP ────────────────────────────── */
-@media (min-width: 769px) {
-    #fz-bottom-nav { display: none !important; }
+/* ── DESKTOP — hide PWA-only elements ──────────────────────── */
+@media (min-width: 901px) {
     #fz-install-banner { display: none !important; }
     #fz-splash { display: none !important; }
-}
-
-/* ── MOBILE BODY PADDING (prevent content behind bottom nav) ── */
-@media (max-width: 768px) {
-    body { padding-bottom: 70px !important; }
-    footer { margin-bottom: 70px; }
+    #fz-page-loader { display: none !important; }
 }
