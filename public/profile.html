@@ -295,7 +295,7 @@
             <img id="crop-image" src="" alt="Image to crop">
         </div>
 
-        <p class="crop-hint">Drag to reposition · Pinch or use slider to zoom · Circle = your profile picture</p>
+        <p class="crop-hint">Drag the box to choose your crop area · Resize corners to adjust · Zoom to see more</p>
 
         <!-- Zoom slider -->
         <div class="crop-zoom-row">
@@ -371,36 +371,29 @@
                 cropperInstance = null;
             }
 
-            // Init Cropper.js — image moves, crop box stays fixed & square
+            // Init Cropper.js — crop box moves INSIDE the image only
             cropperInstance = new Cropper(cropImg, {
-                aspectRatio: 1,              // Locked square
-                viewMode: 0,                 // Image can move freely under the box
-                dragMode: 'move',            // Dragging moves the IMAGE, not the box
-                autoCropArea: 0.9,           // Crop box takes 90% of view by default
-                cropBoxMovable: false,       // Box stays centered — user moves image
-                cropBoxResizable: false,     // No resizing — keeps square lock
+                aspectRatio: 1,              // Locked square crop box
+                viewMode: 3,                 // Image fills container, crop box CANNOT leave image bounds
+                dragMode: 'crop',            // Dragging moves the CROP BOX inside the image
+                autoCropArea: 0.75,          // Start at 75% of image
+                cropBoxMovable: true,        // User drags the box around inside the photo
+                cropBoxResizable: true,      // User can resize but aspect ratio keeps it square
                 toggleDragModeOnDblclick: false,
-                background: false,           // Hide checkerboard — cleaner look
-                guides: false,               // No inner grid lines
+                background: false,           // No checkerboard outside image
+                guides: true,               // Rule-of-thirds grid inside box
                 center: true,
-                highlight: false,            // No overlay highlight border
-                movable: true,               // Image is draggable
+                highlight: true,
+                movable: false,              // Image itself stays still — only box moves
                 rotatable: false,
                 scalable: false,
                 zoomable: true,
                 zoomOnTouch: true,
                 zoomOnWheel: true,
-                minCropBoxWidth: 10,
-                minCropBoxHeight: 10,
+                minCropBoxWidth: 50,
+                minCropBoxHeight: 50,
                 ready() {
                     document.getElementById('zoom-slider').value = 0;
-                    // Zoom to fit image nicely on open
-                    const cd = cropperInstance.getCanvasData();
-                    const scale = Math.max(
-                        cropperInstance.getCropBoxData().width / cd.naturalWidth,
-                        cropperInstance.getCropBoxData().height / cd.naturalHeight
-                    );
-                    cropperInstance.zoomTo(Math.min(scale * 1.05, 1));
                 }
             });
 
