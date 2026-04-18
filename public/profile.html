@@ -295,7 +295,7 @@
             <img id="crop-image" src="" alt="Image to crop">
         </div>
 
-        <p class="crop-hint">Drag the box to choose your crop area · Resize corners to adjust · Zoom to see more</p>
+        <p class="crop-hint">Move or resize the box · Drag the photo to reposition · Zoom to get closer</p>
 
         <!-- Zoom slider -->
         <div class="crop-zoom-row">
@@ -371,20 +371,20 @@
                 cropperInstance = null;
             }
 
-            // Init Cropper.js — crop box moves INSIDE the image only
+            // Init Cropper.js — full image visible, crop box locked inside it
             cropperInstance = new Cropper(cropImg, {
-                aspectRatio: 1,              // Locked square crop box
-                viewMode: 3,                 // Image fills container, crop box CANNOT leave image bounds
-                dragMode: 'crop',            // Dragging moves the CROP BOX inside the image
-                autoCropArea: 0.75,          // Start at 75% of image
-                cropBoxMovable: true,        // User drags the box around inside the photo
-                cropBoxResizable: true,      // User can resize but aspect ratio keeps it square
+                aspectRatio: 1,              // Locked square
+                viewMode: 1,                 // Full image always visible, crop box can't leave image
+                dragMode: 'move',            // Drag moves the image to reposition under box
+                autoCropArea: 0.75,          // Crop box starts at 75% of the image size
+                cropBoxMovable: true,        // Can drag box around
+                cropBoxResizable: true,      // Can resize box (stays square via aspectRatio)
                 toggleDragModeOnDblclick: false,
-                background: false,           // No checkerboard outside image
-                guides: true,               // Rule-of-thirds grid inside box
+                background: false,           // No checkerboard
+                guides: true,
                 center: true,
                 highlight: true,
-                movable: false,              // Image itself stays still — only box moves
+                movable: true,
                 rotatable: false,
                 scalable: false,
                 zoomable: true,
@@ -392,8 +392,17 @@
                 zoomOnWheel: true,
                 minCropBoxWidth: 50,
                 minCropBoxHeight: 50,
+                initialAspectRatio: 1,
                 ready() {
                     document.getElementById('zoom-slider').value = 0;
+                    // Fit entire image into the container so nothing is cropped on load
+                    const containerData = cropperInstance.getContainerData();
+                    const imageData = cropperInstance.getImageData();
+                    const scale = Math.min(
+                        containerData.width  / imageData.naturalWidth,
+                        containerData.height / imageData.naturalHeight
+                    );
+                    cropperInstance.zoomTo(scale);
                 }
             });
 
