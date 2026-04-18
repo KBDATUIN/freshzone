@@ -5,9 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | Dashboard</title>
     <meta name="description" content="FreshZone live dashboard — real-time campus vape and smoke detection monitoring.">
-    <meta name="theme-color" content="#004e7a">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#004e7a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FreshZone">
+    <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+    <link rel="stylesheet" href="/pwa.css">
     <style>
         /* ── SENSOR CARDS ─────────────────────────────────── */
         .aqi-badge {
@@ -401,6 +409,9 @@
                 if (isAdmin && ackBtn) { ackBtn.style.display = 'block'; ackBtn.disabled = false; }
                 if (resolveBtn) resolveBtn.style.display = 'none';
                 activeAlerts[zoneCode] = true;
+                // Update bottom nav badge
+                const monitorLink = document.querySelector('#fz-bottom-nav a[href="dashboard.html"]');
+                if (monitorLink) monitorLink.classList.add('has-alert');
 
             } else if (smoke && acknowledgedZones.has(zoneCode)) {
                 // Acknowledged — show resolve button for everyone
@@ -431,6 +442,11 @@
                 if (ackBtn) ackBtn.style.display = 'none';
                 if (resolveBtn) resolveBtn.style.display = 'none';
                 activeAlerts[zoneCode] = false;
+                // Clear bottom nav badge if no more alerts
+                if (!Object.values(activeAlerts).some(Boolean)) {
+                    const monitorLink = document.querySelector('#fz-bottom-nav a[href="dashboard.html"]');
+                    if (monitorLink) monitorLink.classList.remove('has-alert');
+                }
             }
 
             // PM chips
@@ -673,5 +689,6 @@
 
         initHotkeys('dashboard');
     </script>
+    <script src="/pwa.js" defer></script>
 </body>
 </html>

@@ -1,123 +1,86 @@
 // ============================================================
-//  sw.js — FreshZone Service Worker
-//  Handles: Web Push Notifications + Offline Caching
+//  sw.js — FreshZone Service Worker v3
+//  Handles: Push Notifications + Offline Caching + PWA
 // ============================================================
 
-const CACHE_NAME = 'freshzone-v1';
-
-// Static assets to cache on install
+const CACHE_NAME = 'freshzone-v3';
 const STATIC_ASSETS = [
-    '/',
-    '/dashboard.html',
-    '/history.html',
-    '/profile.html',
-    '/contact.html',
-    '/auth.html',
-    '/style.css',
-    '/utils.js',
-    '/auth.js',
-    '/role-guard.js',
-    '/logo.png',
-    '/logo1.png',
-    '/vape.png',
-    '/favicon.ico',
+    '/', '/auth.html', '/dashboard.html', '/history.html',
+    '/profile.html', '/contact.html', '/style.css',
+    '/utils.js', '/auth.js', '/role-guard.js',
+    '/logo.png', '/logo1.png', '/vape.png', '/favicon.ico',
+    '/manifest.json',
     '/favicon_io/android-chrome-192x192.png',
     '/favicon_io/android-chrome-512x512.png',
     '/favicon_io/apple-touch-icon.png',
-    '/favicon_io/favicon-16x16.png',
-    '/favicon_io/favicon-32x32.png',
-    '/favicon_io/favicon.ico',
-    '/favicon_io/site.webmanifest',
 ];
 
-// ── INSTALL: cache all static assets ─────────────────────────
+// ── INSTALL ───────────────────────────────────────────────────
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(STATIC_ASSETS);
-        })
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(STATIC_ASSETS).catch(() => {}))
+            .then(() => self.skipWaiting())
     );
-    self.skipWaiting();
 });
 
-// ── ACTIVATE: clear old caches ────────────────────────────────
+// ── ACTIVATE ──────────────────────────────────────────────────
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(
-                keys
-                    .filter((key) => key !== CACHE_NAME)
-                    .map((key) => caches.delete(key))
-            )
-        )
+        caches.keys()
+            .then(keys => Promise.all(
+                keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+            ))
+            .then(() => self.clients.claim())
     );
-    self.clients.claim();
 });
 
-// ── FETCH: serve from cache, fall back to network ─────────────
+// ── FETCH: network-first for API, cache-first for assets ──────
 self.addEventListener('fetch', (event) => {
+    if (event.request.method !== 'GET') return;
     const url = new URL(event.request.url);
 
-    // Skip non-GET requests (POST, PUT, DELETE — API calls)
-    if (event.request.method !== 'GET') return;
-
-    // Skip API calls — never cache these, always need live data
+    // API calls — always network, never cache
     if (url.pathname.startsWith('/api/')) return;
 
-    // For all other GET requests: Cache First, then Network
     event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            if (cachedResponse) {
-                // Serve from cache immediately, update in background
-                fetch(event.request).then((networkResponse) => {
-                    if (networkResponse && networkResponse.status === 200) {
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, networkResponse.clone());
-                        });
-                    }
-                }).catch(() => {});
-                return cachedResponse;
-            }
-
-            // Not in cache — try network
-            return fetch(event.request).then((networkResponse) => {
-                if (!networkResponse || networkResponse.status !== 200) {
-                    return networkResponse;
+        fetch(event.request)
+            .then(response => {
+                if (response.ok) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
                 }
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, networkResponse.clone());
-                });
-                return networkResponse;
-            }).catch(() => {
-                // Offline and not cached — return dashboard as fallback for HTML
-                if (event.request.headers.get('accept') &&
-                    event.request.headers.get('accept').includes('text/html')) {
-                    return caches.match('/dashboard.html');
-                }
-            });
-        })
+                return response;
+            })
+            .catch(() => caches.match(event.request)
+                .then(cached => cached || caches.match('/auth.html'))
+            )
     );
 });
 
-// ── PUSH NOTIFICATIONS ────────────────────────────────────────
-self.addEventListener('push', function(event) {
+// ── PUSH NOTIFICATION ─────────────────────────────────────────
+self.addEventListener('push', (event) => {
     if (!event.data) return;
 
-    const data = event.data.json();
+    let data;
+    try { data = event.data.json(); }
+    catch { data = { title: '🚨 FreshZone Alert', body: event.data.text() }; }
 
     const options = {
-        body:    data.body || 'Vape/smoke detected!',
-        icon:    '/logo1.png',
-        badge:   '/logo1.png',
-        vibrate: [200, 100, 200, 100, 200],
+        body:    data.body  || 'Vape/smoke detected on campus!',
+        icon:    '/favicon_io/android-chrome-192x192.png',
+        badge:   '/favicon_io/favicon-32x32.png',
+        image:   '/vape.png',
+        vibrate: [300, 100, 300, 100, 300],
         tag:     'freshzone-alert',
         renotify: true,
         requireInteraction: true,
+        silent:  false,
         actions: [
-            { action: 'view',    title: '👁 View Dashboard' },
+            { action: 'view',    title: '👁 Open Dashboard' },
             { action: 'dismiss', title: '✕ Dismiss' }
         ],
-        data: { url: data.url || '/' }
+        data: { url: data.url || '/dashboard.html', timestamp: Date.now() }
     };
 
     event.waitUntil(
@@ -126,23 +89,27 @@ self.addEventListener('push', function(event) {
 });
 
 // ── NOTIFICATION CLICK ────────────────────────────────────────
-self.addEventListener('notificationclick', function(event) {
+self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-
     if (event.action === 'dismiss') return;
 
-    const url = event.notification.data?.url || '/';
+    const url = event.notification.data?.url || '/dashboard.html';
 
     event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-            for (const client of clientList) {
-                if (client.url.includes('dashboard') && 'focus' in client) {
-                    return client.focus();
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then(clientList => {
+                // Focus existing window if open
+                for (const client of clientList) {
+                    if ('focus' in client) {
+                        client.navigate(url);
+                        return client.focus();
+                    }
                 }
-            }
-            if (clients.openWindow) {
-                return clients.openWindow(url);
-            }
-        })
+                // Open new window
+                if (clients.openWindow) return clients.openWindow(url);
+            })
     );
 });
+
+// ── NOTIFICATION CLOSE ────────────────────────────────────────
+self.addEventListener('notificationclose', () => {});

@@ -1,0 +1,309 @@
+/* ============================================================
+   pwa.css — FreshZone PWA: Splash + Bottom Nav + Install Banner
+   ============================================================ */
+
+/* ── SPLASH SCREEN ─────────────────────────────────────────── */
+#fz-splash {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(160deg, #004e7a 0%, #00b4d8 60%, #90e0ef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+#fz-splash.fz-splash-hide { opacity: 0; pointer-events: none; }
+
+.fz-splash-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    animation: splashIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1) both;
+}
+@keyframes splashIn {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.fz-splash-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    background: white;
+    padding: 8px;
+    object-fit: contain;
+}
+
+.fz-splash-name {
+    font-family: 'Syne', 'Lexend', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.03em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
+.fz-splash-tagline {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.fz-splash-spinner {
+    margin-top: 8px;
+}
+.fz-spinner-ring {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── BOTTOM NAVIGATION BAR ─────────────────────────────────── */
+#fz-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,78,122,0.1);
+    display: flex;
+    align-items: stretch;
+    z-index: 9000;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    /* Safe area for phones with home indicator */
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+[data-theme="dark"] #fz-bottom-nav {
+    background: rgba(13,26,38,0.97);
+    border-top-color: rgba(0,180,216,0.12);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+}
+
+.fz-bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: #94a3b8;
+    padding: 8px 4px;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.fz-bottom-nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    border-radius: 0 0 4px 4px;
+    background: var(--secondary, #00b4d8);
+    transform: scaleX(0);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+.fz-bottom-nav-item.active {
+    color: var(--primary, #004e7a);
+}
+[data-theme="dark"] .fz-bottom-nav-item.active {
+    color: var(--secondary, #00b4d8);
+}
+.fz-bottom-nav-item.active::before {
+    transform: scaleX(1);
+    background: var(--primary, #004e7a);
+}
+[data-theme="dark"] .fz-bottom-nav-item.active::before {
+    background: var(--secondary, #00b4d8);
+}
+
+.fz-bottom-nav-item:active {
+    transform: scale(0.9);
+}
+
+.fz-bottom-nav-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: transform 0.2s;
+}
+.fz-bottom-nav-item.active .fz-bottom-nav-icon {
+    transform: translateY(-2px) scale(1.1);
+}
+
+.fz-bottom-nav-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-family: 'DM Sans', 'Inter', sans-serif;
+}
+
+/* Alert badge on monitor icon when detecting */
+.fz-bottom-nav-item[href="dashboard.html"] .fz-nav-badge {
+    position: absolute;
+    top: 6px;
+    right: calc(50% - 22px);
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: pulseBadge 1.5s ease-in-out infinite;
+    display: none;
+}
+.fz-bottom-nav-item[href="dashboard.html"].has-alert .fz-nav-badge {
+    display: block;
+}
+@keyframes pulseBadge {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.8; }
+}
+
+/* ── INSTALL BANNER ────────────────────────────────────────── */
+#fz-install-banner {
+    position: fixed;
+    bottom: 70px; /* above bottom nav */
+    left: 12px;
+    right: 12px;
+    background: white;
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    border: 1px solid rgba(0,78,122,0.1);
+    z-index: 9500;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.1);
+}
+[data-theme="dark"] #fz-install-banner {
+    background: #0f1e2c;
+    border-color: rgba(0,180,216,0.15);
+}
+#fz-install-banner.fz-install-show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.fz-install-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.fz-install-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.fz-install-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.fz-install-text strong {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #004e7a;
+    font-family: 'DM Sans', sans-serif;
+}
+[data-theme="dark"] .fz-install-text strong { color: #90e0ef; }
+.fz-install-text span {
+    font-size: 0.72rem;
+    color: #6c757d;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fz-install-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.fz-install-btn {
+    background: #004e7a !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 8px 18px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    width: auto !important;
+    margin: 0 !important;
+    box-shadow: 0 3px 10px rgba(0,78,122,0.3) !important;
+    text-transform: none !important;
+}
+.fz-install-btn:hover { background: #00b4d8 !important; }
+.fz-install-btn::after { display: none !important; }
+
+.fz-install-dismiss {
+    background: transparent !important;
+    color: #94a3b8 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 0.85rem !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    text-transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: unset !important;
+}
+.fz-install-dismiss:hover { background: rgba(0,0,0,0.06) !important; color: #64748b !important; }
+.fz-install-dismiss::after { display: none !important; }
+
+/* ── STANDALONE MODE TWEAKS ────────────────────────────────── */
+@media (display-mode: standalone) {
+    /* Hide browser-specific UI hints */
+    .hotkey-badge { display: none !important; }
+    /* Add top safe area padding for notch phones */
+    nav { padding-top: calc(0.7rem + env(safe-area-inset-top, 0)); }
+}
+
+/* ── HIDE BOTTOM NAV ON DESKTOP ────────────────────────────── */
+@media (min-width: 769px) {
+    #fz-bottom-nav { display: none !important; }
+    #fz-install-banner { display: none !important; }
+    #fz-splash { display: none !important; }
+}
+
+/* ── MOBILE BODY PADDING (prevent content behind bottom nav) ── */
+@media (max-width: 768px) {
+    body { padding-bottom: 70px !important; }
+    footer { margin-bottom: 70px; }
+}

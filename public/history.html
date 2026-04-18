@@ -5,9 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | History</title>
     <meta name="description" content="FreshZone detection history — complete archive of campus air quality events.">
-    <meta name="theme-color" content="#004e7a">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#004e7a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FreshZone">
+    <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+    <link rel="stylesheet" href="/pwa.css">
     <style>
         /* ── KEYFRAMES ─────────────────────────────────────── */
         @keyframes rowSlideIn {
@@ -457,5 +465,6 @@
 
         initHotkeys('history');
     </script>
+    <script src="/pwa.js" defer></script>
 </body>
 </html>
