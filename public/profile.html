@@ -16,6 +16,137 @@
     <meta name="apple-mobile-web-app-title" content="FreshZone">
     <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
     <link rel="stylesheet" href="/pwa.css">
+    <!-- Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+
+    <style>
+        /* ── CROP MODAL OVERLAY ─────────────────────────────── */
+        #crop-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        #crop-modal.open { display: flex; }
+
+        .crop-modal-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: cropSlideUp 0.35s cubic-bezier(0.175,0.885,0.32,1.1);
+        }
+        [data-theme="dark"] .crop-modal-card {
+            background: #1a2a3a;
+        }
+        @keyframes cropSlideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        .crop-modal-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary, #004e7a);
+            font-family: Lexend, sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Cropper container — fixed height so it doesn't overflow on mobile */
+        .crop-container {
+            width: 100%;
+            height: 300px;
+            background: #0a0a0a;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .crop-container img {
+            display: block;
+            max-width: 100%;
+        }
+
+        /* Crop hint */
+        .crop-hint {
+            font-size: 0.78rem;
+            color: var(--gray, #888);
+            text-align: center;
+            margin: -6px 0 0;
+            font-family: sans-serif;
+        }
+
+        /* Action buttons row */
+        .crop-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .crop-btn-apply {
+            flex: 1;
+            padding: 12px;
+            background: var(--primary, #004e7a);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: Lexend, sans-serif;
+        }
+        .crop-btn-apply:hover { filter: brightness(1.15); transform: scale(1.02); }
+        .crop-btn-cancel {
+            flex: 0 0 auto;
+            padding: 12px 18px;
+            background: transparent;
+            color: var(--gray, #888);
+            border: 1.5px solid var(--gray, #ccc);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: sans-serif;
+            transition: 0.2s;
+        }
+        .crop-btn-cancel:hover { background: rgba(0,0,0,0.05); }
+
+        /* Zoom controls */
+        .crop-zoom-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .crop-zoom-row label {
+            font-size: 0.78rem;
+            color: var(--gray, #888);
+            white-space: nowrap;
+            font-family: sans-serif;
+        }
+        .crop-zoom-row input[type=range] {
+            flex: 1;
+            accent-color: var(--primary, #004e7a);
+        }
+
+        /* Loading spinner inside button */
+        .crop-btn-apply.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .crop-btn-apply.loading::after {
+            content: " ⏳";
+        }
+    </style>
 </head>
 <body>
 
@@ -30,18 +161,18 @@
             <a href="profile.html" class="active">Profile</a>
             <a href="contact.html">Contact</a>
             <a href="#" onclick="openLogoutModal();return false;">Logout</a>
-<div class="nav-user" id="nav-user-display">
-                    <span class="nav-user-dot"></span>
-                    <span id="nav-user-name">—</span>
+            <div class="nav-user" id="nav-user-display">
+                <span class="nav-user-dot"></span>
+                <span id="nav-user-name">—</span>
+            </div>
+            <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+            <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
+                <span class="push-toggle-icon">🔔</span>
+                <div class="push-toggle-switch" id="push-btn" onclick="togglePushNotifications()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')togglePushNotifications()">
+                    <div class="push-toggle-knob"></div>
                 </div>
-                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
-                <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
-                    <span class="push-toggle-icon">🔔</span>
-                    <div class="push-toggle-switch" id="push-btn" onclick="togglePushNotifications()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')togglePushNotifications()">
-                        <div class="push-toggle-knob"></div>
-                    </div>
-                    <span class="push-toggle-label" id="push-label">OFF</span>
-                </label>
+                <span class="push-toggle-label" id="push-label">OFF</span>
+            </label>
         </div>
         <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
             <span></span><span></span><span></span>
@@ -59,7 +190,7 @@
         <div class="mobile-nav-divider"></div>
         <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout">🚪 Logout</a>
         <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn">🔔 Notify Me</a>
-        </div>
+    </div>
 </div>
 
 <div class="container profile-wrapper">
@@ -68,7 +199,7 @@
         <!-- Avatar -->
         <div class="profile-avatar">
             <img src="" id="userPhoto" class="profile-img" alt="Profile photo" style="object-fit:cover;object-position:center center;">
-            <input type="file" id="upload" hidden accept="image/*" onchange="previewFile()">
+            <input type="file" id="upload" hidden accept="image/*" onchange="openCropModal(this)">
             <button class="change-photo-btn" onclick="document.getElementById('upload').click()" aria-label="Change profile photo">
                 📷 Change Photo
             </button>
@@ -151,6 +282,31 @@
     </div>
 </div>
 
+<!-- ── CROP MODAL ──────────────────────────────────────────── -->
+<div id="crop-modal" role="dialog" aria-modal="true" aria-label="Crop your photo">
+    <div class="crop-modal-card">
+        <h3 class="crop-modal-title">✂️ Crop Your Photo</h3>
+
+        <!-- Cropper lives here -->
+        <div class="crop-container">
+            <img id="crop-image" src="" alt="Image to crop">
+        </div>
+
+        <p class="crop-hint">Drag to reposition · Pinch or use slider to zoom · Circle = your profile picture</p>
+
+        <!-- Zoom slider -->
+        <div class="crop-zoom-row">
+            <label for="zoom-slider">🔍 Zoom</label>
+            <input type="range" id="zoom-slider" min="0" max="3" step="0.01" value="0">
+        </div>
+
+        <div class="crop-actions">
+            <button class="crop-btn-apply" id="crop-apply-btn" onclick="applyCrop()">✅ Save Photo</button>
+            <button class="crop-btn-cancel" onclick="closeCropModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <div id="session-warning" role="status"></div>
 <div id="notification" class="notification" role="alert" aria-live="polite"></div>
 
@@ -167,17 +323,174 @@
 
 <footer><p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p></footer>
 
+<!-- Cropper.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script src="utils.js"></script>
 <script>
-    // Auth guard — uses JWT token from new backend
+    // Auth guard
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     const token = localStorage.getItem('fz-token');
-
     if (!currentUser || !token) {
         alert('No user logged in!');
         window.location.href = 'auth.html';
     }
 
+    // ── CROPPER STATE ──────────────────────────────────────────
+    let cropperInstance = null;
+
+    // Called when user picks a file
+    function openCropModal(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showNotification('Please select an image file.', 'error');
+            input.value = '';
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            showNotification('Image must be under 10MB.', 'error');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const cropImg = document.getElementById('crop-image');
+            cropImg.src = e.target.result;
+
+            // Show modal first so the image has a rendered size
+            document.getElementById('crop-modal').classList.add('open');
+
+            // Destroy previous instance if any
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+
+            // Init Cropper.js — square aspect ratio locked, round crop box style
+            cropperInstance = new Cropper(cropImg, {
+                aspectRatio: 1,           // Always square (circle preview)
+                viewMode: 1,              // Crop box can't go outside the image
+                dragMode: 'move',         // Move image, not crop box
+                autoCropArea: 0.8,        // Use 80% of image by default
+                cropBoxMovable: false,    // Box is fixed — only image moves
+                cropBoxResizable: false,  // Keep it square locked
+                toggleDragModeOnDblclick: false,
+                background: true,
+                guides: true,
+                center: true,
+                highlight: true,
+                ready() {
+                    // Reset zoom slider on new image
+                    document.getElementById('zoom-slider').value = 0;
+                }
+            });
+
+            // Zoom slider → cropper zoom
+            document.getElementById('zoom-slider').oninput = function() {
+                if (cropperInstance) {
+                    cropperInstance.zoomTo(parseFloat(this.value));
+                }
+            };
+
+            // Sync slider when user pinch-zooms or scroll-zooms the cropper
+            cropImg.addEventListener('zoom', function(e) {
+                const slider = document.getElementById('zoom-slider');
+                slider.value = Math.max(0, Math.min(3, e.detail.ratio));
+            });
+        };
+        reader.readAsDataURL(file);
+
+        // Reset file input so picking the same file again triggers onchange
+        input.value = '';
+    }
+
+    function closeCropModal() {
+        document.getElementById('crop-modal').classList.remove('open');
+        if (cropperInstance) {
+            cropperInstance.destroy();
+            cropperInstance = null;
+        }
+    }
+
+    // Close modal if user clicks outside the card
+    document.getElementById('crop-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeCropModal();
+    });
+
+    async function applyCrop() {
+        if (!cropperInstance) return;
+
+        const applyBtn = document.getElementById('crop-apply-btn');
+        applyBtn.classList.add('loading');
+        applyBtn.textContent = 'Saving…';
+
+        try {
+            // Get cropped canvas — output at 300×300px, JPEG quality 0.82
+            const canvas = cropperInstance.getCroppedCanvas({
+                width: 300,
+                height: 300,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+
+            const croppedBase64 = canvas.toDataURL('image/jpeg', 0.82);
+
+            // Check size — backend allows up to 500KB base64
+            if (croppedBase64.length > 490000) {
+                // Re-compress at lower quality if too big
+                const smaller = canvas.toDataURL('image/jpeg', 0.6);
+                if (smaller.length > 490000) {
+                    showNotification('Image is too large even after compression. Try a smaller photo.', 'error');
+                    applyBtn.classList.remove('loading');
+                    applyBtn.textContent = '✅ Save Photo';
+                    return;
+                }
+                await uploadPhoto(smaller);
+            } else {
+                await uploadPhoto(croppedBase64);
+            }
+        } catch (err) {
+            showNotification('Failed to process image. Try another photo.', 'error');
+            applyBtn.classList.remove('loading');
+            applyBtn.textContent = '✅ Save Photo';
+        }
+    }
+
+    async function uploadPhoto(base64) {
+        const applyBtn = document.getElementById('crop-apply-btn');
+        try {
+            // Update preview immediately
+            document.getElementById('userPhoto').src = base64;
+
+            const data = await apiFetch('/profile', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    full_name: document.getElementById('userName').textContent,
+                    photo_url: base64
+                })
+            });
+
+            if (data && data.success) {
+                // Persist to localStorage so other pages pick it up
+                const cu = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                cu.photo_url = base64;
+                localStorage.setItem('currentUser', JSON.stringify(cu));
+                showNotification('✅ Profile photo updated!', 'success');
+                closeCropModal();
+            } else {
+                showNotification(data?.message || 'Failed to save photo.', 'error');
+            }
+        } catch (err) {
+            showNotification('Connection error saving photo. Try again.', 'error');
+        } finally {
+            applyBtn.classList.remove('loading');
+            applyBtn.textContent = '✅ Save Photo';
+        }
+    }
+
+    // ── PROFILE LOAD ───────────────────────────────────────────
     async function loadProfile() {
         try {
             const data = await apiFetch('/profile');
@@ -188,7 +501,6 @@
             const u = data.user;
 
             document.getElementById('userName').textContent       = u.full_name || '—';
-            // Also update nav user name pill
             const navName = document.getElementById('nav-user-name');
             if (navName && u.full_name) navName.textContent = u.full_name;
             document.getElementById('userEmail').textContent      = u.email || '—';
@@ -204,7 +516,7 @@
                 ? new Date(u.last_login).toLocaleString(phLocale, { ...phTZ, year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true })
                 : '—';
             document.getElementById('userEmergency').textContent  = u.emergency_contact || '—';
-            // Use cached photo from localStorage first to avoid flash, then API photo
+
             const cachedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const photoSrc = u.photo_url || cachedUser.photo_url
                 || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.full_name) + '&background=00b4d8&color=fff&size=150';
@@ -250,7 +562,6 @@
         });
 
         if (data && data.success) {
-            // Update localStorage name too
             const cu = JSON.parse(localStorage.getItem('currentUser'));
             cu.full_name = full_name;
             localStorage.setItem('currentUser', JSON.stringify(cu));
@@ -287,82 +598,33 @@
         }
     }
 
-    function previewFile() {
-        const file = document.getElementById('upload').files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) { showNotification('Image must be under 5MB.', 'error'); return; }
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const img = new Image();
-            img.onload = async () => {
-                // Center-crop to square using canvas — fixes the half-photo bug
-                const size   = Math.min(img.width, img.height);
-                const canvas = document.createElement('canvas');
-                canvas.width  = 150;
-                canvas.height = 150;
-                const ctx = canvas.getContext('2d');
-
-                // Draw cropped square centered on subject
-                const sx = (img.width  - size) / 2;
-                const sy = (img.height - size) / 2;
-                ctx.drawImage(img, sx, sy, size, size, 0, 0, 150, 150);
-
-                // Get compressed base64 — kept small so it fits in DB TEXT column
-                const croppedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-                // Update preview immediately
-                document.getElementById('userPhoto').src = croppedBase64;
-
-                // Save to backend
-                const data = await apiFetch('/profile', {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        full_name: document.getElementById('userName').textContent,
-                        photo_url: croppedBase64
-                    })
-                });
-                if (data && data.success) {
-                    // Update localStorage too so it persists across pages
-                    const cu = JSON.parse(localStorage.getItem('currentUser') || '{}');
-                    cu.photo_url = croppedBase64;
-                    localStorage.setItem('currentUser', JSON.stringify(cu));
-                    showNotification('Photo updated!', 'success');
-                }
-            };
-            img.src = reader.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    // Password strength
+    // Password strength meter
     document.getElementById('pw-new').addEventListener('input', function() {
         let pw = this.value, score = 0;
-        if (pw.length >= 8) score++;
+        if (pw.length >= 8)  score++;
         if (pw.length >= 12) score++;
         if (/[A-Z]/.test(pw)) score++;
         if (/[0-9]/.test(pw)) score++;
         if (/[^A-Za-z0-9]/.test(pw)) score++;
         const levels = [
-            {pct:'0%',color:'#ddd',text:''},
-            {pct:'20%',color:'#e74c3c',text:'Very Weak'},
-            {pct:'40%',color:'#e67e22',text:'Weak'},
-            {pct:'60%',color:'#f39c12',text:'Fair'},
-            {pct:'80%',color:'#2ecc71',text:'Strong'},
-            {pct:'100%',color:'#27ae60',text:'Very Strong'},
+            {pct:'0%',  color:'#ddd',    text:''},
+            {pct:'20%', color:'#e74c3c', text:'Very Weak'},
+            {pct:'40%', color:'#e67e22', text:'Weak'},
+            {pct:'60%', color:'#f39c12', text:'Fair'},
+            {pct:'80%', color:'#2ecc71', text:'Strong'},
+            {pct:'100%',color:'#27ae60', text:'Very Strong'},
         ];
-        const lv = levels[Math.min(score,5)];
-        document.getElementById('profile-pw-bar').style.width = lv.pct;
+        const lv = levels[Math.min(score, 5)];
+        document.getElementById('profile-pw-bar').style.width      = lv.pct;
         document.getElementById('profile-pw-bar').style.background = lv.color;
-        document.getElementById('profile-pw-label').textContent = lv.text;
-        document.getElementById('profile-pw-label').style.color = lv.color;
+        document.getElementById('profile-pw-label').textContent    = lv.text;
+        document.getElementById('profile-pw-label').style.color    = lv.color;
     });
 
     loadProfile();
     initHotkeys('profile');
 
-    // ── PUSH NOTIFICATION STATE ────────────────────────────
-    // Uses utils.js apiFetch so JWT token is included and subscribe works
+    // Push notification state
     function updatePushBtn(subscribed) {
         const toggle    = document.getElementById('push-btn');
         const label     = document.getElementById('push-label');
@@ -379,9 +641,8 @@
         if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
     }
 
-    // Auto-initialize push state on load
     initPushNotifications();
 </script>
-    <script src="/pwa.js" defer></script>
+<script src="/pwa.js" defer></script>
 </body>
 </html>
