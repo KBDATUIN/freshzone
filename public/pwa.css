@@ -3,14 +3,6 @@
    Splash + Page Transitions + Install Banner + Loader
    ============================================================ */
 
-/* ── PAGE TRANSITION ───────────────────────────────────────── */
-html.fz-page-enter {
-    opacity: 0;
-    transition: opacity 0.18s ease;
-}
-html.fz-page-enter.fz-page-visible {
-    opacity: 1;
-}
 
 /* ── SPLASH SCREEN ─────────────────────────────────────────── */
 #fz-splash {

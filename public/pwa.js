@@ -41,35 +41,6 @@
     }, 1400);
 })();
 
-// ── INSTANT PAGE TRANSITIONS (no full reload feel) ────────────
-(function initPageTransitions() {
-    // Add fade-in on every page load
-    document.documentElement.classList.add('fz-page-enter');
-    window.addEventListener('DOMContentLoaded', () => {
-        requestAnimationFrame(() => {
-            document.documentElement.classList.add('fz-page-visible');
-        });
-    });
-
-    // Intercept same-origin link clicks for instant feel
-    document.addEventListener('click', (e) => {
-        const link = e.target.closest('a[href]');
-        if (!link) return;
-
-        const href = link.getAttribute('href');
-        // Only handle internal page links, not # anchors or external
-        if (!href || href.startsWith('#') || href.startsWith('http') ||
-            href.startsWith('mailto') || href.startsWith('tel')) return;
-        if (link.getAttribute('onclick')) return; // has JS handler, skip
-        if (link.target === '_blank') return;
-
-        e.preventDefault();
-
-        // Fade out then navigate
-        document.documentElement.classList.remove('fz-page-visible');
-        setTimeout(() => { window.location.href = href; }, 180);
-    });
-})();
 
 // ── INSTALL PROMPT ─────────────────────────────────────────────
 let deferredInstallPrompt = null;
