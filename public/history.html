@@ -142,11 +142,67 @@
         .filter-export-btn:hover { background: #218838 !important; }
         .filter-danger-btn:hover { background: #c0392b !important; }
 
-        @media (max-width: 480px) {
+        /* Inline clear button inside input wrap */
+        .filter-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .filter-input-wrap input,
+        .filter-input-wrap select {
+            width: 100%;
+            padding-right: 2rem;
+        }
+        .filter-inline-clear {
+            position: absolute !important;
+            right: 6px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 20px !important;
+            height: 20px !important;
+            min-width: unset !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 50% !important;
+            background: #94a3b8 !important;
+            color: white !important;
+            font-size: 0.6rem !important;
+            cursor: pointer !important;
+            box-shadow: none !important;
+            text-transform: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            z-index: 2 !important;
+            transition: background 0.2s !important;
+        }
+        .filter-inline-clear:hover { background: #64748b !important; }
+        .filter-inline-clear::after { display: none !important; }
+
+        /* Button label parts */
+        .fab-icon { font-size: 0.9rem; }
+        .fab-text  { font-size: 0.8rem; }
+
+        /* Tooltip under action buttons */
+        .filter-action-btn[title] { position: relative; }
+
+        @media (max-width: 600px) {
             .filter-inputs-row { flex-direction: column; gap: 0.6rem; }
             .filter-inputs-row .filter-group { min-width: auto; }
-            .filter-actions-row { gap: 0.5rem; }
-            .filter-action-btn { flex: 1; min-width: 0; font-size: 0.78rem !important; padding: 0.6rem 0.5rem !important; }
+            .filter-actions-row { gap: 0.5rem; flex-wrap: wrap; }
+            .filter-action-btn {
+                flex: 1;
+                min-width: calc(50% - 0.25rem);
+                font-size: 0.78rem !important;
+                padding: 0.6rem 0.5rem !important;
+            }
+            .fab-text { display: none; }
+            .fab-icon { font-size: 1.1rem; }
+        }
+        @media (max-width: 380px) {
+            .filter-action-btn { min-width: 100%; }
         }
 </style>
 </head>
@@ -230,29 +286,54 @@
 
         <!-- Filter bar -->
         <div class="filter-bar">
+            <!-- Row 1: Filter inputs each with inline clear -->
             <div class="filter-inputs-row">
+
                 <div class="filter-group">
                     <label for="filter-search">🔍 Search</label>
-                    <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable()">
+                    <div class="filter-input-wrap">
+                        <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable();updateClearBtns()">
+                        <button class="filter-inline-clear" id="clear-search" onclick="clearField('filter-search')" title="Clear search" style="display:none;">✕</button>
+                    </div>
                 </div>
+
                 <div class="filter-group">
-                    <label for="filter-status">Status</label>
-                    <select id="filter-status" onchange="renderTable()">
-                        <option value="">All</option>
-                        <option value="Detected">Detected</option>
-                        <option value="Acknowledged">Acknowledged</option>
-                        <option value="Cleared">Cleared</option>
-                    </select>
+                    <label for="filter-status">📊 Status</label>
+                    <div class="filter-input-wrap">
+                        <select id="filter-status" onchange="renderTable();updateClearBtns()">
+                            <option value="">All Statuses</option>
+                            <option value="Detected">Detected</option>
+                            <option value="Acknowledged">Acknowledged</option>
+                            <option value="Cleared">Cleared</option>
+                        </select>
+                        <button class="filter-inline-clear" id="clear-status" onclick="clearField('filter-status')" title="Clear status" style="display:none;">✕</button>
+                    </div>
                 </div>
+
                 <div class="filter-group">
                     <label for="filter-date">📅 Date</label>
-                    <input type="date" id="filter-date" onchange="renderTable()">
+                    <div class="filter-input-wrap">
+                        <input type="date" id="filter-date" onchange="renderTable();updateClearBtns()">
+                        <button class="filter-inline-clear" id="clear-date" onclick="clearField('filter-date')" title="Clear date" style="display:none;">✕</button>
+                    </div>
                 </div>
+
             </div>
+
+            <!-- Row 2: Action buttons clearly labeled -->
             <div class="filter-actions-row">
-                <button class="filter-action-btn filter-clear-btn" onclick="clearFilters()">✕ Clear</button>
-                <button class="filter-action-btn filter-export-btn" onclick="exportCSV()">⬇ Export CSV</button>
-                <button id="clear-all-btn" class="filter-action-btn filter-danger-btn" onclick="clearAllHistory()" style="display:none;">🗑 Clear All</button>
+                <button class="filter-action-btn filter-clear-btn" onclick="clearFilters()" title="Reset all filters">
+                    <span class="fab-icon">↺</span>
+                    <span class="fab-text">Reset Filters</span>
+                </button>
+                <button class="filter-action-btn filter-export-btn" onclick="exportCSV()" title="Export table as CSV file">
+                    <span class="fab-icon">⬇</span>
+                    <span class="fab-text">Export to CSV</span>
+                </button>
+                <button id="clear-all-btn" class="filter-action-btn filter-danger-btn" onclick="clearAllHistory()" style="display:none;" title="Permanently delete all history">
+                    <span class="fab-icon">🗑</span>
+                    <span class="fab-text">Delete All History</span>
+                </button>
             </div>
         </div>
 
