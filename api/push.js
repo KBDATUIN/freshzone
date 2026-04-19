@@ -112,5 +112,35 @@ async function sendPushToAll(title, body, url = '/dashboard.html') {
     }
 }
 
+
+// ── POST /api/push/test — send a test push to all subscribers ─
+// Protected by ESP32 API key so only you can trigger it
+router.post('/test', async (req, res) => {
+    const apiKey = req.headers['x-api-key'];
+    if (!apiKey || apiKey !== process.env.ESP32_API_KEY) {
+        return res.status(401).json({ success: false, message: 'Invalid API key.' });
+    }
+
+    try {
+        const [subs] = await db.query('SELECT COUNT(*) as count FROM push_subscriptions');
+        const count = subs[0].count;
+
+        if (count === 0) {
+            return res.json({ success: false, message: 'No subscribers found. Enable notifications on the dashboard first.' });
+        }
+
+        await sendPushToAll(
+            '🚨 TEST — Vape/Smoke Detected!',
+            'This is a test alert from FreshZone. System is working correctly.',
+            '/dashboard.html'
+        );
+
+        res.json({ success: true, message: `Test push sent to ${count} subscriber(s).` });
+    } catch (err) {
+        console.error('[push/test] Error:', err.message);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 module.exports = router;
 module.exports.sendPushToAll = sendPushToAll;
