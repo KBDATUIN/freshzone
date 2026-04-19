@@ -71,11 +71,23 @@ self.addEventListener('push', (event) => {
         icon:    '/favicon_io/android-chrome-192x192.png',
         badge:   '/favicon_io/favicon-32x32.png',
         image:   '/vape.png',
-        vibrate: [300, 100, 300, 100, 300],
-        tag:     'freshzone-alert',
+
+        // Vibrate strongly — long-short-long-short-long pattern
+        vibrate: [500, 200, 500, 200, 500, 200, 500],
+
+        // Use unique tag per alert so each event shows separately
+        tag:      'freshzone-alert-' + Date.now(),
         renotify: true,
+
+        // CRITICAL: keeps notification on screen until user taps it
         requireInteraction: true,
-        silent:  false,
+
+        // CRITICAL: never silent — triggers sound + screen wake
+        silent: false,
+
+        // Priority hint (Android)
+        priority: 'high',
+
         actions: [
             { action: 'view',    title: '👁 Open Dashboard' },
             { action: 'dismiss', title: '✕ Dismiss' }

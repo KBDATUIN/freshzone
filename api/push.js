@@ -88,7 +88,10 @@ async function sendPushToAll(title, body, url = '/dashboard.html') {
             subs.map(async (row) => {
                 try {
                     const sub = JSON.parse(row.subscription_data);
-                    await webpush.sendNotification(sub, payload);
+                    await webpush.sendNotification(sub, payload, {
+                        urgency: 'high',   // forces immediate delivery, wakes screen
+                        TTL: 60,           // 60 seconds to deliver or drop
+                    });
                 } catch (err) {
                     if (err.statusCode === 410 || err.statusCode === 404) {
                         expiredIds.push(row.id);
