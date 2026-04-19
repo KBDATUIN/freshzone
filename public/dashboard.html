@@ -173,6 +173,92 @@
             letter-spacing: 0.04em;
             min-width: 22px;
         }
+
+        /* ── FULL-SCREEN ALARM OVERLAY ─────────────────────── */
+        #fz-alarm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(180, 0, 0, 0.96);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: alarmFlash 0.6s ease-in-out infinite alternate;
+        }
+        @keyframes alarmFlash {
+            from { background: rgba(180, 0, 0, 0.93); }
+            to   { background: rgba(220, 30, 30, 0.99); }
+        }
+        .fz-alarm-inner {
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            z-index: 2;
+        }
+        .fz-alarm-icon {
+            font-size: 5rem;
+            animation: alarmBounce 0.5s ease-in-out infinite alternate;
+            display: block;
+            margin-bottom: 1rem;
+        }
+        @keyframes alarmBounce {
+            from { transform: scale(1); }
+            to   { transform: scale(1.2); }
+        }
+        .fz-alarm-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            margin-bottom: 0.5rem;
+        }
+        .fz-alarm-location {
+            font-size: 1.2rem;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 0.4rem;
+        }
+        .fz-alarm-pm {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            font-family: monospace;
+        }
+        .fz-alarm-pulse {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            animation: alarmPulseRing 1s ease-out infinite;
+            z-index: -1;
+        }
+        @keyframes alarmPulseRing {
+            0%   { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(2);   opacity: 0; }
+        }
+        .fz-alarm-close {
+            background: white !important;
+            color: #dc2626 !important;
+            border: none !important;
+            border-radius: 50px !important;
+            padding: 1rem 2.5rem !important;
+            font-size: 1.1rem !important;
+            font-weight: 800 !important;
+            width: auto !important;
+            cursor: pointer !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+            text-transform: none !important;
+            margin: 0 !important;
+            letter-spacing: 0.01em;
+            transition: transform 0.15s !important;
+        }
+        .fz-alarm-close:hover { transform: scale(1.05) !important; }
+        .fz-alarm-close::after { display: none !important; }
+
     </style>
 </head>
 <body>
@@ -298,6 +384,19 @@
         </div>
     </div>
 
+
+    <!-- ── FULL-SCREEN ALARM OVERLAY ─────────────────────────── -->
+    <div id="fz-alarm-overlay" style="display:none;">
+        <div class="fz-alarm-inner">
+            <div class="fz-alarm-icon">🚨</div>
+            <div class="fz-alarm-title">VAPE DETECTED!</div>
+            <div class="fz-alarm-location" id="fz-alarm-location">—</div>
+            <div class="fz-alarm-pm" id="fz-alarm-pm">—</div>
+            <div class="fz-alarm-pulse"></div>
+            <button class="fz-alarm-close" onclick="closeAlarmOverlay()">✓ I Acknowledge</button>
+        </div>
+    </div>
+
     <!-- Staff Response Modal — shown to staff when admin acknowledges -->
     <div class="staff-response-modal" id="staff-response-modal" role="alertdialog" aria-modal="true" aria-labelledby="staff-modal-title">
         <div class="staff-response-card">
@@ -410,6 +509,15 @@
                 // Show acknowledge button for admin only
                 if (isAdmin && ackBtn) { ackBtn.style.display = 'block'; ackBtn.disabled = false; }
                 if (resolveBtn) resolveBtn.style.display = 'none';
+                // Show full-screen alarm overlay for NEW detections
+                if (!activeAlerts[zoneCode] && !alarmShownFor.has(zoneCode)) {
+                    alarmShownFor.add(zoneCode);
+                    showAlarmOverlay(
+                        data.location_name || zoneCode,
+                        parseFloat(data.pm2_5 || 0).toFixed(1),
+                        data.aqi_value || '—'
+                    );
+                }
                 activeAlerts[zoneCode] = true;
                 // Update bottom nav badge
                 const monitorLink = document.querySelector('#fz-bottom-nav a[href="dashboard.html"]');
@@ -431,6 +539,7 @@
             } else {
                 // Sensor is genuinely clear
                 acknowledgedZones.delete(zoneCode);
+                alarmShownFor.delete(zoneCode); // reset so next real detection triggers again
                 card.className = 'location-card clear';
                 dot.className  = 'status-dot dot-clear';
                 statusText.innerHTML = '● Air Clear';
@@ -666,6 +775,72 @@
                 showNotification('Connection error. Try again.', 'error');
                 if (resolveBtn) { resolveBtn.disabled = false; resolveBtn.textContent = '✅ Mark as Resolved'; }
             }
+        }
+
+
+        // ── FULL-SCREEN ALARM SYSTEM ────────────────────────────
+        let alarmAudio = null;
+        let alarmShownFor = new Set();
+
+        function showAlarmOverlay(locationName, pm25, aqi) {
+            const overlay = document.getElementById('fz-alarm-overlay');
+            if (!overlay) return;
+
+            document.getElementById('fz-alarm-location').textContent = '📍 ' + locationName;
+            document.getElementById('fz-alarm-pm').textContent =
+                `PM2.5: ${pm25} µg/m³  |  AQI: ${aqi}`;
+
+            overlay.style.display = 'flex';
+
+            // Vibrate phone — 3 long buzzes
+            if (navigator.vibrate) {
+                navigator.vibrate([800, 300, 800, 300, 800, 300, 800]);
+            }
+
+            // Play alarm sound using Web Audio API (no file needed)
+            playAlarmSound();
+
+            // Auto-dismiss after 15 seconds if no action
+            setTimeout(() => closeAlarmOverlay(), 15000);
+        }
+
+        function closeAlarmOverlay() {
+            const overlay = document.getElementById('fz-alarm-overlay');
+            if (overlay) overlay.style.display = 'none';
+            stopAlarmSound();
+        }
+
+        function playAlarmSound() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                alarmAudio = new AudioCtx();
+
+                function beep(freq, start, duration) {
+                    const osc = alarmAudio.createOscillator();
+                    const gain = alarmAudio.createGain();
+                    osc.connect(gain);
+                    gain.connect(alarmAudio.destination);
+                    osc.type = 'square';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.4, alarmAudio.currentTime + start);
+                    gain.gain.exponentialRampToValueAtTime(0.001, alarmAudio.currentTime + start + duration);
+                    osc.start(alarmAudio.currentTime + start);
+                    osc.stop(alarmAudio.currentTime + start + duration);
+                }
+
+                // Siren pattern: high-low repeating
+                for (let i = 0; i < 6; i++) {
+                    beep(880, i * 0.6,       0.5);
+                    beep(660, i * 0.6 + 0.3, 0.3);
+                }
+            } catch(e) {}
+        }
+
+        function stopAlarmSound() {
+            try {
+                if (alarmAudio) { alarmAudio.close(); alarmAudio = null; }
+            } catch(e) {}
         }
 
         // ── START POLLING ──────────────────────────────────────
