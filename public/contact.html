@@ -110,6 +110,12 @@
 
     <div class="container" style="max-width:720px;">
 
+        <!-- Page header -->
+        <div class="contact-page-header">
+            <h1><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;color:var(--secondary);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact &amp; Reports</h1>
+            <p>Send feedback, report device issues, or submit suggestions to the administrator.</p>
+        </div>
+
         <!-- Report Form -->
         <div class="glass-card">
             <h2><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Send a Report</h2>
@@ -265,7 +271,7 @@
                     const msg = t.message.length > 200 ? t.message.slice(0,200) + '…' : t.message;
                     const isResolved = t.ticket_status === 'Resolved';
                     return `<div class="ticket-item ${isResolved ? 'resolved' : ''}" id="ticket-${t.id}">
-                        <div class="ticket-meta">${date} · <b>${t.submitter_name || t.submitter_email}</b> · <span style="font-family:monospace;background:rgba(0,180,216,0.1);padding:1px 6px;border-radius:4px;">${t.ticket_ref}</span></div>
+                        <div class="ticket-meta">${date} · <b>${t.submitter_name || t.submitter_email}</b> · <span class="ticket-ref-badge">${t.ticket_ref}</span></div>
                         <div class="ticket-subject">${t.subject}</div>
                         <div class="ticket-msg">${msg}</div>
                         ${!isResolved
