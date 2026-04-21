@@ -232,41 +232,20 @@
 
         <!-- View mode -->
         <div class="profile-details" id="profile-view">
-            <div class="profile-detail-row">
-                <span class="profile-detail-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Position</span>
-                <span class="profile-detail-value" id="userPosition">—</span>
-            </div>
-            <div class="profile-detail-row">
-                <span class="profile-detail-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.63 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.54 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l1.14-.88a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.92 16.92z"/></svg> Contact</span>
-                <span class="profile-detail-value" id="userContact">—</span>
-            </div>
-            <div class="profile-detail-row">
-                <span class="profile-detail-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Email</span>
-                <span class="profile-detail-value" id="userEmail">—</span>
-            </div>
-            <div class="profile-detail-row">
-                <span class="profile-detail-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M8 10h8M8 14h5"/></svg> Employee ID</span>
-                <span class="profile-detail-value" id="userEmployeeID">—</span>
-            </div>
-            <div class="profile-detail-row">
-                <span class="profile-detail-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Date Joined</span>
-                <span class="profile-detail-value" id="userDateJoined">—</span>
-            </div>
-            <div class="profile-detail-row">
-                <span class="profile-detail-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Last Login</span>
-                <span class="profile-detail-value" id="userLastLogin">—</span>
-            </div>
-            <div class="profile-detail-row">
-                <span class="profile-detail-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.63 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.54 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l1.14-.88a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.92 16.92z"/></svg> Emergency</span>
-                <span class="profile-detail-value" id="userEmergency">—</span>
-            </div>
+            <p><strong>Position:</strong> <span id="userPosition"></span></p>
+            <p><strong>Contact:</strong>  <span id="userContact"></span></p>
+            <p><strong>Email:</strong>    <span id="userEmail"></span></p>
+            <p><strong>Employee ID:</strong> <span id="userEmployeeID"></span></p>
+            <p><strong>Date Joined:</strong> <span id="userDateJoined"></span></p>
+            <p><strong>Last Login:</strong>  <span id="userLastLogin"></span></p>
+            <p><strong>Emergency Contact:</strong> <span id="userEmergency"></span></p>
         </div>
 
         <div id="roleMessage" class="profile-role-badge"></div>
 
         <!-- Edit Profile button -->
         <button onclick="toggleEdit(true)" id="edit-btn" style="margin-top:1rem;width:auto;padding:0.55rem 1.5rem;font-size:0.85rem;border-radius:10px;display:inline-flex;align-items:center;gap:6px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Edit Profile
         </button>
 
