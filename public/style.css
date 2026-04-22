@@ -225,20 +225,70 @@ nav {
 .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
 
 /* Mobile drawer */
-.mobile-nav { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; backdrop-filter:blur(4px); }
+/* ── MOBILE NAV OVERLAY ─────────────────────────────────────── */
+/* z-index 1100 — above sticky nav (z-index 1000) so drawer is never hidden */
+.mobile-nav {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.52);
+    z-index:1100;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+}
 .mobile-nav.open { display:block; }
+
 .mobile-nav-drawer {
-    position:absolute; top:0; right:0; width:260px; height:100%;
-    background:rgba(255,255,255,0.96); backdrop-filter:blur(20px);
-    padding:1.2rem 1rem; display:flex; flex-direction:column; gap:0.3rem;
-    box-shadow:-4px 0 24px rgba(0,0,0,0.18); animation:slideInRight 0.26s ease;
+    position:fixed;   /* fixed so it always covers full height regardless of scroll */
+    top:0; right:0;
+    width:270px; height:100%;
+    background:rgba(255,255,255,0.97);
+    backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+    padding:1rem 1rem 2rem;
+    display:flex; flex-direction:column; gap:0.25rem;
+    box-shadow:-6px 0 32px rgba(0,0,0,0.18);
+    animation:slideInRight 0.24s cubic-bezier(0.4,0,0.2,1);
+    z-index:1101; /* above the overlay backdrop */
+    overflow-y:auto;
+}
+[data-theme="dark"] .mobile-nav-drawer {
+    background:rgba(8,18,30,0.98);
 }
 @keyframes slideInRight { from{transform:translateX(100%)} to{transform:translateX(0)} }
-.mobile-nav-drawer a { text-decoration:none; color:var(--gray); padding:0.65rem 1rem; border-radius:var(--radius-sm); font-weight:500; font-size:0.95rem; transition:all 0.22s; display:block; }
-.mobile-nav-drawer a.active,.mobile-nav-drawer a:hover { background:var(--primary); color:white; }
-.mobile-nav-close { background:transparent !important; border:none; box-shadow:none !important; width:auto; padding:0.4rem; margin:0 0 0.4rem auto; font-size:1.4rem; color:var(--gray); text-transform:none; cursor:pointer; }
-.mobile-nav-close:hover { background:transparent !important; transform:none !important; box-shadow:none !important; color:var(--primary) !important; }
+
+/* Close button — large tap target, always visible at top of drawer */
+.mobile-nav-close {
+    background:transparent !important;
+    border:none;
+    box-shadow:none !important;
+    width:40px !important; height:40px !important;
+    padding:0 !important;
+    margin:0 0 0.75rem auto !important;
+    display:flex !important; align-items:center !important; justify-content:center !important;
+    color:var(--gray) !important;
+    text-transform:none !important;
+    cursor:pointer !important;
+    border-radius:8px !important;
+    transition:background 0.18s !important;
+    flex-shrink:0 !important;
+    position:relative !important;
+    z-index:10 !important;
+}
+.mobile-nav-close:hover {
+    background:rgba(0,78,122,0.08) !important;
+    transform:none !important;
+    box-shadow:none !important;
+    color:var(--primary) !important;
+}
 .mobile-nav-close::after { display:none !important; }
+.mobile-nav-close svg { width:22px !important; height:22px !important; pointer-events:none !important; }
+
+.mobile-nav-drawer a {
+    text-decoration:none; color:var(--gray);
+    padding:0.7rem 1rem; border-radius:var(--radius-sm);
+    font-weight:500; font-size:0.95rem;
+    transition:all 0.2s; display:flex; align-items:center; gap:8px;
+}
+.mobile-nav-drawer a.active, .mobile-nav-drawer a:hover { background:var(--primary); color:white; }
 
 /* ── LAYOUT ─────────────────────────────────────────────────── */
 .container { max-width:1100px; margin:auto; padding:2rem 1.5rem; position:relative; z-index:10; }

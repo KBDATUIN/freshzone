@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style>/* Anti-flash */html{background:linear-gradient(135deg,#90e0ef,#00b4d8,#004e7a);}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
+    <style>
+        /* Anti-flash */
+        html { background: linear-gradient(135deg,#0a1628,#004e7a,#00b4d8); }
+        html[data-theme="dark"] { background: linear-gradient(135deg,#040c14,#071018,#0a1520); }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | Secure Access</title>
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
@@ -18,143 +22,657 @@
     <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
     <link rel="stylesheet" href="/pwa.css">
     <style>
-        .email-sent-banner { display: none; }
-        @media (max-width: 600px) {
-            .email-sent-banner { display:flex;align-items:center;gap:10px;background:#e8f5e9;border:1.5px solid #66bb6a;border-radius:12px;padding:12px 14px;margin-bottom:14px;animation:bannerSlideIn 0.4s cubic-bezier(0.175,0.885,0.32,1.1) both; }
-            [data-theme="dark"] .email-sent-banner { background:rgba(40,167,69,0.15);border-color:#2ecc71; }
-            @keyframes bannerSlideIn { from{opacity:0;transform:translateY(-10px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-            .email-sent-icon { font-size:22px;flex-shrink:0; }
-            .email-sent-text { display:flex;flex-direction:column;gap:2px; }
-            .email-sent-text strong { font-size:0.85rem;color:#2e7d32;font-family:sans-serif; }
-            [data-theme="dark"] .email-sent-text strong { color:#66bb6a; }
-            .email-sent-text span { font-size:0.78rem;color:#555;font-family:sans-serif;word-break:break-all; }
-            [data-theme="dark"] .email-sent-text span { color:#aaa; }
+        /* ── AUTH PAGE OVERHAUL ─────────────────────────────── */
+        * { box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(135deg, #0a1628 0%, #003a5c 35%, #004e7a 65%, #006b9e 100%);
+            background-size: 400% 400%;
+            animation: authWave 20s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
         }
-            </style>
+        @keyframes authWave {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating orbs background */
+        .auth-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .auth-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.25;
+            animation: orbFloat 16s ease-in-out infinite;
+        }
+        .auth-orb:nth-child(1) { width:400px; height:400px; background:#00b4d8; top:-10%; left:-10%; animation-delay:0s; }
+        .auth-orb:nth-child(2) { width:300px; height:300px; background:#0077b6; bottom:-5%; right:-8%; animation-delay:5s; }
+        .auth-orb:nth-child(3) { width:200px; height:200px; background:#90e0ef; top:50%; left:60%; animation-delay:10s; }
+        @keyframes orbFloat {
+            0%,100% { transform: translateY(0) scale(1); }
+            50%      { transform: translateY(-30px) scale(1.05); }
+        }
+
+        /* Grid mesh overlay */
+        .auth-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,180,216,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,180,216,0.06) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Main layout */
+        .auth-layout {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 920px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+            min-height: 580px;
+        }
+
+        /* Left panel — branding */
+        .auth-panel-left {
+            background: linear-gradient(160deg, rgba(0,78,122,0.9) 0%, rgba(0,30,60,0.95) 100%);
+            padding: 3rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-panel-left::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(0,180,216,0.2), transparent 70%);
+            border-radius: 50%;
+        }
+        .auth-panel-left::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(144,224,239,0.12), transparent 70%);
+            border-radius: 50%;
+        }
+
+        .auth-brand {
+            position: relative;
+            z-index: 2;
+        }
+        .auth-brand img {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.12);
+            padding: 6px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .auth-brand h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: white;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: 0.5rem;
+        }
+        .auth-brand p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            font-weight: 400;
+            max-width: 240px;
+        }
+
+        /* Status indicators */
+        .auth-stats {
+            position: relative;
+            z-index: 2;
+        }
+        .auth-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        .auth-stat-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34,197,94,0.22);
+            flex-shrink: 0;
+            animation: statPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes statPulse {
+            0%,100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.22); }
+            50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0.08); }
+        }
+        .auth-stat-text {
+            color: rgba(255,255,255,0.75);
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+        .auth-stat-text strong { color: white; font-weight: 700; }
+
+        /* Right panel — form */
+        .auth-panel-right {
+            background: rgba(255,255,255,0.97);
+            padding: 2.5rem 2.25rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        [data-theme="dark"] .auth-panel-right {
+            background: rgba(10,22,38,0.98);
+        }
+
+        /* Form header */
+        .auth-form-header {
+            margin-bottom: 1.5rem;
+        }
+        .auth-form-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #003049;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.25rem;
+        }
+        [data-theme="dark"] .auth-form-header h2 { color: #d0eaf8; }
+        .auth-form-header p {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 400;
+        }
+        [data-theme="dark"] .auth-form-header p { color: #64748b; }
+
+        /* Tab switcher */
+        .auth-tabs {
+            display: flex;
+            gap: 0;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 3px;
+            margin-bottom: 1.5rem;
+        }
+        [data-theme="dark"] .auth-tabs { background: rgba(255,255,255,0.05); }
+        .auth-tab {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.22s;
+            box-shadow: none !important;
+            margin: 0 !important;
+            width: auto !important;
+            letter-spacing: 0;
+        }
+        .auth-tab::after { display: none !important; }
+        .auth-tab:hover { color: #004e7a; background: transparent; transform: none !important; }
+        .auth-tab.active {
+            background: white !important;
+            color: #004e7a !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            transform: none !important;
+        }
+        [data-theme="dark"] .auth-tab.active {
+            background: rgba(0,180,216,0.15) !important;
+            color: #00b4d8 !important;
+        }
+
+        /* Form fields override for clean look */
+        .auth-panel-right label {
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-top: 0;
+            margin-bottom: 0.3rem;
+        }
+        [data-theme="dark"] .auth-panel-right label { color: #64748b; }
+        .auth-panel-right input,
+        .auth-panel-right select {
+            padding: 0.7rem 0.9rem;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            background: #f8fafc;
+            transition: all 0.2s;
+            margin-top: 0;
+        }
+        [data-theme="dark"] .auth-panel-right input,
+        [data-theme="dark"] .auth-panel-right select {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.08);
+            color: #d0eaf8;
+        }
+        .auth-panel-right input:focus,
+        .auth-panel-right select:focus {
+            border-color: #00b4d8;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0,180,216,0.12);
+        }
+        [data-theme="dark"] .auth-panel-right input:focus,
+        [data-theme="dark"] .auth-panel-right select:focus {
+            background: rgba(0,180,216,0.05);
+        }
+
+        /* Input group spacing */
+        .auth-panel-right .input-group { margin-bottom: 0.7rem; }
+
+        /* Primary button override */
+        .auth-panel-right .btn-primary {
+            background: linear-gradient(135deg, #004e7a, #0077b6) !important;
+            border: none;
+            border-radius: 12px !important;
+            padding: 0.82rem 1rem !important;
+            font-weight: 700 !important;
+            font-size: 0.9rem !important;
+            letter-spacing: 0.02em;
+            box-shadow: 0 4px 16px rgba(0,78,122,0.35) !important;
+            transition: all 0.22s !important;
+            margin-top: 1rem !important;
+        }
+        .auth-panel-right .btn-primary:hover {
+            background: linear-gradient(135deg, #0077b6, #00b4d8) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 24px rgba(0,180,216,0.4) !important;
+        }
+        .auth-panel-right .btn-success {
+            border-radius: 12px !important;
+            padding: 0.82rem 1rem !important;
+            font-weight: 700 !important;
+        }
+
+        /* Link/switch text */
+        .auth-panel-right .auth-extra-links {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.82rem;
+            color: #94a3b8;
+        }
+        .auth-panel-right .text-link {
+            color: #0077b6;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        [data-theme="dark"] .auth-panel-right .text-link { color: #00b4d8; }
+        .auth-panel-right .text-link:hover { text-decoration: underline; }
+
+        /* OTP box */
+        .auth-panel-right .otp-box {
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+        [data-theme="dark"] .auth-panel-right .otp-box { border-top-color: rgba(255,255,255,0.08); }
+
+        /* Email sent banner */
+        .email-sent-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(0,180,216,0.08), rgba(0,180,216,0.04));
+            border: 1px solid rgba(0,180,216,0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            animation: bannerIn 0.38s cubic-bezier(0.175,0.885,0.32,1.1) both;
+        }
+        @keyframes bannerIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+        .email-sent-icon { display: flex; align-items: center; flex-shrink: 0; opacity: 0.8; }
+        .email-sent-icon svg { width: 20px; height: 20px; }
+        .email-sent-text { display: flex; flex-direction: column; gap: 1px; }
+        .email-sent-text strong { font-size: 0.82rem; color: #004e7a; font-family: sans-serif; }
+        [data-theme="dark"] .email-sent-text strong { color: #00b4d8; }
+        .email-sent-text span { font-size: 0.75rem; color: #64748b; font-family: sans-serif; }
+
+        /* Info alert */
+        .auth-panel-right .info-alert {
+            background: rgba(0,180,216,0.07);
+            border: 1px solid rgba(0,180,216,0.18);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.83rem;
+            color: #475569;
+            margin-bottom: 0.75rem;
+        }
+        [data-theme="dark"] .auth-panel-right .info-alert { color: #94a3b8; }
+
+        /* Dark mode toggle */
+        .auth-dark-btn {
+            position: fixed;
+            top: 1rem; right: 1rem;
+            background: rgba(255,255,255,0.12) !important;
+            border: 1px solid rgba(255,255,255,0.18) !important;
+            color: white !important;
+            width: 38px !important; height: 38px !important;
+            border-radius: 10px !important;
+            box-shadow: none !important;
+            z-index: 100;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer;
+            transition: all 0.2s !important;
+            font-size: 1rem !important;
+        }
+        .auth-dark-btn:hover { background: rgba(255,255,255,0.22) !important; transform: none !important; }
+        .auth-dark-btn::after { display: none !important; }
+
+        /* Footer */
+        .auth-footer-bar {
+            position: fixed;
+            bottom: 0.75rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.4);
+            font-size: 0.72rem;
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        /* Grid inputs */
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+        }
+
+        /* Resend OTP button */
+        .btn-resend {
+            background: transparent !important;
+            color: #0077b6 !important;
+            border: 1.5px solid #0077b6 !important;
+            border-radius: 10px !important;
+            padding: 0.5rem 1rem !important;
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
+            box-shadow: none !important;
+            margin-top: 0.5rem !important;
+            width: auto !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            letter-spacing: 0 !important;
+            text-transform: none !important;
+        }
+        .btn-resend:hover { background: rgba(0,119,182,0.06) !important; transform: none !important; box-shadow: none !important; }
+        .btn-resend::after { display: none !important; }
+        [data-theme="dark"] .btn-resend { color: #00b4d8 !important; border-color: #00b4d8 !important; }
+
+        /* ── MOBILE: stack layout ──────────────────────────── */
+        @media (max-width: 700px) {
+            body { padding: 0; align-items: flex-start; }
+            .auth-layout {
+                grid-template-columns: 1fr;
+                border-radius: 0;
+                box-shadow: none;
+                min-height: 100vh;
+            }
+            .auth-panel-left {
+                padding: 2rem 1.5rem 1.5rem;
+                min-height: auto;
+            }
+            .auth-brand h1 { font-size: 1.8rem; }
+            .auth-stats { display: none; }
+            .auth-panel-right { padding: 1.75rem 1.25rem; flex: 1; }
+            .auth-dark-btn { top: 0.75rem; right: 0.75rem; width:34px !important; height:34px !important; }
+            .auth-footer-bar { display: none; }
+            .grid-inputs { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 400px) {
+            .auth-panel-left { padding: 1.5rem 1.25rem 1rem; }
+            .auth-panel-right { padding: 1.5rem 1rem; }
+        }
+    </style>
 </head>
 <body>
-<div class="auth-wrapper">
-    <div class="smoke-container" id="smoke-bg"></div>
-    <div class="auth-container">
-        <header class="auth-header">
-            <h1>Welcome to FreshZone</h1>
-            <p>Campus vape aerosol detection system — keeping your school environment safe and compliant.</p>
-        </header>
-        <main class="glass-card auth-card">
-            <div class="brand-section">
-                <img src="logo1.png" alt="FreshZone Logo" class="auth-logo">
-            </div>
 
-            <!-- LOGIN VIEW -->
-            <div id="login-view" class="auth-form-content">
-                <div class="input-group">
-                    <label for="login-email">Email or Phone Number</label>
-                    <input type="text" id="login-email" placeholder="name@gmail.com or 09XXXXXXXXX" autocomplete="username">
-                </div>
-                <div class="input-group">
-                    <label for="login-password">Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-                        <button type="button" class="eye-btn" onclick="togglePassword('login-password', this)" aria-label="Toggle password visibility">
-                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.6rem;">
-                    <div style="display:flex;align-items:center;gap:0.5rem;">
-                        <input type="checkbox" id="remember-me" checked style="width:auto;margin:0;accent-color:var(--secondary);">
-                        <label for="remember-me" style="margin:0;font-size:0.8rem;font-weight:500;cursor:pointer;">Stay logged in</label>
-                    </div>
-
-                </div>
-                <button class="btn-primary" onclick="login()">Sign In</button>
-                <div class="auth-extra-links">
-                    <p>New here? <span onclick="showView('signup-view')" class="text-link">Create account</span></p>
-                    <p onclick="showView('forgot-view')" class="text-link small">Forgot your password?</p>
-                </div>
-            </div>
-
-            <!-- SIGNUP VIEW -->
-            <div id="signup-view" class="auth-form-content hidden">
-                <div class="grid-inputs">
-                    <div class="input-group"><label for="signup-name">Full Name</label><input type="text" id="signup-name" placeholder="John Doe" autocomplete="name"></div>
-                    <div class="input-group"><label for="signup-employeeid">Employee ID</label><input type="text" id="signup-employeeid" placeholder="02XXXXXX"></div>
-                </div>
-                <div class="input-group"><label for="signup-email">Email Address</label><input type="email" id="signup-email" placeholder="email@gmail.com" autocomplete="email"></div>
-                <div class="input-group"><label for="signup-contact">Contact Number</label><input type="tel" id="signup-contact" placeholder="+63 9xx xxx xxxx" autocomplete="tel"></div>
-                <div class="input-group">
-                    <label for="signup-position">Position</label>
-                    <select id="signup-position"><option value="" disabled selected>Select your position</option><option value="Administrator">Administrator</option><option value="Staff / Teachers">Staff / Teachers</option></select>
-                </div>
-                <div class="input-group">
-                    <label for="signup-password">Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="signup-password" placeholder="Min. 8 characters" autocomplete="new-password">
-                        <button type="button" class="eye-btn" onclick="togglePassword('signup-password', this)" aria-label="Toggle password visibility">
-                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                        </button>
-                    </div>
-                    <div class="pw-strength-bar" id="signup-pw-bar"></div>
-                    <span class="pw-strength-label" id="signup-pw-label"></span>
-                </div>
-                <button id="signup-btn" class="btn-primary" onclick="sendOTP('signup')">Send Verification OTP</button>
-                <div id="signup-otp-section" class="otp-box hidden">
-                    <div class="email-sent-banner" id="signup-email-banner">
-                        <span class="email-sent-icon">✉️</span>
-                        <div class="email-sent-text"><strong>OTP sent to your email!</strong><span id="signup-email-display"></span></div>
-                    </div>
-                    <div class="input-group"><label for="signup-otp-input">Verification Code</label><input type="text" id="signup-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric"></div>
-                    <div class="otp-timer" id="signup-otp-timer"></div>
-                    <button class="btn-success" onclick="verifyOTP('signup')">Verify &amp; Register</button>
-                    <button id="signup-resend-btn" onclick="resendOTP('signup')" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1px solid var(--secondary);padding:0.4rem 1rem;border-radius:8px;font-size:0.82rem;cursor:pointer;">🔄 Resend OTP</button>
-                </div>
-                <div class="auth-extra-links"><p>Already have an account? <span onclick="showView('login-view')" class="text-link">Sign In</span></p></div>
-            </div>
-
-            <!-- FORGOT PASSWORD VIEW -->
-            <div id="forgot-view" class="auth-form-content hidden">
-                <div class="info-alert"><p>Enter your registered email to reset your password.</p></div>
-                <div class="input-group"><label for="reset-email">Registered Email</label><input type="email" id="reset-email" placeholder="name@gmail.com" autocomplete="email"></div>
-                <button id="reset-btn" class="btn-primary" onclick="sendOTP('reset')">Send Reset Code</button>
-                <div id="reset-otp-section" class="otp-box hidden">
-                    <div class="email-sent-banner" id="reset-email-banner">
-                        <span class="email-sent-icon">✉️</span>
-                        <div class="email-sent-text"><strong>Reset code sent to your email!</strong><span id="reset-email-display"></span></div>
-                    </div>
-                    <div class="input-group"><label for="reset-otp-input">OTP Code</label><input type="text" id="reset-otp-input" placeholder="6-digit code" maxlength="6" inputmode="numeric"></div>
-                    <div class="otp-timer" id="reset-otp-timer"></div>
-                    <button id="reset-resend-btn" onclick="resendOTP('reset')" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1px solid var(--secondary);padding:0.4rem 1rem;border-radius:8px;font-size:0.82rem;cursor:pointer;">🔄 Resend OTP</button>
-                    <div class="input-group">
-                        <label for="reset-new-password">New Password</label>
-                        <div class="input-password-wrap">
-                            <input type="password" id="reset-new-password" placeholder="Enter new password" autocomplete="new-password">
-                            <button type="button" class="eye-btn" onclick="togglePassword('reset-new-password', this)" aria-label="Toggle password visibility">
-                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                            </button>
-                        </div>
-                        <div class="pw-strength-bar" id="reset-pw-bar"></div>
-                        <span class="pw-strength-label" id="reset-pw-label"></span>
-                    </div>
-                    <button class="btn-primary" onclick="verifyOTP('reset')">Update Password</button>
-                </div>
-                <div class="auth-extra-links"><p><span onclick="showView('login-view')" class="text-link">← Back to Login</span></p></div>
-            </div>
-
-                </main>
-        <div style="text-align:center;margin-top:0.75rem;">
-            <button id="auth-dark-toggle" class="dark-toggle" title="Toggle dark mode">🌙</button>
-        </div>
-        <footer class="auth-footer"><p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p></footer>
-    </div>
+<!-- Background effects -->
+<div class="auth-orbs">
+    <div class="auth-orb"></div>
+    <div class="auth-orb"></div>
+    <div class="auth-orb"></div>
 </div>
+<div class="auth-grid"></div>
+
+<!-- Dark mode toggle -->
+<button id="auth-dark-toggle" class="auth-dark-btn dark-toggle" title="Toggle dark mode">🌙</button>
+
+<!-- Main layout -->
+<div class="auth-layout">
+
+    <!-- Left: branding -->
+    <div class="auth-panel-left">
+        <div class="auth-brand">
+            <img src="logo1.png" alt="FreshZone Logo">
+            <h1>Fresh<br>Zone</h1>
+            <p>Campus vape aerosol detection — keeping your school environment safe and compliant.</p>
+        </div>
+
+        <div class="auth-stats">
+            <div class="auth-stat-item">
+                <span class="auth-stat-dot"></span>
+                <span class="auth-stat-text"><strong>2</strong> sensors active — 4th Floor</span>
+            </div>
+            <div class="auth-stat-item">
+                <span class="auth-stat-dot" style="background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,0.2)"></span>
+                <span class="auth-stat-text">Monitoring <strong>24/7</strong> in real time</span>
+            </div>
+            <div class="auth-stat-item">
+                <span class="auth-stat-dot" style="background:#00b4d8;box-shadow:0 0 0 3px rgba(0,180,216,0.2)"></span>
+                <span class="auth-stat-text">Campus faculty access only</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: form -->
+    <div class="auth-panel-right">
+
+        <!-- Tab switcher for login / signup -->
+        <div id="auth-tabs-bar" class="auth-tabs">
+            <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+            <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+        </div>
+
+        <!-- LOGIN VIEW -->
+        <div id="login-view" class="auth-form-content">
+            <div class="auth-form-header">
+                <h2>Welcome back</h2>
+                <p>Sign in to your FreshZone account</p>
+            </div>
+
+            <div class="input-group">
+                <label for="login-email">Email or Employee ID</label>
+                <input type="text" id="login-email" placeholder="name@gmail.com or 02XXXXXXX" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <div class="input-password-wrap">
+                    <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+                    <button type="button" class="eye-btn" onclick="togglePassword('login-password', this)" aria-label="Toggle password visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.5rem;">
+                <label style="display:flex;align-items:center;gap:0.4rem;margin:0;font-size:0.8rem;font-weight:500;text-transform:none;letter-spacing:0;cursor:pointer;color:#64748b;">
+                    <input type="checkbox" id="remember-me" checked style="width:auto;margin:0;accent-color:#004e7a;">
+                    Stay signed in
+                </label>
+                <span onclick="switchToForgot()" class="text-link" style="font-size:0.8rem;">Forgot password?</span>
+            </div>
+
+            <button class="btn-primary" onclick="login()">Sign In</button>
+        </div>
+
+        <!-- SIGNUP VIEW -->
+        <div id="signup-view" class="auth-form-content hidden">
+            <div class="auth-form-header">
+                <h2>Create account</h2>
+                <p>Register with your campus credentials</p>
+            </div>
+
+            <div class="grid-inputs">
+                <div class="input-group"><label for="signup-name">Full Name</label><input type="text" id="signup-name" placeholder="John Doe" autocomplete="name"></div>
+                <div class="input-group"><label for="signup-employeeid">Employee ID</label><input type="text" id="signup-employeeid" placeholder="02XXXXXX"></div>
+            </div>
+            <div class="input-group"><label for="signup-email">Email Address</label><input type="email" id="signup-email" placeholder="name@gmail.com" autocomplete="email"></div>
+            <div class="input-group"><label for="signup-contact">Contact Number</label><input type="tel" id="signup-contact" placeholder="+63 9xx xxx xxxx" autocomplete="tel"></div>
+            <div class="input-group">
+                <label for="signup-position">Position</label>
+                <select id="signup-position"><option value="" disabled selected>Select your position</option><option value="Administrator">Administrator</option><option value="Staff / Teachers">Staff / Teachers</option></select>
+            </div>
+            <div class="input-group">
+                <label for="signup-password">Password</label>
+                <div class="input-password-wrap">
+                    <input type="password" id="signup-password" placeholder="Min. 8 characters" autocomplete="new-password">
+                    <button type="button" class="eye-btn" onclick="togglePassword('signup-password', this)" aria-label="Toggle password visibility">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                </div>
+                <div class="pw-strength-bar" id="signup-pw-bar"></div>
+                <span class="pw-strength-label" id="signup-pw-label"></span>
+            </div>
+            <button id="signup-btn" class="btn-primary" onclick="sendOTP('signup')">Send Verification Code</button>
+
+            <div id="signup-otp-section" class="otp-box hidden">
+                <div class="email-sent-banner" id="signup-email-banner">
+                    <span class="email-sent-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                    </span>
+                    <div class="email-sent-text"><strong>OTP sent to your email!</strong><span id="signup-email-display"></span></div>
+                </div>
+                <div class="input-group"><label for="signup-otp-input">Verification Code</label><input type="text" id="signup-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric"></div>
+                <div class="otp-timer" id="signup-otp-timer"></div>
+                <button class="btn-success" onclick="verifyOTP('signup')">Verify &amp; Register</button>
+                <button id="signup-resend-btn" onclick="resendOTP('signup')" class="btn-resend" style="display:none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Resend Code
+                </button>
+            </div>
+        </div>
+
+        <!-- FORGOT PASSWORD VIEW -->
+        <div id="forgot-view" class="auth-form-content hidden">
+            <div class="auth-form-header">
+                <h2>Reset password</h2>
+                <p>We'll send a reset code to your registered email</p>
+            </div>
+
+            <div class="info-alert">Enter your registered email address to receive a password reset code.</div>
+            <div class="input-group"><label for="reset-email">Registered Email</label><input type="email" id="reset-email" placeholder="name@gmail.com" autocomplete="email"></div>
+            <button id="reset-btn" class="btn-primary" onclick="sendOTP('reset')">Send Reset Code</button>
+
+            <div id="reset-otp-section" class="otp-box hidden">
+                <div class="email-sent-banner" id="reset-email-banner">
+                    <span class="email-sent-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                    </span>
+                    <div class="email-sent-text"><strong>Reset code sent!</strong><span id="reset-email-display"></span></div>
+                </div>
+                <div class="input-group"><label for="reset-otp-input">OTP Code</label><input type="text" id="reset-otp-input" placeholder="6-digit code" maxlength="6" inputmode="numeric"></div>
+                <div class="otp-timer" id="reset-otp-timer"></div>
+                <button id="reset-resend-btn" onclick="resendOTP('reset')" class="btn-resend" style="display:none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Resend Code
+                </button>
+                <div class="input-group">
+                    <label for="reset-new-password">New Password</label>
+                    <div class="input-password-wrap">
+                        <input type="password" id="reset-new-password" placeholder="Enter new password" autocomplete="new-password">
+                        <button type="button" class="eye-btn" onclick="togglePassword('reset-new-password', this)" aria-label="Toggle password visibility">
+                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                    <div class="pw-strength-bar" id="reset-pw-bar"></div>
+                    <span class="pw-strength-label" id="reset-pw-label"></span>
+                </div>
+                <button class="btn-primary" onclick="verifyOTP('reset')">Update Password</button>
+            </div>
+
+            <div style="margin-top:1rem;text-align:center;">
+                <span onclick="switchTab('login')" class="text-link" style="font-size:0.82rem;">← Back to Sign In</span>
+            </div>
+        </div>
+
+    </div><!-- /auth-panel-right -->
+</div><!-- /auth-layout -->
+
+<div class="auth-footer-bar">© 2026 FreshZone – Campus Vape Aerosol Detection System</div>
 
 <div id="notification" class="notification hidden" role="alert" aria-live="polite"></div>
 
 <script src="utils.js"></script>
+<script>
+    // Tab switcher
+    function switchTab(tab) {
+        const isLogin  = tab === 'login';
+        const isSignup = tab === 'signup';
+        document.getElementById('login-view').classList.toggle('hidden', !isLogin);
+        document.getElementById('signup-view').classList.toggle('hidden', !isSignup);
+        document.getElementById('forgot-view').classList.add('hidden');
+        document.getElementById('auth-tabs-bar').style.display = (tab === 'forgot') ? 'none' : 'flex';
+        document.getElementById('tab-login').classList.toggle('active', isLogin);
+        document.getElementById('tab-signup').classList.toggle('active', isSignup);
+    }
+
+    function switchToForgot() {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('signup-view').classList.add('hidden');
+        document.getElementById('forgot-view').classList.remove('hidden');
+        document.getElementById('auth-tabs-bar').style.display = 'none';
+    }
+
+    // Legacy showView compatibility (used by auth.js internally)
+    function showView(id) {
+        if (id === 'login-view')  { switchTab('login');  return; }
+        if (id === 'signup-view') { switchTab('signup'); return; }
+        if (id === 'forgot-view') { switchToForgot();   return; }
+    }
+</script>
 <script src="auth.js"></script>
-    <script src="/pwa.js" defer></script>
+<script src="/pwa.js" defer></script>
 </body>
 </html>
