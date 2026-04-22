@@ -350,88 +350,9 @@
                     <span class="push-toggle-label" id="push-label">OFF</span>
                 </label>
             </div>
-            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false">
-                <span></span><span></span><span></span>
-            </button>
         </div>
     </nav>
 
-    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true" aria-label="Navigation menu">
-        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
-            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            <a href="dashboard.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
-            <a href="history.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
-            <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
-            <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
-            <div class="mobile-nav-divider"></div>
-            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
-            <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notifications</a>
-        </div>
-    </div>
-
-    <div class="container" style="position:relative;z-index:10;">
-        <div class="hero">
-            <h1>Campus Vape Aerosol Detector <span class="live-badge"><span class="live-dot"></span>LIVE</span></h1>
-            <p id="hero-subtitle">Real-time vape aerosol detection — 4th Floor Comfort Rooms</p>
-            <div class="flex-btn-container">
-                <button onclick="location.href='history.html'"
-                    style="width:auto;padding:12px 30px;background:var(--secondary);font-size:1rem;">
-                    View Detection History
-                </button>
-            </div>
-        </div>
-
-        <div class="staff-alert-bar" id="staff-info-bar">
-            <span style="display:inline-flex;align-items:center;"><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
-            <span>You are logged in as <strong>Staff</strong>. Only Administrators can acknowledge vape alerts. You will be notified when a vape aerosol is detected on campus.</span>
-        </div>
-
-        <div class="last-updated-bar" id="last-updated-bar">Fetching sensor data…</div>
-
-        <div class="grid" id="sensor-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px,1fr));">
-
-            <div class="location-card" id="card-zone1" role="region" aria-label="4th Floor Male CR status">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                    <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><line x1="16" y1="3" x2="22" y2="9"/><polyline points="22 3 22 9 16 9"/></svg>
-                    <h3 id="name-zone1" style="margin:0;font-size:1rem;">4th Floor Male CR</h3>
-                </div>
-                <p id="status-zone1" style="font-weight:bold;">
-                    <span class="status-dot dot-offline" id="dot-zone1"></span>
-                    <span id="status-text-zone1">Loading…</span>
-                </p>
-                <span class="aqi-badge aqi-offline" id="aqi-zone1">AQI: —</span>
-                <div class="pm-values" id="pm-zone1"></div>
-                <small class="card-timestamp" id="ts-zone1">Last reading: —</small>
-                <button class="ack-btn" id="ack-zone1" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE1','4th Floor Male CR')">
-                    Acknowledge Alert
-                </button>
-                <button class="resolve-btn" id="resolve-zone1" style="display:none;" onclick="resolveAlert('ESP32-ZONE1','4th Floor Male CR')">
-                    Mark as Resolved
-                </button>
-            </div>
-
-            <div class="location-card" id="card-zone2" role="region" aria-label="4th Floor Female CR status">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                    <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="9" y1="21" x2="15" y2="21"/></svg>
-                    <h3 id="name-zone2" style="margin:0;font-size:1rem;">4th Floor Female CR</h3>
-                </div>
-                <p id="status-zone2" style="font-weight:bold;">
-                    <span class="status-dot dot-offline" id="dot-zone2"></span>
-                    <span id="status-text-zone2">Loading…</span>
-                </p>
-                <span class="aqi-badge aqi-offline" id="aqi-zone2">AQI: —</span>
-                <div class="pm-values" id="pm-zone2"></div>
-                <small class="card-timestamp" id="ts-zone2">Last reading: —</small>
-                <button class="ack-btn" id="ack-zone2" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE2','4th Floor Female CR')">
-                    Acknowledge Alert
-                </button>
-                <button class="resolve-btn" id="resolve-zone2" style="display:none;" onclick="resolveAlert('ESP32-ZONE2','4th Floor Female CR')">
-                    Mark as Resolved
-                </button>
-            </div>
-
-        </div>
-    </div>
 
 
     <div id="fz-alarm-overlay" style="display:none;">
@@ -913,6 +834,64 @@
 
         initHotkeys('dashboard');
     </script>
-    <script src="/pwa.js" defer></script>
+    <script src="/pwa.js" defer>
+        // ── BOTTOM NAV MORE MENU ───────────────────────────────
+        function toggleBnMore(e) {
+            if (e) e.stopPropagation();
+            var menu     = document.getElementById('fz-bn-more-menu');
+            var backdrop = document.getElementById('fz-bn-more-backdrop');
+            var tab      = document.getElementById('fz-bn-tab-more');
+            if (!menu) return;
+            var isOpen = menu.classList.contains('open');
+            menu.classList.toggle('open', !isOpen);
+            if (backdrop) backdrop.classList.toggle('open', !isOpen);
+            if (tab) tab.setAttribute('aria-expanded', String(!isOpen));
+        }
+        function closeBnMore() {
+            var m = document.getElementById('fz-bn-more-menu');
+            var b = document.getElementById('fz-bn-more-backdrop');
+            var t = document.getElementById('fz-bn-tab-more');
+            if (m) m.classList.remove('open');
+            if (b) b.classList.remove('open');
+            if (t) t.setAttribute('aria-expanded','false');
+        }
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeBnMore(); });
+
+    </script>
+    <!-- ── BOTTOM NAV (mobile ≤900px, CSS-driven) ─────────── -->
+    <nav id="fz-bottom-nav" aria-label="Mobile navigation">
+        <a href="dashboard.html" class="fz-bn-tab active" aria-label="Monitor">
+            <span class="fz-bn-badge"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Monitor</span>
+            <span class="fz-bn-active-dot"></span>
+        </a>
+        <a href="history.html" class="fz-bn-tab" aria-label="History">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg>
+            <span>History</span>
+        </a>
+        <a href="profile.html" class="fz-bn-tab" aria-label="Profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+        </a>
+        <a href="contact.html" class="fz-bn-tab" aria-label="Contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+            <span>Contact</span>
+        </a>
+        <button class="fz-bn-tab" id="fz-bn-tab-more" onclick="toggleBnMore(event)" aria-label="More" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <span>More</span>
+        </button>
+    </nav>
+    <div id="fz-bn-more-menu" role="menu" aria-label="More options">
+        <button class="fz-bn-more-item" onclick="togglePushNotifications();closeBnMore();" id="fz-bn-push-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span id="fz-bn-push-label">Notifications</span>
+        </button>
+        <button class="fz-bn-more-item danger" onclick="openLogoutModal();closeBnMore();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span>
+        </button>
+    </div>
+    <div id="fz-bn-more-backdrop" onclick="closeBnMore()"></div>
+
 </body>
 </html>

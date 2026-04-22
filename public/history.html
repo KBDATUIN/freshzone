@@ -275,85 +275,9 @@
                     <span class="push-toggle-label" id="push-label">OFF</span>
                 </label>
             </div>
-            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
-                <span></span><span></span><span></span>
-            </button>
         </div>
     </nav>
 
-    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true">
-        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
-            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
-            <a href="history.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
-            <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
-            <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
-            <div class="mobile-nav-divider"></div>
-            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
-            <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notifications</a>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="page-hero">
-            <div>
-                <h1><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;color:var(--secondary);"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg>Detection History</h1>
-                <p>Complete archive of on-campus vape aerosol detection events</p>
-            </div>
-            <img src="vape.png" alt="No Vaping Allowed">
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-grid animate-in">
-            <div class="stat-box">
-                <p><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-1px;color:var(--danger);"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Today's Alerts</p>
-                <h3 id="stat-today">0</h3>
-            </div>
-            <div class="stat-box">
-                <p><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-1px;color:var(--secondary);"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Total Records</p>
-                <h3 id="stat-total" style="color:var(--success)">0</h3>
-            </div>
-            <div class="stat-box">
-                <p><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-1px;color:var(--success);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Resolved</p>
-                <h3 id="stat-resolved">0</h3>
-            </div>
-        </div>
-
-        <!-- Filter bar -->
-        <div class="filter-bar">
-            <!-- Row 1: Filter inputs each with inline clear -->
-            <div class="filter-inputs-row">
-
-                <div class="filter-group">
-                    <label for="filter-search"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search</label>
-                    <div class="filter-input-wrap">
-                        <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable();updateClearBtns()">
-                        <button class="filter-inline-clear" id="clear-search" onclick="clearField('filter-search')" title="Clear search" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filter-status"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Status</label>
-                    <div class="filter-input-wrap">
-                        <select id="filter-status" onchange="renderTable();updateClearBtns()">
-                            <option value="">All Statuses</option>
-                            <option value="Detected">Detected</option>
-                            <option value="Acknowledged">Acknowledged</option>
-                            <option value="Cleared">Cleared</option>
-                        </select>
-                        <button class="filter-inline-clear" id="clear-status" onclick="clearField('filter-status')" title="Clear status" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label for="filter-date"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Date</label>
-                    <div class="filter-input-wrap">
-                        <input type="date" id="filter-date" onchange="renderTable();updateClearBtns()">
-                        <button class="filter-inline-clear" id="clear-date" onclick="clearField('filter-date')" title="Clear date" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                    </div>
-                </div>
-
-            </div>
 
             <!-- Row 2: Filter action buttons -->
             <div class="filter-actions-row">
@@ -681,6 +605,64 @@
         })();
         initHotkeys('history');
     </script>
-    <script src="/pwa.js" defer></script>
+    <script src="/pwa.js" defer>
+        // ── BOTTOM NAV MORE MENU ───────────────────────────────
+        function toggleBnMore(e) {
+            if (e) e.stopPropagation();
+            var menu     = document.getElementById('fz-bn-more-menu');
+            var backdrop = document.getElementById('fz-bn-more-backdrop');
+            var tab      = document.getElementById('fz-bn-tab-more');
+            if (!menu) return;
+            var isOpen = menu.classList.contains('open');
+            menu.classList.toggle('open', !isOpen);
+            if (backdrop) backdrop.classList.toggle('open', !isOpen);
+            if (tab) tab.setAttribute('aria-expanded', String(!isOpen));
+        }
+        function closeBnMore() {
+            var m = document.getElementById('fz-bn-more-menu');
+            var b = document.getElementById('fz-bn-more-backdrop');
+            var t = document.getElementById('fz-bn-tab-more');
+            if (m) m.classList.remove('open');
+            if (b) b.classList.remove('open');
+            if (t) t.setAttribute('aria-expanded','false');
+        }
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeBnMore(); });
+
+    </script>
+    <!-- ── BOTTOM NAV (mobile ≤900px, CSS-driven) ─────────── -->
+    <nav id="fz-bottom-nav" aria-label="Mobile navigation">
+        <a href="dashboard.html" class="fz-bn-tab" aria-label="Monitor">
+            <span class="fz-bn-badge"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Monitor</span>
+        </a>
+        <a href="history.html" class="fz-bn-tab active" aria-label="History">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg>
+            <span>History</span>
+            <span class="fz-bn-active-dot"></span>
+        </a>
+        <a href="profile.html" class="fz-bn-tab" aria-label="Profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+        </a>
+        <a href="contact.html" class="fz-bn-tab" aria-label="Contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+            <span>Contact</span>
+        </a>
+        <button class="fz-bn-tab" id="fz-bn-tab-more" onclick="toggleBnMore(event)" aria-label="More" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <span>More</span>
+        </button>
+    </nav>
+    <div id="fz-bn-more-menu" role="menu" aria-label="More options">
+        <button class="fz-bn-more-item" onclick="togglePushNotifications();closeBnMore();" id="fz-bn-push-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span id="fz-bn-push-label">Notifications</span>
+        </button>
+        <button class="fz-bn-more-item danger" onclick="openLogoutModal();closeBnMore();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span>
+        </button>
+    </div>
+    <div id="fz-bn-more-backdrop" onclick="closeBnMore()"></div>
+
 </body>
 </html>

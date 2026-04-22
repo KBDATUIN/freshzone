@@ -89,75 +89,9 @@
                     <span class="push-toggle-label" id="push-label">OFF</span>
                 </label>
             </div>
-            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
-                <span></span><span></span><span></span>
-            </button>
         </div>
     </nav>
 
-    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true">
-        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
-            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
-            <a href="history.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
-            <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
-            <a href="contact.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
-            <div class="mobile-nav-divider"></div>
-            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
-            <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notifications</a>
-        </div>
-    </div>
-
-    <div class="container" style="max-width:720px;">
-
-        <!-- Page header -->
-        <div class="contact-page-header">
-            <h1><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;color:var(--secondary);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact &amp; Reports</h1>
-            <p>Send feedback, report device issues, or submit suggestions to the administrator.</p>
-        </div>
-
-        <!-- Report Form -->
-        <div class="glass-card">
-            <h2><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Send a Report</h2>
-            <p style="color:var(--gray);margin-bottom:1.2rem;margin-top:0.3rem;">
-                Have feedback or a device issue? Let us know.
-            </p>
-
-            <label for="contact-name">Full Name</label>
-            <input type="text" id="contact-name" placeholder="Your Name">
-
-            <label for="contact-email">Email Address</label>
-            <input type="email" id="contact-email" placeholder="your@email.com">
-
-            <label for="contact-subject">Subject</label>
-            <select id="contact-subject">
-                <option value="" disabled selected>Select a subject</option>
-                <option value="Vape Alert Feedback">Vape Alert Feedback</option>
-                <option value="Device Maintenance">Device Maintenance</option>
-                <option value="General Suggestion">General Suggestion</option>
-                <option value="Bug Report">Bug Report</option>
-                <option value="Other">Other</option>
-            </select>
-
-            <label for="contact-message">
-                Message
-                <span class="char-count"><span id="char-counter">0</span>/2000</span>
-            </label>
-            <textarea id="contact-message" rows="5" placeholder="Describe the issue or suggestion…" maxlength="2000" oninput="const n=this.value.length; const el=document.getElementById('char-counter'); el.textContent=n; el.style.color=n>1800?'#e74c3c':n>1500?'#f39c12':'';"></textarea>
-
-            <button onclick="submitReport()" style="margin-top:1.25rem;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Submit Report</button>
-
-            <!-- Confirmation box -->
-            <div class="ticket-success" id="ticket-confirm"></div>
-        </div>
-
-        <!-- Admin Inbox (only visible to Administrators) -->
-        <div class="inbox-section glass-card" id="admin-inbox" style="display:none;">
-            <h3><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> Admin Inbox</h3>
-            <div id="inbox-list"></div>
-        </div>
-
-    </div>
 
     <div id="session-warning" role="status"></div>
     <div id="notification" class="notification" role="alert" aria-live="polite"></div>
@@ -306,6 +240,64 @@
         })();
         initHotkeys('contact');
     </script>
-    <script src="/pwa.js" defer></script>
+    <script src="/pwa.js" defer>
+        // ── BOTTOM NAV MORE MENU ───────────────────────────────
+        function toggleBnMore(e) {
+            if (e) e.stopPropagation();
+            var menu     = document.getElementById('fz-bn-more-menu');
+            var backdrop = document.getElementById('fz-bn-more-backdrop');
+            var tab      = document.getElementById('fz-bn-tab-more');
+            if (!menu) return;
+            var isOpen = menu.classList.contains('open');
+            menu.classList.toggle('open', !isOpen);
+            if (backdrop) backdrop.classList.toggle('open', !isOpen);
+            if (tab) tab.setAttribute('aria-expanded', String(!isOpen));
+        }
+        function closeBnMore() {
+            var m = document.getElementById('fz-bn-more-menu');
+            var b = document.getElementById('fz-bn-more-backdrop');
+            var t = document.getElementById('fz-bn-tab-more');
+            if (m) m.classList.remove('open');
+            if (b) b.classList.remove('open');
+            if (t) t.setAttribute('aria-expanded','false');
+        }
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeBnMore(); });
+
+    </script>
+    <!-- ── BOTTOM NAV (mobile ≤900px, CSS-driven) ─────────── -->
+    <nav id="fz-bottom-nav" aria-label="Mobile navigation">
+        <a href="dashboard.html" class="fz-bn-tab" aria-label="Monitor">
+            <span class="fz-bn-badge"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Monitor</span>
+        </a>
+        <a href="history.html" class="fz-bn-tab" aria-label="History">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg>
+            <span>History</span>
+        </a>
+        <a href="profile.html" class="fz-bn-tab" aria-label="Profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+        </a>
+        <a href="contact.html" class="fz-bn-tab active" aria-label="Contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+            <span>Contact</span>
+            <span class="fz-bn-active-dot"></span>
+        </a>
+        <button class="fz-bn-tab" id="fz-bn-tab-more" onclick="toggleBnMore(event)" aria-label="More" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <span>More</span>
+        </button>
+    </nav>
+    <div id="fz-bn-more-menu" role="menu" aria-label="More options">
+        <button class="fz-bn-more-item" onclick="togglePushNotifications();closeBnMore();" id="fz-bn-push-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span id="fz-bn-push-label">Notifications</span>
+        </button>
+        <button class="fz-bn-more-item danger" onclick="openLogoutModal();closeBnMore();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span>
+        </button>
+    </div>
+    <div id="fz-bn-more-backdrop" onclick="closeBnMore()"></div>
+
 </body>
 </html>
