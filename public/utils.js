@@ -1,11 +1,10 @@
 // ============================================================
-//  utils.js (UPDATED) — shared utilities + API helper
+//  utils.js — FreshZone shared utilities
 // ============================================================
 
 const API = 'https://freshzone-production.up.railway.app';
 
 // ── API HELPER ────────────────────────────────────────────────
-// Attaches the JWT token to every request automatically
 async function apiFetch(endpoint, options = {}) {
     const token = localStorage.getItem('fz-token');
     const headers = {
@@ -14,9 +13,6 @@ async function apiFetch(endpoint, options = {}) {
         ...(options.headers || {}),
     };
     const res = await fetch(`${API}/api${endpoint}`, { ...options, headers });
-
-    // Only logout on 401 (token expired/missing) — NOT on 403 (permission denied)
-    // 403 means the user is logged in but lacks permission (e.g. staff trying admin action)
     if (res.status === 401) {
         localStorage.removeItem('fz-token');
         localStorage.removeItem('currentUser');
@@ -47,24 +43,54 @@ function confirmLogout() {
 }
 
 // ── DARK MODE ─────────────────────────────────────────────────
+const _ICON_MOON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+const _ICON_SUN  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+
+function _updateToggleBtns(theme) {
+    ['dark-toggle','auth-dark-toggle'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        btn.innerHTML = theme === 'dark' ? _ICON_SUN : _ICON_MOON;
+        btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+        btn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    });
+}
+
 function initDarkMode() {
     const saved = localStorage.getItem('fz-theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
-    const btn = document.getElementById('dark-toggle');
-    if (btn) btn.textContent = saved === 'dark' ? '☀️' : '🌙';
+    _updateToggleBtns(saved);
 }
+
 function toggleDarkMode() {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('fz-theme', next);
-    const btn = document.getElementById('dark-toggle');
-    if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+    _updateToggleBtns(next);
 }
 
 // ── MOBILE NAV ────────────────────────────────────────────────
-function openMobileNav()  { document.getElementById('mobile-nav')?.classList.add('open'); document.getElementById('hamburger')?.classList.add('open'); }
-function closeMobileNav() { document.getElementById('mobile-nav')?.classList.remove('open'); document.getElementById('hamburger')?.classList.remove('open'); }
+function openMobileNav() {
+    document.getElementById('mobile-nav')?.classList.add('open');
+    document.getElementById('hamburger')?.classList.add('open');
+    document.getElementById('hamburger')?.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+}
+function closeMobileNav() {
+    document.getElementById('mobile-nav')?.classList.remove('open');
+    document.getElementById('hamburger')?.classList.remove('open');
+    document.getElementById('hamburger')?.setAttribute('aria-expanded','false');
+    document.body.style.overflow = '';
+}
+
+// Close mobile nav on Escape
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeMobileNav();
+        closeLogoutModal();
+    }
+});
 
 // ── SESSION TIMEOUT (30 min idle) ─────────────────────────────
 let _idleTimer, _warnTimer;
@@ -77,7 +103,7 @@ function resetIdleTimer() {
     if (warn) warn.style.display = 'none';
     _warnTimer = setTimeout(() => {
         const w = document.getElementById('session-warning');
-        if (w) { w.style.display = 'block'; w.textContent = '⚠️ Session expiring in 2 minutes due to inactivity.'; }
+        if (w) { w.style.display = 'block'; w.textContent = 'Session expiring in 2 minutes due to inactivity.'; }
     }, IDLE_LIMIT - WARN_BEFORE);
     _idleTimer = setTimeout(() => {
         localStorage.removeItem('currentUser');
@@ -88,7 +114,8 @@ function resetIdleTimer() {
 function initSessionTimeout() {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     if (!user) return;
-    ['click','keydown','mousemove','touchstart','scroll'].forEach(e => document.addEventListener(e, resetIdleTimer, { passive: true }));
+    ['click','keydown','mousemove','touchstart','scroll'].forEach(e =>
+        document.addEventListener(e, resetIdleTimer, { passive: true }));
     resetIdleTimer();
 }
 
@@ -106,84 +133,61 @@ function initHotkeys(pageKey) {
         profile:   { M:'Dashboard', H:'History', C:'Contact' },
         contact:   { M:'Dashboard', H:'History', P:'Profile' },
     };
-    const keys      = map[pageKey]    || {};
+    const keys = map[pageKey] || {};
     const keyLabels = labels[pageKey] || {};
 
-    // Inject shortcut modal into DOM
     const modal = document.createElement('div');
     modal.id = 'shortcut-modal';
-    modal.style.cssText = `
-        display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
-        z-index:9999;align-items:center;justify-content:center;
-    `;
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;';
     const allShortcuts = [
         ...Object.entries(keyLabels).map(([k,v]) => [k, `Go to ${v}`]),
-        ['L', 'Logout'],
-        ['Esc', 'Close modals'],
+        ['L', 'Logout'], ['Esc', 'Close dialogs'],
     ];
     modal.innerHTML = `
-        <div style="background:var(--card-bg,white);border-radius:16px;padding:1.8rem 2rem;
-                    max-width:360px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);
-                    font-family:'Inter',sans-serif;">
+        <div style="background:var(--card-bg,white);border-radius:16px;padding:1.8rem 2rem;max-width:360px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
-                <h3 style="margin:0;color:var(--primary,#004e7a);font-size:1.1rem;">⌨ Keyboard Shortcuts</h3>
+                <h3 style="margin:0;color:var(--primary,#004e7a);font-size:1.05rem;font-family:Syne,sans-serif;">Keyboard Shortcuts</h3>
                 <button onclick="document.getElementById('shortcut-modal').style.display='none'"
-                    style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--gray,#888);line-height:1;">✕</button>
+                    style="background:none;border:none;cursor:pointer;color:var(--gray,#888);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;padding:0;margin:0;box-shadow:none !important;"
+                    aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
             ${allShortcuts.map(([k,v]) => `
-                <div style="display:flex;justify-content:space-between;align-items:center;
-                            padding:0.5rem 0;border-bottom:1px solid rgba(0,0,0,0.06);">
-                    <span style="font-size:0.88rem;color:var(--dark,#333);">${v}</span>
-                    <kbd style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px;
-                                padding:3px 10px;font-size:0.82rem;font-weight:700;
-                                color:#334155;font-family:monospace;">${k}</kbd>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.45rem 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+                    <span style="font-size:0.87rem;color:var(--dark,#333);">${v}</span>
+                    <kbd style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px;padding:3px 10px;font-size:0.8rem;font-weight:700;color:#334155;font-family:monospace;">${k}</kbd>
                 </div>
             `).join('')}
-        </div>
-    `;
+        </div>`;
     document.body.appendChild(modal);
-
-    // Close modal on backdrop click
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.style.display = 'none';
-    });
+    modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
 
     document.addEventListener('keydown', function(e) {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
         const k = e.key.toUpperCase();
-
-        // ? key — show shortcut modal
         if (e.key === '?' || e.key === '/') {
             e.preventDefault();
             const m = document.getElementById('shortcut-modal');
             if (m) m.style.display = m.style.display === 'none' ? 'flex' : 'none';
             return;
         }
-
-        // Navigation shortcuts
         if (keys[k]) {
-            showNotification(`⌨ Going to ${keyLabels[k]}…`, 'info', 900);
+            showNotification(`Going to ${keyLabels[k]}…`, 'info', 900);
             setTimeout(() => location.href = keys[k], 700);
             return;
         }
-
-        // Logout
         if (k === 'L') { openLogoutModal(); return; }
-
-        // Close modal/drawer
         if (e.key === 'Escape') {
             document.getElementById('shortcut-modal').style.display = 'none';
-            closeLogoutModal();
-            return;
+            closeLogoutModal(); closeMobileNav();
         }
     });
 
-    // Badge — click to open shortcuts
     const badge = document.createElement('div');
     badge.className = 'hotkey-badge';
     badge.textContent = '⌨ Press ? for shortcuts';
     badge.style.cursor = 'pointer';
-    badge.title = 'Click to view shortcuts';
     badge.addEventListener('click', () => {
         const m = document.getElementById('shortcut-modal');
         if (m) m.style.display = 'flex';
@@ -211,8 +215,8 @@ function runEntranceAnimations() {
     targets.forEach(sel => {
         document.querySelectorAll(sel).forEach(el => {
             el.classList.add('animate-in');
-            const cleanup = () => { el.classList.remove('animate-in'); el.style.opacity = '1'; el.style.transform = ''; };
-            el.addEventListener('animationend', cleanup, { once: true });
+            const cleanup = () => { el.classList.remove('animate-in'); el.style.opacity='1'; el.style.transform=''; };
+            el.addEventListener('animationend', cleanup, { once:true });
             setTimeout(cleanup, 1200);
         });
     });
@@ -225,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     runEntranceAnimations();
 });
 
-// ── WEB PUSH NOTIFICATIONS (shared across all pages) ─────────
+// ── WEB PUSH NOTIFICATIONS ────────────────────────────────────
 let _pushSubscription = null;
 
 async function initPushNotifications() {
@@ -245,30 +249,27 @@ async function togglePushNotifications() {
     if (_pushSubscription) {
         try {
             await _pushSubscription.unsubscribe();
-            await apiFetch('/push/unsubscribe', { method: 'DELETE', body: JSON.stringify({ endpoint: _pushSubscription.endpoint }) });
+            await apiFetch('/push/unsubscribe', { method:'DELETE', body:JSON.stringify({ endpoint:_pushSubscription.endpoint }) });
         } catch(e) {}
         _pushSubscription = null;
         updatePushBtn(false);
         showNotification('Push notifications disabled.', 'info');
     } else {
         try {
-            // Check if previously blocked
             if (Notification.permission === 'denied') {
-                showNotification('Notifications are blocked. Please enable them in your browser settings (🔒 icon in address bar).', 'error', 6000);
-                return;
+                showNotification('Notifications are blocked. Please enable them in browser settings.', 'error', 6000); return;
             }
             const keyData = await apiFetch('/push/vapid-public-key');
-            if (!keyData || !keyData.publicKey) { showNotification('Push service not configured.', 'error'); return; }
+            if (!keyData?.publicKey) { showNotification('Push service not configured.', 'error'); return; }
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
-                showNotification('Notification permission denied. Click the 🔒 icon in your browser address bar to allow.', 'error', 6000);
-                return;
+                showNotification('Notification permission denied. Check browser settings.', 'error', 6000); return;
             }
-            const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(keyData.publicKey) });
+            const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlBase64ToUint8Array(keyData.publicKey) });
             _pushSubscription = sub;
-            await apiFetch('/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription: sub }) });
+            await apiFetch('/push/subscribe', { method:'POST', body:JSON.stringify({ subscription:sub }) });
             updatePushBtn(true);
-            showNotification('🔔 Notifications enabled! You will be alerted when vape is detected.', 'success', 5000);
+            showNotification('Notifications enabled! You will be alerted when vape is detected.', 'success', 5000);
         } catch (err) {
             console.error('[push] Error:', err);
             showNotification('Failed to enable notifications. Try again.', 'error');
@@ -277,25 +278,20 @@ async function togglePushNotifications() {
 }
 
 function updatePushBtn(subscribed) {
-    const btn       = document.getElementById('push-btn');
-    const lbl       = document.getElementById('push-label');
+    const btn = document.getElementById('push-btn');
+    const lbl = document.getElementById('push-label');
     const mobileBtn = document.getElementById('mobile-push-btn');
-    if (btn) {
-        if (subscribed) btn.classList.add('active');
-        else btn.classList.remove('active');
-        btn.style.background = '';
-        btn.style.color = '';
+    if (btn) { subscribed ? btn.classList.add('active') : btn.classList.remove('active'); btn.style.background=''; btn.style.color=''; }
+    if (lbl) { lbl.textContent = subscribed ? 'ON' : 'OFF'; lbl.style.color = subscribed ? 'var(--secondary)' : '#94a3b8'; }
+    if (mobileBtn) {
+        const bellSvg = `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+        mobileBtn.innerHTML = `${bellSvg} ${subscribed ? 'Notifications ON' : 'Notify Me'}`;
     }
-    if (lbl) {
-        lbl.textContent = subscribed ? 'ON' : 'OFF';
-        lbl.style.color = subscribed ? 'var(--secondary)' : '#aaa';
-    }
-    if (mobileBtn) mobileBtn.textContent = subscribed ? '🔔 Notifications ON' : '🔔 Notify Me';
 }
 
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const base64  = (base64String + padding).replace(/-/g,'+').replace(/_/g,'/');
     const rawData = window.atob(base64);
     const output  = new Uint8Array(rawData.length);
     for (let i = 0; i < rawData.length; ++i) output[i] = rawData.charCodeAt(i);
@@ -306,24 +302,15 @@ function urlBase64ToUint8Array(base64String) {
 function showCardLoading(cardId) {
     const card = document.getElementById(cardId);
     if (!card) return;
-    card.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;padding:1rem;">
-            <div style="width:12px;height:12px;border-radius:50%;background:var(--gray);opacity:0.5;animation:pulse-dot 1.2s infinite;"></div>
-            <span style="color:var(--gray);font-size:0.9rem;">Loading sensor data…</span>
-        </div>`;
+    card.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:1rem;"><div style="width:10px;height:10px;border-radius:50%;background:var(--gray);opacity:0.4;animation:pulse-dot 1.2s infinite;"></div><span style="color:var(--gray);font-size:0.9rem;">Loading sensor data…</span></div>`;
 }
-
 function showAPIError(message = 'Connection error. Retrying…') {
     const bar = document.getElementById('last-updated-bar');
-    if (bar) { bar.textContent = '⚠️ ' + message; bar.style.color = 'var(--danger)'; }
+    if (bar) { bar.textContent = message; bar.style.color = 'var(--danger)'; }
 }
-
 function clearAPIError() {
     const bar = document.getElementById('last-updated-bar');
     if (bar) { bar.style.color = ''; }
 }
 
-// Auto-init push on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    initPushNotifications();
-});
+document.addEventListener('DOMContentLoaded', () => { initPushNotifications(); });
