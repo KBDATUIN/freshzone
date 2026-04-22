@@ -13,8 +13,18 @@ const { sendAlertEmail } = require('./mailer');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// FIX: Trust Railway's Proxy for Rate Limiting
+// FIX: Trust Railway's Proxy for Rate Limiting and HTTPS detection
 app.set('trust proxy', 1);
+
+// ── HTTPS REDIRECT MIDDLEWARE ────────────────────────────────
+// Forces the browser to use https://freshzone.space
+app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+        res.redirect(`https://${req.header('host')}${req.url}`);
+    } else {
+        next();
+    }
+});
 
 // ── SECURITY HEADERS ─────────────────────────────────────────
 app.use((req, res, next) => {
@@ -27,24 +37,19 @@ app.use((req, res, next) => {
 });
 
 // ── RATE LIMITING ────────────────────────────────────────────
-// General API limiter — only applied to /api/* routes, NOT static files.
-// 500 req / 15 min per IP is enough for multiple logged-in users polling
-// every 5 seconds across several endpoints.
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500,                  // raised from 200 — dashboard polls every 5s
+    max: 500,                  
     message: { success: false, message: 'Too many requests, please try again later.' },
     standardHeaders: true,
     legacyHeaders: false,
     skip: (req) => {
-        // Never rate-limit static assets or health check
         const p = req.path;
         return p === '/api/health' ||
-               !p.startsWith('/api/'); // static files have no /api/ prefix
+               !p.startsWith('/api/'); 
     },
 });
 
-// Auth limiter — strict, 20 attempts per 15 min per IP
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 20,
@@ -53,25 +58,22 @@ const authLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-// Push subscription limiter
 const pushLimiter = rateLimit({
     windowMs: 60 * 1000,
-    max: 10,                   // raised from 5 — subscribe + test during demos
+    max: 10,                   
     message: { success: false, message: 'Too many subscription requests.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
 
-// ESP32 readings limiter — 2 ESP32s sending every 5s = ~12/min, allow headroom
 const esp32Limiter = rateLimit({
-    windowMs: 60 * 1000,       // 1 minute window (was 10 seconds)
-    max: 30,                   // 2 devices × 12/min + headroom
+    windowMs: 60 * 1000,       
+    max: 30,                   
     message: { success: false, message: 'Too many readings.' },
     standardHeaders: true,
     legacyHeaders: false,
 });
 
-// Apply general limiter to API routes only
 app.use('/api/', generalLimiter);
 
 // ── CORS ─────────────────────────────────────────────────────
@@ -79,6 +81,8 @@ app.use(cors({
     origin: function(origin, callback) {
         const allowed = [
             process.env.FRONTEND_URL,
+            'https://freshzone.space',
+            'https://www.freshzone.space',
             'http://localhost:3000',
             'http://localhost:5500',
             'http://127.0.0.1:5500',
@@ -99,12 +103,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── API ROUTES ────────────────────────────────────────────────
-app.use('/api/auth',     authLimiter,  require('./api/auth'));
+app.use('/api/auth',     authLimiter,   require('./api/auth'));
 app.use('/api/readings', esp32Limiter, require('./api/readings'));
 app.use('/api/history',               require('./api/history'));
 app.use('/api/profile',               require('./api/profile'));
 app.use('/api/contact',               require('./api/contact'));
-app.use('/api/push',     pushLimiter,  require('./api/push'));
+app.use('/api/push',     pushLimiter,   require('./api/push'));
 
 // ── DASHBOARD STATS ───────────────────────────────────────────
 app.get('/api/stats/dashboard', async (req, res) => {
@@ -150,8 +154,6 @@ cron.schedule('*/5 * * * *', async () => {
 });
 
 cron.schedule('*/5 * * * *', async () => {
-    // Only escalate events still in 'Detected' status (not yet acknowledged).
-    // Once staff clicks Acknowledge, escalation stops automatically.
     try {
         const [unacked] = await db.query(
             `SELECT de.*, sn.location_name FROM detection_events de
