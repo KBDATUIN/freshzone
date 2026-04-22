@@ -449,15 +449,5 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') { e.preventDefault(); verifyOTP('reset'); }
     });
 
-    // ── Dark mode toggle ──────────────────────────────────────
-    const authDarkBtn = document.getElementById('auth-dark-toggle');
-    if (authDarkBtn) {
-        const saved = localStorage.getItem('fz-theme') || 'light';
-        authDarkBtn.textContent = saved === 'dark' ? '☀️' : '🌙';
-        authDarkBtn.addEventListener('click', () => {
-            toggleDarkMode();
-            const theme = document.documentElement.getAttribute('data-theme');
-            authDarkBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
-        });
-    }
+    // Dark mode toggle is handled by utils.js
 });

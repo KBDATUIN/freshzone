@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style>/* Anti-flash */html{background:linear-gradient(135deg,#90e0ef,#00b4d8,#004e7a);}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
+    <style>/* Anti-flash */html{background:linear-gradient(135deg,#004e7a,#00b4d8,#90e0ef);}html[data-theme="dark"]{background:linear-gradient(135deg,#060e18,#0a1928,#0d1f32);}</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | Secure Access</title>
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#004e7a">
     <meta name="mobile-web-app-capable" content="yes">
@@ -17,36 +16,48 @@
     <meta name="apple-mobile-web-app-title" content="FreshZone">
     <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
     <link rel="stylesheet" href="/pwa.css">
-    <style>
-        .email-sent-banner { display: none; }
-        @media (max-width: 600px) {
-            .email-sent-banner { display:flex;align-items:center;gap:10px;background:#e8f5e9;border:1.5px solid #66bb6a;border-radius:12px;padding:12px 14px;margin-bottom:14px;animation:bannerSlideIn 0.4s cubic-bezier(0.175,0.885,0.32,1.1) both; }
-            [data-theme="dark"] .email-sent-banner { background:rgba(40,167,69,0.15);border-color:#2ecc71; }
-            @keyframes bannerSlideIn { from{opacity:0;transform:translateY(-10px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-            .email-sent-icon { font-size:22px;flex-shrink:0; }
-            .email-sent-text { display:flex;flex-direction:column;gap:2px; }
-            .email-sent-text strong { font-size:0.85rem;color:#2e7d32;font-family:sans-serif; }
-            [data-theme="dark"] .email-sent-text strong { color:#66bb6a; }
-            .email-sent-text span { font-size:0.78rem;color:#555;font-family:sans-serif;word-break:break-all; }
-            [data-theme="dark"] .email-sent-text span { color:#aaa; }
-        }
-            </style>
 </head>
 <body>
 <div class="auth-wrapper">
     <div class="smoke-container" id="smoke-bg"></div>
+
     <div class="auth-container">
+
+        <!-- HEADER -->
         <header class="auth-header">
-            <h1>Welcome to FreshZone</h1>
-            <p>Campus vape aerosol detection system — keeping your school environment safe and compliant.</p>
+            <h1>FreshZone</h1>
+            <p>Campus vape aerosol detection — keeping your school safe.</p>
+            <div class="auth-trust-row">
+                <span class="auth-trust-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Secure Login
+                </span>
+                <span class="auth-trust-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Verified Access
+                </span>
+                <span class="auth-trust-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                    Real-time Alerts
+                </span>
+            </div>
         </header>
+
+        <!-- CARD -->
         <main class="glass-card auth-card">
+            <!-- Logo -->
             <div class="brand-section">
                 <img src="logo1.png" alt="FreshZone Logo" class="auth-logo">
             </div>
 
-            <!-- LOGIN VIEW -->
-            <div id="login-view" class="auth-form-content">
+            <!-- Tab Switcher -->
+            <div class="auth-tabs" id="auth-tabs" role="tablist" aria-label="Authentication mode">
+                <button class="auth-tab active" id="tab-login"   onclick="switchTab('login')"  role="tab" aria-selected="true"  aria-controls="login-view">Sign In</button>
+                <button class="auth-tab"        id="tab-signup"  onclick="switchTab('signup')" role="tab" aria-selected="false" aria-controls="signup-view">Create Account</button>
+            </div>
+
+            <!-- ═══ LOGIN VIEW ═══ -->
+            <div id="login-view" class="auth-form-content" role="tabpanel" aria-labelledby="tab-login">
                 <div class="input-group">
                     <label for="login-email">Email or Phone Number</label>
                     <input type="text" id="login-email" placeholder="name@gmail.com or 09XXXXXXXXX" autocomplete="username">
@@ -61,22 +72,24 @@
                         </button>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.6rem;">
-                    <div style="display:flex;align-items:center;gap:0.5rem;">
-                        <input type="checkbox" id="remember-me" checked style="width:auto;margin:0;accent-color:var(--secondary);">
-                        <label for="remember-me" style="margin:0;font-size:0.8rem;font-weight:500;cursor:pointer;">Stay logged in</label>
-                    </div>
-
+                <div class="auth-meta-row">
+                    <label class="auth-remember">
+                        <input type="checkbox" id="remember-me" checked>
+                        <span>Stay logged in</span>
+                    </label>
+                    <span class="auth-forgot" onclick="switchTab('forgot')">Forgot password?</span>
                 </div>
-                <button class="btn-primary" onclick="login()">Sign In</button>
+                <button class="btn-primary" onclick="login()" style="margin-top:1.1rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    Sign In
+                </button>
                 <div class="auth-extra-links">
-                    <p>New here? <span onclick="showView('signup-view')" class="text-link">Create account</span></p>
-                    <p onclick="showView('forgot-view')" class="text-link small">Forgot your password?</p>
+                    <p>New here? <span onclick="switchTab('signup')" class="text-link">Create account</span></p>
                 </div>
             </div>
 
-            <!-- SIGNUP VIEW -->
-            <div id="signup-view" class="auth-form-content hidden">
+            <!-- ═══ SIGNUP VIEW ═══ -->
+            <div id="signup-view" class="auth-form-content hidden" role="tabpanel" aria-labelledby="tab-signup">
                 <div class="grid-inputs">
                     <div class="input-group"><label for="signup-name">Full Name</label><input type="text" id="signup-name" placeholder="John Doe" autocomplete="name"></div>
                     <div class="input-group"><label for="signup-employeeid">Employee ID</label><input type="text" id="signup-employeeid" placeholder="02XXXXXX"></div>
@@ -99,33 +112,55 @@
                     <div class="pw-strength-bar" id="signup-pw-bar"></div>
                     <span class="pw-strength-label" id="signup-pw-label"></span>
                 </div>
-                <button id="signup-btn" class="btn-primary" onclick="sendOTP('signup')">Send Verification OTP</button>
+                <button id="signup-btn" class="btn-primary" onclick="sendOTP('signup')" style="margin-top:1.1rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                    Send Verification OTP
+                </button>
                 <div id="signup-otp-section" class="otp-box hidden">
                     <div class="email-sent-banner" id="signup-email-banner">
-                        <span class="email-sent-icon">✉️</span>
+                        <span class="email-sent-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                        </span>
                         <div class="email-sent-text"><strong>OTP sent to your email!</strong><span id="signup-email-display"></span></div>
                     </div>
                     <div class="input-group"><label for="signup-otp-input">Verification Code</label><input type="text" id="signup-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric"></div>
                     <div class="otp-timer" id="signup-otp-timer"></div>
-                    <button class="btn-success" onclick="verifyOTP('signup')">Verify &amp; Register</button>
-                    <button id="signup-resend-btn" onclick="resendOTP('signup')" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1px solid var(--secondary);padding:0.4rem 1rem;border-radius:8px;font-size:0.82rem;cursor:pointer;">🔄 Resend OTP</button>
+                    <button class="btn-success" onclick="verifyOTP('signup')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Verify &amp; Register
+                    </button>
+                    <button id="signup-resend-btn" onclick="resendOTP('signup')" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                        Resend OTP
+                    </button>
                 </div>
-                <div class="auth-extra-links"><p>Already have an account? <span onclick="showView('login-view')" class="text-link">Sign In</span></p></div>
+                <div class="auth-extra-links"><p>Already have an account? <span onclick="switchTab('login')" class="text-link">Sign In</span></p></div>
             </div>
 
-            <!-- FORGOT PASSWORD VIEW -->
+            <!-- ═══ FORGOT PASSWORD VIEW ═══ -->
             <div id="forgot-view" class="auth-form-content hidden">
-                <div class="info-alert"><p>Enter your registered email to reset your password.</p></div>
+                <div class="info-alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <p style="margin:0;font-size:0.84rem;">Enter your registered email to receive a password reset code.</p>
+                </div>
                 <div class="input-group"><label for="reset-email">Registered Email</label><input type="email" id="reset-email" placeholder="name@gmail.com" autocomplete="email"></div>
-                <button id="reset-btn" class="btn-primary" onclick="sendOTP('reset')">Send Reset Code</button>
+                <button id="reset-btn" class="btn-primary" onclick="sendOTP('reset')" style="margin-top:1rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                    Send Reset Code
+                </button>
                 <div id="reset-otp-section" class="otp-box hidden">
                     <div class="email-sent-banner" id="reset-email-banner">
-                        <span class="email-sent-icon">✉️</span>
+                        <span class="email-sent-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                        </span>
                         <div class="email-sent-text"><strong>Reset code sent to your email!</strong><span id="reset-email-display"></span></div>
                     </div>
                     <div class="input-group"><label for="reset-otp-input">OTP Code</label><input type="text" id="reset-otp-input" placeholder="6-digit code" maxlength="6" inputmode="numeric"></div>
                     <div class="otp-timer" id="reset-otp-timer"></div>
-                    <button id="reset-resend-btn" onclick="resendOTP('reset')" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1px solid var(--secondary);padding:0.4rem 1rem;border-radius:8px;font-size:0.82rem;cursor:pointer;">🔄 Resend OTP</button>
+                    <button id="reset-resend-btn" onclick="resendOTP('reset')" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                        Resend OTP
+                    </button>
                     <div class="input-group">
                         <label for="reset-new-password">New Password</label>
                         <div class="input-password-wrap">
@@ -138,23 +173,69 @@
                         <div class="pw-strength-bar" id="reset-pw-bar"></div>
                         <span class="pw-strength-label" id="reset-pw-label"></span>
                     </div>
-                    <button class="btn-primary" onclick="verifyOTP('reset')">Update Password</button>
+                    <button class="btn-primary" onclick="verifyOTP('reset')" style="margin-top:1rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Update Password
+                    </button>
                 </div>
-                <div class="auth-extra-links"><p><span onclick="showView('login-view')" class="text-link">← Back to Login</span></p></div>
+                <div class="auth-extra-links">
+                    <p><span onclick="switchTab('login')" class="text-link">← Back to Sign In</span></p>
+                </div>
             </div>
+        </main>
 
-                </main>
-        <div style="text-align:center;margin-top:0.75rem;">
-            <button id="auth-dark-toggle" class="dark-toggle" title="Toggle dark mode">🌙</button>
+        <!-- Dark mode toggle -->
+        <div class="auth-dark-toggle-wrap">
+            <span class="auth-dark-label">Appearance</span>
+            <button id="auth-dark-toggle" class="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
         </div>
-        <footer class="auth-footer"><p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p></footer>
+
+        <footer class="auth-footer">
+            <p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p>
+        </footer>
     </div>
 </div>
 
 <div id="notification" class="notification hidden" role="alert" aria-live="polite"></div>
 
+<script>
+// Tab switcher — works with the existing showView() in auth.js
+function switchTab(mode) {
+    const tabs = {
+        login:  { tab:'tab-login',  view:'login-view'  },
+        signup: { tab:'tab-signup', view:'signup-view' },
+        forgot: { tab:null,         view:'forgot-view' },
+    };
+    // Hide all views
+    ['login-view','signup-view','forgot-view'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.classList.add('hidden'); el.style.display = ''; }
+    });
+    // Deactivate all tabs
+    document.querySelectorAll('.auth-tab').forEach(t => {
+        t.classList.remove('active'); t.setAttribute('aria-selected','false');
+    });
+    // Show selected
+    const target = tabs[mode];
+    if (target) {
+        const view = document.getElementById(target.view);
+        if (view) { view.classList.remove('hidden'); }
+        if (target.tab) {
+            const tab = document.getElementById(target.tab);
+            if (tab) { tab.classList.add('active'); tab.setAttribute('aria-selected','true'); }
+        }
+    }
+}
+// Keep legacy showView working (called from auth.js)
+function showView(id) {
+    const map = {'login-view':'login','signup-view':'signup','forgot-view':'forgot'};
+    switchTab(map[id] || 'login');
+}
+</script>
 <script src="utils.js"></script>
 <script src="auth.js"></script>
-    <script src="/pwa.js" defer></script>
+<script src="/pwa.js" defer></script>
 </body>
 </html>
