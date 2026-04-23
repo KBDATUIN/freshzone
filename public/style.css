@@ -974,82 +974,161 @@ th { white-space:nowrap; }
 }
 
 /* ─────────────────────────────────────────────
-   SAFE UI POLISH (NO LAYOUT BREAKING)
+   UI/UX ENHANCEMENT v2 (SAFE + VISIBLE UPGRADE)
+   No layout breaking, only refinement
 ──────────────────────────────────────────── */
 
-/* Keep your original structure, just refine visuals */
-
-/* === BODY (smooth + less harsh) === */
+/* === 1. BACKGROUND: smoother + more premium === */
 body {
-    background-size: 320% 320%;
-    animation: wave 22s ease-in-out infinite;
-    line-height: 1.65;
+    background-size: 280% 280%;
+    animation: wave 18s ease-in-out infinite;
 }
 
-/* === CARDS (no layout change, just polish) === */
-.glass-card, .card, .auth-card, .stat-box, .profile-card {
-    box-shadow: 0 8px 24px rgba(0,78,122,0.08),
-                0 2px 8px rgba(0,0,0,0.05);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+/* subtle overlay to reduce harsh gradient */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.35);
+    pointer-events: none;
+    z-index: 0;
 }
 
-/* subtle hover only (no scaling = no break) */
-.glass-card:hover, .card:hover, .stat-box:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(0,78,122,0.12);
+[data-theme="dark"] body::before {
+    background: rgba(0,0,0,0.3);
 }
 
-/* === BUTTONS (keep size, improve feel) === */
+/* === 2. CARD ELEVATION SYSTEM === */
+.glass-card, .card, .auth-card, .profile-card {
+    position: relative;
+    z-index: 1;
+    box-shadow:
+        0 6px 18px rgba(0,0,0,0.06),
+        0 2px 6px rgba(0,0,0,0.04);
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+/* hover = clean lift (no scaling issues) */
+.glass-card:hover, .card:hover, .profile-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 14px 36px rgba(0,0,0,0.10),
+        0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* dark mode border fix */
+[data-theme="dark"] .glass-card,
+[data-theme="dark"] .card,
+[data-theme="dark"] .profile-card {
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* === 3. PROFILE SECTION (your main screen fix) === */
+.profile-card {
+    overflow: hidden;
+}
+
+/* avatar highlight ring improvement */
+.profile-avatar {
+    box-shadow:
+        0 0 0 4px rgba(255,255,255,0.6),
+        0 8px 20px rgba(0,180,216,0.25);
+}
+
+/* name emphasis */
+.profile-card h2 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* details spacing */
+.profile-details p {
+    padding: 6px 0;
+}
+
+/* === 4. BUTTON EXPERIENCE === */
 button {
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+/* softer hover (less aggressive) */
+button:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 6px 18px rgba(0,180,216,0.2);
+}
+
+/* click feedback */
+button:active {
+    transform: scale(0.97);
+}
+
+/* === 5. INPUT EXPERIENCE === */
+input, select, textarea {
+    background: rgba(255,255,255,0.92);
     transition: all 0.2s ease;
 }
 
-button:hover {
-    filter: brightness(1.05);
-}
-
-/* remove aggressive scaling that caused break */
-button:active {
-    transform: scale(0.98);
-}
-
-/* === INPUTS (cleaner but same size) === */
-input, select, textarea {
-    background: rgba(255,255,255,0.95);
-}
-
+/* focus glow */
 input:focus, select:focus, textarea:focus {
-    box-shadow: 0 0 0 2px rgba(0,180,216,0.15);
+    border-color: var(--secondary);
+    box-shadow:
+        0 0 0 3px rgba(0,180,216,0.12),
+        0 6px 14px rgba(0,0,0,0.05);
 }
 
-/* === NAVBAR (keep layout, improve glass) === */
+/* === 6. NAVBAR (clean + modern glass) === */
 nav {
-    backdrop-filter: blur(14px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(170%);
+    background: rgba(255,255,255,0.65) !important;
 }
 
-/* === PROFILE CARD FIX (your screenshot issue) === */
-.profile-card {
-    overflow: hidden; /* prevents visual glitch */
+/* dark nav */
+[data-theme="dark"] nav {
+    background: rgba(6,14,24,0.7) !important;
 }
 
-/* === TEXT READABILITY === */
-p {
-    line-height: 1.6;
+/* nav links interaction */
+.nav-links a {
+    transition: all 0.2s ease;
+    border-radius: 10px;
 }
 
-/* === TABLE (no scaling that breaks rows) === */
+.nav-links a:hover {
+    background: rgba(0,78,122,0.08);
+}
+
+/* active tab (PROFILE button fix from screenshot) */
+.nav-links a.active {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(0,78,122,0.2);
+}
+
+/* === 7. TABLE / LIST CLEANUP === */
 tbody tr:hover {
-    background: rgba(0,180,216,0.03);
+    background: rgba(0,180,216,0.04);
 }
 
-/* === ANIMATION SAFETY === */
+/* === 8. TEXT READABILITY === */
+p {
+    line-height: 1.65;
+    color: var(--gray);
+}
+
+[data-theme="dark"] p {
+    color: #94a3b8;
+}
+
+/* === 9. SMOOTH GLOBAL TRANSITIONS === */
 * {
     transition-property: background, color, border, box-shadow, transform;
 }
 
-/* === MOBILE SAFETY === */
-@media (max-width:768px) {
-    .glass-card:hover, .card:hover, .stat-box:hover {
-        transform: none;
+/* === 10. PERFORMANCE SAFETY === */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
     }
 }
