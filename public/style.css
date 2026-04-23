@@ -974,181 +974,186 @@ th { white-space:nowrap; }
 }
 
 /* ─────────────────────────────────────────────
-   IMPROVED PREMIUM DASHBOARD (STABLE & DYNAMIC)
-   - Enhanced depth with glassmorphism
-   - Pulse animations for live status
-   - Premium micro-interactions
+   FINAL UI UPGRADE (RESPECTS LIGHT + DARK MODE)
 ──────────────────────────────────────────── */
 
-/* === 1. BACKGROUND (Dynamic Mesh Depth) === */
+/* === 1. BACKGROUND IMPROVEMENT (LIGHT MODE ONLY) === */
 body {
-    background-blend-mode: soft-light;
-    background-attachment: fixed;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(0,180,216,0.08), transparent 40%),
+        radial-gradient(circle at 80% 0%, rgba(0,78,122,0.08), transparent 40%),
+        linear-gradient(135deg, var(--light), var(--secondary), var(--primary));
+    background-size: 300% 300%;
 }
 
-/* Added a subtle moving ambient light effect */
+/* subtle grid (works both modes) */
 body::after {
     content: "";
     position: fixed;
     inset: 0;
-    background: 
-        radial-gradient(circle at 15% 15%, rgba(var(--primary-rgb, 59, 130, 246), 0.05), transparent 25%),
-        radial-gradient(circle at 85% 85%, rgba(var(--secondary-rgb, 139, 92, 246), 0.05), transparent 25%);
+    background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 42px 42px;
+    opacity: 0.25;
     pointer-events: none;
-    z-index: -1;
+    z-index: 0;
 }
 
-/* === 2. HERO (Glassmorphism Upgrade) === */
+/* === 2. HERO PANEL (MAIN HEADER IMPROVEMENT) === */
 .hero {
-    background: rgba(255, 255, 255, 0.02); /* Works for light/dark */
-    backdrop-filter: blur(8px);
-    box-shadow: 
-        0 10px 30px rgba(0,0,0,0.08),
-        inset 0 1px 1px rgba(255,255,255,0.1);
+    backdrop-filter: blur(14px) saturate(160%);
     border: 1px solid var(--border);
-    border-radius: 16px; /* Smoother corners */
+    box-shadow: var(--shadow-lg);
 }
 
-/* === 3. SENSOR CARDS (Premium Glass & Glow) === */
+/* LIVE badge enhancement */
+.hero .live-badge,
+.live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background: rgba(22,163,74,0.15);
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* pulsing dot */
+.live-badge::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+    animation: pulseLive 2s infinite;
+}
+
+/* === 3. SENSOR CARDS (BIG IMPROVEMENT) === */
 .location-card {
     position: relative;
     border: 1px solid var(--border);
-    background: var(--card-bg, #ffffff);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.25s ease;
 }
 
-/* LEFT STATUS BAR (Improved with Inner Glow) */
+/* left accent bar (status indicator) */
 .location-card::before {
     content: "";
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
-    width: 6px;
+    width: 4px;
     border-radius: 8px 0 0 8px;
     background: var(--gray-light);
-    transition: 0.3s ease;
 }
 
-/* Status variants with subtle glows */
-.location-card.online::before { 
-    background: var(--success); 
-    box-shadow: 2px 0 10px rgba(22, 163, 74, 0.3);
+/* status states */
+.location-card.online::before {
+    background: var(--success);
 }
 
-.location-card.offline::before { 
-    background: var(--gray-light); 
+.location-card.offline::before {
+    background: var(--gray-light);
 }
 
-.location-card.alert::before { 
-    background: var(--danger); 
-    box-shadow: 2px 0 10px rgba(220, 38, 38, 0.3);
+.location-card.alert::before {
+    background: var(--danger);
 }
 
-/* Premium Hover Lift */
+/* hover effect (safe) */
 .location-card:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
 }
 
-/* === 4. STATUS TEXT & NUMBERS === */
+/* === 4. STATUS TEXT IMPROVEMENT === */
 .status-text {
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    text-transform: uppercase;
-    font-size: 0.85rem;
+    font-weight: 600;
 }
 
-/* === 5. BUTTONS (Tactile Feel) === */
+.status-text.online {
+    color: var(--success);
+}
+
+.status-text.offline {
+    color: var(--gray-light);
+}
+
+.status-text.alert {
+    color: var(--danger);
+}
+
+/* === 5. BUTTON IMPROVEMENT === */
 button {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.2s ease;
 }
 
+/* cleaner hover */
 button:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.05);
+    box-shadow: var(--btn-shadow-hover);
 }
 
-button:active {
-    transform: translateY(1px);
-}
-
-/* === 6. NAVBAR (Sleek Floating Effect) === */
+/* === 6. NAVBAR POLISH === */
 nav {
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-    background: rgba(255, 255, 255, 0.8);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    backdrop-filter: blur(14px) saturate(150%);
 }
 
-/* active nav with "capsule" look */
+/* active nav = clearer */
 .nav-links a.active {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white !important;
-    box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
-    border-radius: 8px;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(0,78,122,0.2);
 }
 
-/* === 7. TEXT (Modern Contrast) === */
-p {
-    line-height: 1.6;
-    color: var(--gray-dark, #4b5563);
-}
-
-small {
+/* === 7. TEXT READABILITY FIX === */
+p, small {
     color: var(--gray);
-    letter-spacing: 0.025em;
 }
 
-/* === 8. LIVE BADGE (Animated Pulse) === */
-.live-badge {
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    background: rgba(22,163,74,0.1);
-    color: var(--success);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border: 1px solid rgba(22,163,74,0.2);
+/* === 8. LAST UPDATED TEXT (dashboard feel) === */
+.last-updated {
+    font-size: 0.8rem;
+    color: var(--gray-light);
+    letter-spacing: 0.02em;
 }
 
-/* The "Blinking Dot" for live status */
-.live-badge::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    background: var(--success);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
+/* === 9. SMOOTH HAMBURGER (NO BREAK) === */
+.menu-toggle span {
+    transition: all 0.3s ease;
 }
 
-@keyframes pulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(1.2); }
-    100% { opacity: 1; transform: scale(1); }
+/* animation */
+.menu-toggle.active span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+.menu-toggle.active span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
 }
 
-/* === 9. MICRO INTERACTIONS === */
-.location-card,
-button,
-.nav-links a,
-.status-text {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+/* drawer animation */
+.mobile-nav-drawer {
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* Subtle icon bounce on card hover (if icons exist) */
-.location-card:hover i, 
-.location-card:hover svg {
-    transform: scale(1.1) rotate(3deg);
+/* === 10. LIVE ANIMATION === */
+@keyframes pulseLive {
+    0% { box-shadow: 0 0 0 0 rgba(22,163,74,0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(22,163,74,0); }
+    100% { box-shadow: 0 0 0 0 rgba(22,163,74,0); }
+}
+
+/* === 11. PERFORMANCE SAFE === */
+* {
+    transition-property: background, color, box-shadow, transform, border;
 }
