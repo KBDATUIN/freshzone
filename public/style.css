@@ -973,118 +973,83 @@ th { white-space:nowrap; }
     .mobile-nav-drawer { width:min(280px,90vw); }
 }
 
-/* ── GLOBAL UI POLISH UPGRADE ───────────────────────────────── */
+/* ─────────────────────────────────────────────
+   SAFE UI POLISH (NO LAYOUT BREAKING)
+──────────────────────────────────────────── */
 
-/* Softer gradient + less eye strain */
+/* Keep your original structure, just refine visuals */
+
+/* === BODY (smooth + less harsh) === */
 body {
-    background-size: 300% 300% !important;
-    animation: wave 20s ease-in-out infinite !important;
-    line-height: 1.65 !important;
-    transition: background 0.4s ease, color 0.25s ease;
+    background-size: 320% 320%;
+    animation: wave 22s ease-in-out infinite;
+    line-height: 1.65;
 }
 
-/* Reduce harsh white glare */
-.glass-card, .card, .hero, .auth-card, .contact-page-header {
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
+/* === CARDS (no layout change, just polish) === */
+.glass-card, .card, .auth-card, .stat-box, .profile-card {
+    box-shadow: 0 8px 24px rgba(0,78,122,0.08),
+                0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Softer shadows everywhere */
-.glass-card, .card, .stat-box, .log-container, .auth-card {
-    box-shadow: 0 10px 30px rgba(0, 78, 122, 0.08),
-                0 2px 10px rgba(0, 0, 0, 0.05) !important;
+/* subtle hover only (no scaling = no break) */
+.glass-card:hover, .card:hover, .stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,78,122,0.12);
 }
 
-/* Hover feels more natural (not too jumpy) */
-.glass-card:hover, .card:hover, .stat-box:hover, .location-card:hover {
-    transform: translateY(-3px) scale(1.01);
-}
-
-/* Buttons – more premium feel */
+/* === BUTTONS (keep size, improve feel) === */
 button {
-    border-radius: 14px !important;
-    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
 }
 
 button:hover {
-    transform: translateY(-2px) scale(1.01);
+    filter: brightness(1.05);
 }
 
-/* Inputs – less sharp + easier on eyes */
+/* remove aggressive scaling that caused break */
+button:active {
+    transform: scale(0.98);
+}
+
+/* === INPUTS (cleaner but same size) === */
 input, select, textarea {
-    border-radius: 12px !important;
-    background: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.95);
 }
 
-/* Focus state improvement */
 input:focus, select:focus, textarea:focus {
-    box-shadow: 0 0 0 3px rgba(0,180,216,0.12),
-                0 4px 14px rgba(0,0,0,0.06);
+    box-shadow: 0 0 0 2px rgba(0,180,216,0.15);
 }
 
-/* Navbar – more glassy premium look */
+/* === NAVBAR (keep layout, improve glass) === */
 nav {
-    backdrop-filter: blur(18px) saturate(180%) !important;
-    background: rgba(255,255,255,0.75) !important;
+    backdrop-filter: blur(14px) saturate(160%);
 }
 
-/* Dark mode nav refinement */
-[data-theme="dark"] nav {
-    background: rgba(6,14,24,0.75) !important;
-}
-
-/* Table readability improvement */
-table td {
-    line-height: 1.5;
-}
-
-/* Smooth transitions globally */
-* {
-    transition: all 0.18s ease;
-}
-
-/* Reduce aggressive animation for better UX */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
-    }
-}
-
-/* Auth page refinement */
-.auth-card {
-    border-radius: 24px !important;
-}
-
-.auth-header h1 {
-    letter-spacing: -0.02em;
-}
-
-/* Profile polish */
+/* === PROFILE CARD FIX (your screenshot issue) === */
 .profile-card {
-    backdrop-filter: blur(12px);
+    overflow: hidden; /* prevents visual glitch */
 }
 
-/* Contact form polish */
-.inbox-ticket {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.inbox-ticket:hover {
-    transform: translateY(-2px);
+/* === TEXT READABILITY === */
+p {
+    line-height: 1.6;
 }
 
-/* Subtle UI depth layering */
-.container {
-    isolation: isolate;
+/* === TABLE (no scaling that breaks rows) === */
+tbody tr:hover {
+    background: rgba(0,180,216,0.03);
 }
 
-/* Scrollbar smoother */
-::-webkit-scrollbar-thumb {
-    transition: background 0.2s;
+/* === ANIMATION SAFETY === */
+* {
+    transition-property: background, color, border, box-shadow, transform;
 }
 
-/* Slight color softening (less eye fatigue) */
-:root {
-    --primary: #005f8f;
-    --secondary: #00a8cc;
+/* === MOBILE SAFETY === */
+@media (max-width:768px) {
+    .glass-card:hover, .card:hover, .stat-box:hover {
+        transform: none;
+    }
 }
