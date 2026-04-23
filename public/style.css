@@ -13,20 +13,20 @@
     --dark:       #003049;
     --gray:       #6c757d;
     --gray-light: #94a3b8;
-    --bg:         #f8f9fa;
+    --bg:         #daeeff;
     --success:    #16a34a;
     --danger:     #dc2626;
     --warning:    #d97706;
-    --card-bg:    rgba(255,255,255,0.97);
+    --card-bg:    rgba(227,244,255,0.96);
     --btn-shadow:       0 4px 16px rgba(0,78,122,0.28);
     --btn-shadow-hover: 0 8px 24px rgba(0,180,216,0.4);
-    --input-border: #e2e8f0;
-    --input-bg:     #fff;
-    --table-bg:     #fff;
+    --input-border: rgba(0,100,160,0.2);
+    --input-bg:     rgba(245,251,255,0.95);
+    --table-bg:     rgba(230,245,255,0.95);
     --footer-color: white;
-    --border:       rgba(0,78,122,0.1);
-    --surface:      rgba(255,255,255,0.97);
-    --surface2:     #f8fafc;
+    --border:       rgba(0,78,122,0.18);
+    --surface:      rgba(220,240,255,0.97);
+    --surface2:     #c8e3f8;
     --shadow-sm:    0 1px 6px rgba(0,0,0,0.07), 0 2px 12px rgba(0,0,0,0.05);
     --shadow-md:    0 4px 20px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
     --shadow-lg:    0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08);
@@ -114,7 +114,7 @@ html { scroll-behavior:smooth; }
 /* ── BODY ────────────────────────────────────────────────────── */
 body {
     font-family:'DM Sans', 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, var(--light), var(--secondary), var(--primary));
+    background: linear-gradient(135deg, #005f96, #0093b8, #0ecfef, #005f96);
     background-size: 400% 400%;
     animation: wave 25s ease infinite;
     color: var(--dark);
@@ -140,7 +140,7 @@ h1, h2, h3, h4 { font-family:'Syne', sans-serif; letter-spacing:-0.025em; line-h
 
 /* ── NAVIGATION ─────────────────────────────────────────────── */
 nav {
-    background: rgba(255,255,255,0.92);
+    background: rgba(210,237,255,0.90);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     padding: 0 1.5rem;
@@ -230,7 +230,7 @@ nav {
 .push-toggle-switch.active { background:var(--secondary); }
 .push-toggle-knob {
     position:absolute; top:2.5px; left:2.5px;
-    width:18px; height:18px; background:white;
+    width:18px; height:18px; background:rgba(227,244,255,0.96);
     border-radius:50%; box-shadow:0 1px 4px rgba(0,0,0,0.2);
     transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
     will-change:transform;
@@ -270,7 +270,7 @@ nav {
 .mobile-nav-drawer {
     position:fixed; top:0; right:0;
     width:min(280px,85vw); height:100%; height:100dvh;
-    background:rgba(255,255,255,0.98);
+    background:rgba(210,237,255,0.98);
     backdrop-filter:blur(24px);
     -webkit-backdrop-filter:blur(24px);
     padding:1rem 0.875rem;
@@ -336,7 +336,7 @@ nav {
 
 /* ── LOCATION / SENSOR CARDS ──────────────────────────────── */
 .location-card {
-    background:white; padding:1.5rem; border-radius:var(--radius-lg);
+    background:rgba(227,244,255,0.96); padding:1.5rem; border-radius:var(--radius-lg);
     border-left:5px solid var(--success); position:relative;
     transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
     box-shadow:var(--shadow-sm); overflow:hidden;
@@ -375,7 +375,7 @@ nav {
 /* PM chips */
 .pm-values { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
 .pm-chip {
-    background:#f8fafc; border:1px solid rgba(0,78,122,0.1);
+    background: linear-gradient(135deg,rgba(0,78,122,0.05),rgba(0,180,216,0.07)); border:1px solid rgba(0,78,122,0.1);
     border-radius:6px; padding:3px 8px;
     font-size:0.7rem; color:var(--gray); font-family:monospace; font-weight:500;
 }
@@ -470,8 +470,7 @@ input.field-error, select.field-error, textarea.field-error { border-color:var(-
 .input-group { position:relative; }
 
 /* ── STATS & TABLES ──────────────────────────────────────────── */
-.stat-box {
-    background:white; padding:1.5rem 1.25rem; border-radius:var(--radius-lg);
+.stat-box { background:rgba(227,244,255,0.96); padding:1.5rem 1.25rem; border-radius:var(--radius-lg);
     border-bottom:3px solid var(--primary); text-align:center;
     transition:all 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow:var(--shadow-sm);
     position:relative; overflow:hidden;
@@ -488,7 +487,7 @@ input.field-error, select.field-error, textarea.field-error { border-color:var(-
 .stat-box p { font-size:0.75rem; color:var(--gray); font-weight:600; text-transform:uppercase; letter-spacing:0.06em; margin:0; }
 
 .log-container {
-    background:white; border-radius:var(--radius-lg); overflow-x:auto;
+    background:rgba(227,244,255,0.96); border-radius:var(--radius-lg); overflow-x:auto;
     border:1px solid rgba(0,78,122,0.08); box-shadow:var(--shadow-sm);
     transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
 }
@@ -501,7 +500,7 @@ th {
     padding:12px 16px; text-align:left;
     font-size:0.7rem; font-weight:700; text-transform:uppercase;
     letter-spacing:0.07em; color:var(--gray);
-    background:#f8fafc; cursor:pointer; white-space:nowrap;
+    background: linear-gradient(135deg,rgba(0,78,122,0.05),rgba(0,180,216,0.07)); cursor:pointer; white-space:nowrap;
     transition:color var(--transition);
 }
 th:hover { color:var(--primary); }
@@ -640,7 +639,7 @@ tbody tr:hover { background:rgba(0,78,122,0.025); }
 /* The card */
 .auth-card {
     padding:2.25rem 2rem; border-radius:var(--radius-2xl);
-    background:rgba(255,255,255,0.97);
+    background:rgba(220,242,255,0.97);
     box-shadow:0 24px 64px rgba(0,78,122,0.18), 0 4px 16px rgba(0,0,0,0.08);
     border:1px solid rgba(255,255,255,0.8);
     animation:fadeUp 0.7s 0.1s cubic-bezier(0.4,0,0.2,1) both;
@@ -685,7 +684,7 @@ tbody tr:hover { background:rgba(0,78,122,0.025); }
 }
 .auth-tab:hover { color:var(--primary); background:rgba(0,78,122,0.06); transform:none; }
 .auth-tab.active {
-    background:white; color:var(--primary);
+    background:rgba(227,244,255,0.96); color:var(--primary);
     box-shadow:0 1px 6px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,78,122,0.08);
 }
 .auth-tab::after { display:none !important; }
@@ -793,7 +792,7 @@ tbody tr:hover { background:rgba(0,78,122,0.025); }
 }
 .staff-response-modal.open { display:flex; }
 .staff-response-card {
-    background:white; border-radius:var(--radius-xl); padding:2rem 1.75rem;
+    background:rgba(227,244,255,0.96); border-radius:var(--radius-xl); padding:2rem 1.75rem;
     max-width:380px; width:90%;
     box-shadow:var(--shadow-xl);
     border-top:4px solid var(--danger);
@@ -1157,3 +1156,231 @@ p, small {
 * {
     transition-property: background, color, box-shadow, transform, border;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   FRESHZONE  ·  VISUAL UPGRADE v2  (light-mode polish)
+   Stacks on top of existing rules — no breaks, only improvements
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 1. RICHER BODY GRADIENT ─────────────────────────────────── */
+body {
+    background: linear-gradient(135deg, #004466 0%, #006aa0 25%, #0097c4 55%, #00c8e6 80%, #005f88 100%);
+    background-size: 400% 400%;
+    animation: wave 28s ease infinite;
+}
+[data-theme="dark"] body {
+    background: linear-gradient(135deg, #030a14 0%, #060e1c 35%, #091626 65%, #040c18 100%);
+    background-size: 300% 300%;
+    animation: wave 28s ease infinite;
+}
+
+/* ── 2. CARD SURFACES — iced blue, not white ─────────────────── */
+.glass-card, .hero, .card {
+    background: linear-gradient(160deg, rgba(225,245,255,0.97) 0%, rgba(210,237,255,0.95) 100%);
+    border: 1px solid rgba(0,120,180,0.18);
+    box-shadow: 0 6px 28px rgba(0,60,120,0.13), 0 1px 4px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] .glass-card,
+[data-theme="dark"] .hero,
+[data-theme="dark"] .card {
+    background: rgba(13,22,35,0.98);
+    border-color: rgba(34,211,238,0.10);
+}
+
+/* ── 3. NAVIGATION — frosted blue glass ──────────────────────── */
+nav {
+    background: rgba(0,68,110,0.82) !important;
+    border-bottom: 1px solid rgba(0,180,216,0.25) !important;
+    box-shadow: 0 2px 20px rgba(0,40,80,0.30), 0 1px 0 rgba(0,180,216,0.18) !important;
+}
+.nav-links a {
+    color: rgba(200,238,255,0.85) !important;
+}
+.nav-links a:hover {
+    color: #fff !important;
+    background: rgba(255,255,255,0.12) !important;
+}
+.nav-links a.active {
+    background: linear-gradient(135deg, #00b4d8, #0ecfef) !important;
+    color: #fff !important;
+    box-shadow: 0 3px 14px rgba(0,180,216,0.45) !important;
+}
+.nav-user {
+    background: rgba(255,255,255,0.12) !important;
+    border-color: rgba(255,255,255,0.22) !important;
+    color: rgba(200,238,255,0.9) !important;
+}
+.dark-toggle {
+    border-color: rgba(255,255,255,0.28) !important;
+    color: rgba(200,238,255,0.85) !important;
+}
+.dark-toggle:hover {
+    border-color: #0ecfef !important;
+    color: #fff !important;
+    background: rgba(255,255,255,0.1) !important;
+}
+.hamburger span { background: rgba(200,238,255,0.9) !important; }
+
+/* ── 4. STAT BOXES — gradient tiles ──────────────────────────── */
+.stat-box {
+    background: linear-gradient(145deg, rgba(210,238,255,0.98) 0%, rgba(185,225,255,0.92) 100%) !important;
+    border-bottom: 3px solid var(--secondary) !important;
+    border-top: none !important;
+    box-shadow: 0 4px 18px rgba(0,60,120,0.12), 0 1px 4px rgba(0,0,0,0.05) !important;
+}
+.stat-box:nth-child(even) {
+    background: linear-gradient(145deg, rgba(195,232,255,0.98) 0%, rgba(165,215,255,0.92) 100%) !important;
+}
+.stat-box h3 { color: #004e7a; }
+[data-theme="dark"] .stat-box {
+    background: rgba(0,30,55,0.92) !important;
+    border-bottom-color: var(--accent) !important;
+}
+[data-theme="dark"] .stat-box h3 { color: #7dd3fc; }
+
+/* ── 5. SENSOR / LOCATION CARDS ──────────────────────────────── */
+.location-card {
+    background: linear-gradient(155deg, rgba(222,243,255,0.98) 0%, rgba(205,235,255,0.95) 100%) !important;
+    border: 1px solid rgba(0,120,180,0.15) !important;
+    box-shadow: 0 4px 18px rgba(0,60,120,0.10), 0 1px 3px rgba(0,0,0,0.05) !important;
+}
+[data-theme="dark"] .location-card {
+    background: #0a1928 !important;
+    border-color: rgba(34,211,238,0.1) !important;
+}
+
+/* ── 6. TABLE — blue-tinted headers ─────────────────────────── */
+th {
+    background: rgba(180,220,255,0.65) !important;
+    color: #003a5c !important;
+    border-bottom: 2px solid rgba(0,100,160,0.2) !important;
+}
+th:hover { color: var(--primary) !important; }
+tbody tr:hover { background: rgba(0,130,200,0.06) !important; }
+td { border-bottom-color: rgba(0,80,140,0.08) !important; }
+[data-theme="dark"] th {
+    background: rgba(0,0,0,0.35) !important;
+    color: #7dd3fc !important;
+}
+
+/* ── 7. MOBILE DRAWER ────────────────────────────────────────── */
+.mobile-nav-drawer {
+    background: rgba(0,50,85,0.97) !important;
+}
+.mobile-nav-drawer a { color: rgba(195,235,255,0.85) !important; }
+.mobile-nav-drawer a:hover,
+.mobile-nav-drawer a.active {
+    background: rgba(0,180,216,0.22) !important;
+    color: #fff !important;
+}
+.mobile-nav-divider { background: rgba(0,180,216,0.18) !important; }
+.mobile-nav-logout { color: #fca5a5 !important; }
+
+/* ── 8. FORM INPUTS ──────────────────────────────────────────── */
+input, select, textarea {
+    background: rgba(235,249,255,0.9) !important;
+    border-color: rgba(0,100,160,0.22) !important;
+    color: #002c4a !important;
+}
+input:focus, select:focus, textarea:focus {
+    background: rgba(225,245,255,0.98) !important;
+    border-color: var(--secondary) !important;
+    box-shadow: 0 0 0 3px rgba(0,180,216,0.18) !important;
+}
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background: #0a1928 !important;
+    border-color: #1e3a52 !important;
+    color: #e2f0f8 !important;
+}
+
+/* ── 9. AUTH CARD ────────────────────────────────────────────── */
+.auth-card {
+    background: linear-gradient(160deg, rgba(225,245,255,0.97) 0%, rgba(205,237,255,0.96) 100%) !important;
+    border: 1px solid rgba(0,120,180,0.22) !important;
+    box-shadow: 0 28px 70px rgba(0,40,100,0.22), 0 4px 16px rgba(0,0,0,0.08) !important;
+}
+.auth-tabs {
+    background: rgba(0,100,160,0.1) !important;
+}
+.auth-tab.active {
+    background: rgba(215,240,255,0.98) !important;
+    color: var(--primary) !important;
+}
+[data-theme="dark"] .auth-card {
+    background: rgba(10,20,32,0.98) !important;
+}
+[data-theme="dark"] .auth-tabs {
+    background: rgba(0,0,0,0.3) !important;
+}
+
+/* ── 10. FILTER BAR ──────────────────────────────────────────── */
+.filter-bar {
+    background: linear-gradient(160deg, rgba(218,240,255,0.97), rgba(200,232,255,0.95)) !important;
+    border: 1px solid rgba(0,100,160,0.18) !important;
+}
+[data-theme="dark"] .filter-bar {
+    background: rgba(13,22,35,0.98) !important;
+}
+
+/* ── 11. LOG CONTAINER ───────────────────────────────────────── */
+.log-container {
+    background: linear-gradient(160deg, rgba(220,242,255,0.97), rgba(200,232,255,0.95)) !important;
+    border-color: rgba(0,100,160,0.14) !important;
+}
+[data-theme="dark"] .log-container {
+    background: #0a1928 !important;
+}
+
+/* ── 12. INSTALL BANNER ──────────────────────────────────────── */
+#fz-install-banner {
+    background: linear-gradient(135deg, rgba(220,243,255,0.99), rgba(205,235,255,0.98)) !important;
+    border-color: rgba(0,100,160,0.18) !important;
+}
+
+/* ── 13. MODAL CARD ──────────────────────────────────────────── */
+.modal-content-custom {
+    background: linear-gradient(160deg, rgba(220,243,255,0.99), rgba(205,235,255,0.97)) !important;
+}
+.staff-response-card {
+    background: linear-gradient(160deg, rgba(220,243,255,0.99), rgba(205,235,255,0.97)) !important;
+}
+[data-theme="dark"] .modal-content-custom,
+[data-theme="dark"] .staff-response-card {
+    background: #0d1624 !important;
+}
+
+/* ── 14. PAGE HERO TEXT ──────────────────────────────────────── */
+.page-hero h1 { text-shadow: 0 2px 16px rgba(0,0,0,0.20); }
+
+/* ── 15. SCROLLBAR (blue accent) ─────────────────────────────── */
+::-webkit-scrollbar-thumb { background: rgba(0,100,170,0.28) !important; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,150,210,0.45) !important; }
+
+/* ── 16. PUSH TOGGLE ─────────────────────────────────────────── */
+.push-toggle-switch { background: rgba(0,100,160,0.20) !important; }
+.push-toggle-switch.active { background: var(--secondary) !important; }
+
+/* ── 17. CONTACT PAGE HEADER ─────────────────────────────────── */
+.contact-page-header {
+    background: linear-gradient(155deg, rgba(215,241,255,0.98), rgba(195,230,255,0.96)) !important;
+    border: 1px solid rgba(0,100,160,0.15) !important;
+}
+
+/* ── 18. HOTKEY BADGE ────────────────────────────────────────── */
+.hotkey-badge {
+    background: rgba(0,100,160,0.15) !important;
+    border-color: rgba(0,160,216,0.28) !important;
+    color: #00b4d8 !important;
+    backdrop-filter: blur(8px);
+}
+
+/* ── 19. PROFILE CARD ────────────────────────────────────────── */
+.profile-img { background: rgba(180,225,255,0.6) !important; }
+.profile-divider { background: rgba(0,100,160,0.12) !important; }
+
+/* ── 20. LABEL COLORS ────────────────────────────────────────── */
+label { color: #003a5c !important; }
+[data-theme="dark"] label { color: var(--dark) !important; }
+

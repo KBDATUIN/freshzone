@@ -229,3 +229,24 @@
     #fz-splash { display: none !important; }
     #fz-page-loader { display: none !important; }
 }
+
+
+/* ── FRESHZONE pwa.css VISUAL UPGRADE ──────────────────────── */
+
+/* Splash - richer gradient */
+#fz-splash {
+    background: linear-gradient(155deg, #003a5c 0%, #005f96 30%, #0093b8 65%, #00c5e0 100%) !important;
+}
+
+/* Install banner - iced blue */
+#fz-install-banner {
+    background: linear-gradient(135deg, rgba(218,242,255,0.99), rgba(200,232,255,0.98)) !important;
+    border-color: rgba(0,100,160,0.18) !important;
+    box-shadow: 0 8px 32px rgba(0,50,100,0.18) !important;
+}
+.fz-install-text strong { color: #003a5c !important; }
+
+/* Loader bar color — teal */
+.fz-loader-bar {
+    background: linear-gradient(90deg, #00b4d8, #0ecfef, #00b4d8) !important;
+}
