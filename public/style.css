@@ -156,8 +156,8 @@ nav {
 
 .nav-container {
     max-width: 1200px; margin: auto;
-    display: flex; justify-content: space-between;
-    align-items: center; gap: 0.5rem; height: 100%;
+    display: flex; flex-wrap: nowrap;
+    align-items: center; gap: 0; height: 100%;
 }
 .logo { display:flex; align-items:center; flex-shrink:0; text-decoration:none; }
 .logo img { height:48px; transition:transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s; }
@@ -933,14 +933,20 @@ th { white-space:nowrap; }
 
 /* ── NAV CONTROLS (user pill + dark toggle + push toggle) ────── */
 .nav-controls {
-    display:flex; align-items:center; gap:10px; flex-shrink:0; margin-left:auto;
+    display:flex !important;
+    align-items:center !important;
+    gap:10px;
+    flex-shrink:0 !important;
+    flex-wrap:nowrap !important;
+    margin-left:auto !important;
 }
+.nav-controls .hamburger { display:none; }
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width:900px) {
-    .nav-links { display:none; }
-    .hamburger { display:flex; }
-    .nav-user  { display:none; }
+    .nav-links { display:none !important; }
+    .nav-controls .hamburger { display:flex !important; }
+    .nav-user  { display:none !important; }
     .nav-controls { gap:8px; }
 }
 @media (max-width:768px) {

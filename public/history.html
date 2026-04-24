@@ -243,10 +243,11 @@
         .h-icon   { width:1.1rem; height:1.1rem; margin-right:6px; vertical-align:-0.18em; }
         .sm-icon  { width:0.8rem; height:0.8rem; vertical-align:-0.08em; margin-right:3px; }
     </style>
-
     <style>
-        /* ── NAV LAYOUT FIX ───────────────────────────────────────── */
-        nav { overflow: visible !important; }
+        /* ── NAV LAYOUT — definitive fix (overrides all external CSS) ── */
+        nav {
+            overflow: visible !important;
+        }
         .nav-container {
             display: flex !important;
             flex-wrap: nowrap !important;
@@ -254,13 +255,21 @@
             justify-content: flex-start !important;
             gap: 0 !important;
             height: 100% !important;
-            overflow: visible !important;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
         }
-        .nav-container .logo { flex-shrink: 0; margin-right: 1rem; }
+        .nav-container .logo {
+            flex-shrink: 0 !important;
+            margin-right: 1.25rem !important;
+        }
         .nav-links {
+            display: flex !important;
             flex: 1 1 auto !important;
             min-width: 0 !important;
+            align-items: center !important;
             flex-wrap: nowrap !important;
+            gap: 0.15rem !important;
             overflow: visible !important;
         }
         .nav-controls {
@@ -270,15 +279,13 @@
             align-items: center !important;
             gap: 10px !important;
             margin-left: auto !important;
-            height: 100% !important;
         }
-        /* hamburger lives inside nav-controls; hidden on desktop */
+        /* hamburger is inside nav-controls – hide on desktop, show on mobile */
         .nav-controls .hamburger { display: none !important; }
         @media (max-width: 900px) {
             .nav-links { display: none !important; }
             .nav-controls .hamburger { display: flex !important; }
             .nav-user { display: none !important; }
-            .nav-controls { gap: 8px !important; }
         }
     </style>
 </head>
