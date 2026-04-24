@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>/* Anti-flash */html{background:linear-gradient(155deg,#003855 0%,#005a80 38%,#0098b8 72%,#00c4d8 100%);}html[data-theme="dark"]{background:linear-gradient(155deg,#01060f 0%,#021525 45%,#041e34 100%);}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshZone | About Us</title>
+    <meta name="description" content="FreshZone — Real-time campus vape aerosol detection system built by BSIT students.">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-v2.css">
+    <link rel="stylesheet" href="style-v3.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#004e7a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+    <link rel="stylesheet" href="/pwa.css">
+    <style>
+        /* ICON SYSTEM */
+        .icon { display:inline-block; width:1em; height:1em; vertical-align:-0.125em; flex-shrink:0; }
+        .nav-icon { width:1.05rem; height:1.05rem; margin-right:5px; vertical-align:-0.15em; opacity:0.85; }
+        .btn-icon { width:0.9rem; height:0.9rem; margin-right:4px; vertical-align:-0.1em; }
+        .h-icon   { width:1.1rem; height:1.1rem; margin-right:6px; vertical-align:-0.18em; }
+
+        /* Push toggle */
+        .push-toggle-wrap { display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;margin-left:4px; }
+        .push-toggle-switch { position:relative;width:44px;height:24px;background:#ccc;border-radius:12px;cursor:pointer;transition:background 0.25s;outline:none;flex-shrink:0; }
+        .push-toggle-switch.active { background:var(--secondary,#00c896); }
+        .push-toggle-knob { position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);will-change:transform; }
+        .push-toggle-switch.active .push-toggle-knob { transform:translateX(20px); }
+        .push-toggle-label { font-size:0.72rem;font-weight:700;color:var(--secondary,#00c896);letter-spacing:0.04em;min-width:22px; }
+
+        /* Divider */
+        .about-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,180,216,0.25), transparent);
+            margin: 2rem 0;
+        }
+        [data-theme="dark"] .about-divider {
+            background: linear-gradient(90deg, transparent, rgba(0,200,232,0.18), transparent);
+        }
+
+        /* Values grid */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.1rem;
+            margin-top: 1.5rem;
+        }
+        .value-card {
+            background: rgba(255,255,255,0.62);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.72);
+            border-radius: 18px;
+            padding: 1.4rem 1.25rem;
+            transition: all 0.28s cubic-bezier(0.22,1,0.36,1);
+        }
+        .value-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(0,30,55,0.18); }
+        [data-theme="dark"] .value-card {
+            background: rgba(8,22,40,0.78);
+            border-color: rgba(0,200,232,0.12);
+        }
+        .value-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1rem; color: white;
+        }
+        .value-icon svg { width: 22px; height: 22px; }
+        .value-card h4 {
+            font-family: 'Clash Display', 'Syne', sans-serif !important;
+            font-size: 1rem; color: #003855; margin-bottom: 0.4rem;
+        }
+        [data-theme="dark"] .value-card h4 { color: #d0eeff; }
+        .value-card p { font-size: 0.875rem; color: #4a7a90; line-height: 1.6; margin: 0; }
+        [data-theme="dark"] .value-card p { color: rgba(160,210,230,0.75); }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem; top: 8px; bottom: 8px;
+            width: 2px;
+            background: linear-gradient(180deg, #0077a8, #00c8e8, transparent);
+            border-radius: 2px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.25rem;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -2rem;
+            top: 4px;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0077a8, #00c8e8);
+            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 0 0 3px rgba(0,180,216,0.25);
+        }
+        .timeline-year {
+            font-family: 'Space Grotesk', monospace !important;
+            font-size: 0.72rem; font-weight: 700;
+            color: #0099c8; letter-spacing: 0.06em;
+            text-transform: uppercase; margin-bottom: 0.2rem;
+        }
+        [data-theme="dark"] .timeline-year { color: #38c8e8; }
+        .timeline-title {
+            font-family: 'Clash Display', 'Syne', sans-serif !important;
+            font-size: 0.98rem; color: #003855; margin-bottom: 0.25rem;
+        }
+        [data-theme="dark"] .timeline-title { color: #d0eeff; }
+        .timeline-desc { font-size: 0.86rem; color: #4a7a90; line-height: 1.55; margin: 0; }
+        [data-theme="dark"] .timeline-desc { color: rgba(160,210,230,0.75); }
+
+        /* Glow heading decoration */
+        .section-eyebrow {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 0.7rem; font-weight: 800;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            color: #0099c8; display: block; margin-bottom: 0.5rem;
+        }
+        [data-theme="dark"] .section-eyebrow { color: #38c8e8; }
+
+        .sensor-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(0,200,232,0.10);
+            border: 1px solid rgba(0,200,232,0.28);
+            border-radius: 99px;
+            padding: 4px 12px;
+            font-family: 'Space Grotesk', monospace !important;
+            font-size: 0.75rem; font-weight: 700;
+            color: #0077a8; margin: 3px;
+        }
+        [data-theme="dark"] .sensor-badge { color: #38c8e8; background: rgba(0,200,232,0.08); border-color: rgba(0,200,232,0.2); }
+        .sensor-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #00c8e8; }
+    </style>
+</head>
+<body>
+
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
+                <img src="logo1.png" alt="FreshZone Logo">
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="history.html">History</a>
+                <a href="about.html" class="active">About</a>
+                <a href="profile.html">Profile</a>
+                <a href="contact.html">Contact</a>
+                <a href="#" onclick="openLogoutModal();return false;">Logout</a>
+                <div class="nav-user" id="nav-user-display">
+                    <span class="nav-user-dot"></span>
+                    <span id="nav-user-name">—</span>
+                </div>
+                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
+                    <span style="display:inline-block;width:1rem;height:1rem;opacity:0.7;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+                    <div class="push-toggle-switch" id="push-btn" onclick="togglePushNotifications()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')togglePushNotifications()">
+                        <div class="push-toggle-knob"></div>
+                    </div>
+                    <span class="push-toggle-label" id="push-label">OFF</span>
+                </label>
+            </div>
+            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true">
+        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
+            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
+            <a href="history.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
+            <a href="about.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> About</a>
+            <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
+            <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
+            <div class="mobile-nav-divider"></div>
+            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
+        </div>
+    </div>
+
+    <div class="container" style="max-width:860px; padding-bottom: 3rem;">
+
+        <!-- ── HERO ─────────────────────────────────────────── -->
+        <div class="about-hero animate-in">
+            <img src="logo1.png" alt="FreshZone" style="height:72px;margin-bottom:1.25rem;filter:drop-shadow(0 6px 20px rgba(0,180,216,0.35));">
+            <h1>About FreshZone</h1>
+            <p>A campus-grade IoT air quality monitoring system built to detect vape aerosols in real time — keeping shared spaces safer for everyone.</p>
+        </div>
+
+        <!-- ── KEY STATS STRIP ─────────────────────────────── -->
+        <div class="about-stat-strip animate-in" style="animation-delay:0.1s;">
+            <div class="about-stat-item">
+                <span class="about-stat-num">3</span>
+                <span class="about-stat-label">Campus Locations</span>
+            </div>
+            <div class="about-stat-item">
+                <span class="about-stat-num">3s</span>
+                <span class="about-stat-label">Update Interval</span>
+            </div>
+            <div class="about-stat-item">
+                <span class="about-stat-num">PM2.5</span>
+                <span class="about-stat-label">Primary Metric</span>
+            </div>
+            <div class="about-stat-item">
+                <span class="about-stat-num">24/7</span>
+                <span class="about-stat-label">Live Monitoring</span>
+            </div>
+        </div>
+
+        <div class="about-divider"></div>
+
+        <!-- ── MISSION ─────────────────────────────────────── -->
+        <div class="glass-card about-mission-card animate-in" style="animation-delay:0.15s; margin-bottom:1.5rem;">
+            <span class="section-eyebrow">Our Mission</span>
+            <h2 style="font-size:1.5rem; margin-bottom:0.85rem; color:#003855;">
+                <svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="#0099c8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Why FreshZone Exists
+            </h2>
+            <p style="color:#335a70; line-height:1.75; margin-bottom:1rem;">
+                Vaping inside campus buildings is a growing concern. Traditional enforcement relies on manual patrols — slow, inconsistent, and easy to evade. FreshZone replaces guesswork with data: low-cost ESP32-based sensors continuously sample the air for PM1.0, PM2.5, and PM10 particulate matter, then stream readings to a live web dashboard accessible to all authorized staff.
+            </p>
+            <p style="color:#335a70; line-height:1.75; margin: 0;">
+                When aerosol concentrations exceed safe thresholds, the system automatically flags the location, sends push notifications to registered staff, and logs the incident for review. The goal is faster response, better documentation, and measurable improvement in campus air quality.
+            </p>
+        </div>
+
+        <!-- ── WHAT WE MONITOR ─────────────────────────────── -->
+        <div class="glass-card animate-in" style="animation-delay:0.2s; margin-bottom:1.5rem;">
+            <span class="section-eyebrow">Sensor Coverage</span>
+            <h2 style="font-size:1.3rem; margin-bottom:0.9rem; color:#003855;">What FreshZone Monitors</h2>
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1.25rem;">
+                <span class="sensor-badge"><span class="sensor-badge-dot"></span>PM1.0 µg/m³</span>
+                <span class="sensor-badge"><span class="sensor-badge-dot"></span>PM2.5 µg/m³</span>
+                <span class="sensor-badge"><span class="sensor-badge-dot"></span>PM10 µg/m³</span>
+                <span class="sensor-badge"><span class="sensor-badge-dot"></span>AQI Score</span>
+                <span class="sensor-badge"><span class="sensor-badge-dot"></span>Detection Events</span>
+                <span class="sensor-badge"><span class="sensor-badge-dot"></span>Sensor Health</span>
+            </div>
+            <div class="aq-guide-grid" style="gap:1rem;">
+                <div class="aq-card" style="padding:1.1rem 1rem;">
+                    <h4>PM1.0 – Ultra-fine particles</h4>
+                    <p style="font-size:0.84rem;line-height:1.6;">Particles smaller than 1 µm. These penetrate deepest into lung tissue and are a primary indicator of vape aerosol presence indoors.</p>
+                </div>
+                <div class="aq-card" style="padding:1.1rem 1rem;">
+                    <h4>PM2.5 – Fine particles</h4>
+                    <p style="font-size:0.84rem;line-height:1.6;">The WHO's benchmark for indoor air health. FreshZone uses PM2.5 to calculate AQI and trigger alerts automatically.</p>
+                </div>
+                <div class="aq-card" style="padding:1.1rem 1rem;">
+                    <h4>AQI – Air Quality Index</h4>
+                    <p style="font-size:0.84rem;line-height:1.6;">A 0–500 scale derived from PM2.5. Bands: Good (0–50), Moderate (51–100), Unhealthy (101+). Alerts fire at Moderate+.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CORE VALUES ─────────────────────────────────── -->
+        <div class="glass-card animate-in" style="animation-delay:0.25s; margin-bottom:1.5rem;">
+            <span class="section-eyebrow">Core Values</span>
+            <h2 style="font-size:1.3rem; margin-bottom:0.5rem; color:#003855;">How We Build</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon" style="background:linear-gradient(135deg,#0077a8,#00c8e8);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h4>Privacy-first</h4>
+                    <p>No cameras, no microphones. We detect aerosols — not people. All data is anonymized at the sensor level.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon" style="background:linear-gradient(135deg,#0ea266,#1de9b6);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    </div>
+                    <h4>Real-time</h4>
+                    <p>Sensor data updates every 3 seconds. Staff sees live AQI before manual inspection would even begin.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <h4>Accessible</h4>
+                    <p>PWA-ready on any device. Works on low-end phones with offline fallback through a service worker.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                    </div>
+                    <h4>Accountable</h4>
+                    <p>Every detection event is logged with timestamp, location, and AQI peak. Full history is exportable as CSV.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TECHNOLOGY ──────────────────────────────────── -->
+        <div class="glass-card animate-in" style="animation-delay:0.3s; margin-bottom:1.5rem;">
+            <span class="section-eyebrow">Technology Stack</span>
+            <h2 style="font-size:1.3rem; margin-bottom:1rem; color:#003855;">Built With</h2>
+            <div class="about-tech-grid">
+                <div class="about-tech-pill">
+                    <div class="about-tech-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+                    </div>
+                    <div>
+                        <div class="about-tech-label">ESP32</div>
+                        <div style="font-size:0.72rem;color:#5a8a9f;">Sensor controller</div>
+                    </div>
+                </div>
+                <div class="about-tech-pill">
+                    <div class="about-tech-icon" style="background:linear-gradient(135deg,#1a7a4a,#22c55e);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    </div>
+                    <div>
+                        <div class="about-tech-label">Node.js</div>
+                        <div style="font-size:0.72rem;color:#5a8a9f;">Backend API</div>
+                    </div>
+                </div>
+                <div class="about-tech-pill">
+                    <div class="about-tech-icon" style="background:linear-gradient(135deg,#1e40af,#3b82f6);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                    </div>
+                    <div>
+                        <div class="about-tech-label">MySQL</div>
+                        <div style="font-size:0.72rem;color:#5a8a9f;">Database</div>
+                    </div>
+                </div>
+                <div class="about-tech-pill">
+                    <div class="about-tech-icon" style="background:linear-gradient(135deg,#d97706,#f59e0b);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    </div>
+                    <div>
+                        <div class="about-tech-label">Web Push</div>
+                        <div style="font-size:0.72rem;color:#5a8a9f;">Notifications</div>
+                    </div>
+                </div>
+                <div class="about-tech-pill">
+                    <div class="about-tech-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    </div>
+                    <div>
+                        <div class="about-tech-label">PWA</div>
+                        <div style="font-size:0.72rem;color:#5a8a9f;">Installable app</div>
+                    </div>
+                </div>
+                <div class="about-tech-pill">
+                    <div class="about-tech-icon" style="background:linear-gradient(135deg,#065f46,#10b981);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                    </div>
+                    <div>
+                        <div class="about-tech-label">Nodemailer</div>
+                        <div style="font-size:0.72rem;color:#5a8a9f;">Email / OTP</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── DEVELOPMENT TIMELINE ────────────────────────── -->
+        <div class="glass-card animate-in" style="animation-delay:0.33s; margin-bottom:1.5rem;">
+            <span class="section-eyebrow">Timeline</span>
+            <h2 style="font-size:1.3rem; margin-bottom:1.25rem; color:#003855;">Project Milestones</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2025 Q1 — Concept</div>
+                    <div class="timeline-title">Problem Definition & Hardware Selection</div>
+                    <p class="timeline-desc">Identified vaping as a campus enforcement gap. Selected the ESP32 + PMS5003 sensor stack after evaluating cost vs. accuracy trade-offs.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2025 Q2 — Prototype</div>
+                    <div class="timeline-title">First Sensor Node & API</div>
+                    <p class="timeline-desc">Built the first physical sensor enclosure and the Node.js REST API. Validated PM readings against a reference monitor in a controlled room test.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2025 Q3 — Dashboard</div>
+                    <div class="timeline-title">Web UI, Auth & Notifications</div>
+                    <p class="timeline-desc">Launched the live dashboard with role-based access, OTP email auth, real-time AQI cards, and Web Push alerts for staff and admins.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background:linear-gradient(135deg,#0ea266,#1de9b6);"></div>
+                    <div class="timeline-year">2026 — Present</div>
+                    <div class="timeline-title">Full Deployment & Iteration</div>
+                    <p class="timeline-desc">Three sensor nodes active across campus. History export, CSV reporting, incident ticketing, and continuous UI improvements now in production.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TEAM ────────────────────────────────────────── -->
+        <div class="glass-card animate-in" style="animation-delay:0.36s; margin-bottom:1.5rem;">
+            <span class="section-eyebrow">The Team</span>
+            <h2 style="font-size:1.3rem; margin-bottom:1rem; color:#003855;">Built by BSIT Students</h2>
+            <p style="color:#4a7a90; font-size:0.9rem; margin-bottom:1.5rem; line-height:1.65;">
+                FreshZone is a capstone project developed by a team of Bachelor of Science in Information Technology students — combining hardware engineering, full-stack web development, and UX design.
+            </p>
+            <div class="about-team-grid">
+                <div class="about-team-card">
+                    <div class="about-team-avatar">JD</div>
+                    <div class="about-team-name">Project Lead</div>
+                    <div class="about-team-role">Full-Stack Dev</div>
+                    <p style="font-size:0.78rem;color:#5a8a9f;margin-top:0.5rem;line-height:1.5;">Node.js API, database design, sensor integration & deployment</p>
+                </div>
+                <div class="about-team-card">
+                    <div class="about-team-avatar" style="background:linear-gradient(135deg,#0ea266,#1de9b6);">UI</div>
+                    <div class="about-team-name">UI/UX Designer</div>
+                    <div class="about-team-role">Frontend Dev</div>
+                    <p style="font-size:0.78rem;color:#5a8a9f;margin-top:0.5rem;line-height:1.5;">Dashboard interface, design system, PWA implementation</p>
+                </div>
+                <div class="about-team-card">
+                    <div class="about-team-avatar" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">HW</div>
+                    <div class="about-team-name">Hardware Lead</div>
+                    <div class="about-team-role">IoT Engineer</div>
+                    <p style="font-size:0.78rem;color:#5a8a9f;margin-top:0.5rem;line-height:1.5;">ESP32 firmware, sensor calibration & enclosure design</p>
+                </div>
+                <div class="about-team-card">
+                    <div class="about-team-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24);">QA</div>
+                    <div class="about-team-name">QA & Docs</div>
+                    <div class="about-team-role">Testing Lead</div>
+                    <p style="font-size:0.78rem;color:#5a8a9f;margin-top:0.5rem;line-height:1.5;">System testing, user documentation & presentation</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── ACKNOWLEDGEMENTS ────────────────────────────── -->
+        <div class="glass-card animate-in" style="animation-delay:0.4s; margin-bottom:1.5rem; text-align:center; padding:2rem 2rem;">
+            <span class="section-eyebrow">Acknowledgements</span>
+            <h2 style="font-size:1.2rem; margin-bottom:0.75rem; color:#003855;">Gratitude</h2>
+            <p style="color:#4a7a90; font-size:0.9rem; line-height:1.75; max-width:520px; margin:0 auto 1.25rem;">
+                We thank our thesis adviser, the campus administration, and all faculty who supported this project — and every staff member who gave feedback during testing.
+            </p>
+            <a href="contact.html" style="display:inline-flex;align-items:center;gap:8px;padding:0.65rem 1.4rem;border-radius:12px;background:linear-gradient(135deg,#005f8a,#0099c8,#00c4e8);color:white;text-decoration:none;font-weight:700;font-size:0.9rem;box-shadow:0 4px 16px rgba(0,150,200,0.38);transition:all 0.22s ease;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                Send Us Feedback
+            </a>
+        </div>
+
+    </div>
+
+    <div id="notification" class="notification hidden" role="alert" aria-live="polite"></div>
+
+    <div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+        <div class="modal-content-custom">
+            <h3 id="logout-title">Confirm Logout</h3>
+            <p>Are you sure you want to log out of FreshZone?</p>
+            <div class="modal-btn-group">
+                <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <footer><p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p></footer>
+
+    <script src="utils.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        (function() {
+            const el = document.getElementById('nav-user-name');
+            if (el && (user.full_name || user.name)) el.textContent = user.full_name || user.name;
+        })();
+    </script>
+    <script src="/pwa.js" defer></script>
+    <script defer src="enhance.js"></script>
+</body>
+</html>

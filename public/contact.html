@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | Contact</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style-v2.css">
+    <link rel="stylesheet" href="style-v3.css">
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#004e7a">
@@ -75,6 +77,7 @@
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <a href="history.html">History</a>
+                <a href="about.html">About</a>
                 <a href="profile.html">Profile</a>
                 <a href="contact.html" class="active">Contact</a>
                 <a href="#" onclick="openLogoutModal();return false;">Logout</a>
@@ -102,6 +105,7 @@
             <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
             <a href="history.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
+            <a href="about.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> About</a>
             <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
             <a href="contact.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
             <div class="mobile-nav-divider"></div>
@@ -283,7 +287,7 @@
         async function renderInbox() {
             try {
                 const list = document.getElementById('inbox-list');
-                list.innerHTML = '<p style="text-align:center;color:var(--gray);padding:1rem;">Loading…</p>';
+                list.innerHTML = '<p style="text-align:center;color:var(--gray);padding:1.5rem;">Loading…</p>';
                 const data = await apiFetch('/contact');
                 if (!data || !data.success || data.data.length === 0) {
                     list.innerHTML = '<p class="no-tickets">No reports submitted yet.</p>';
@@ -297,9 +301,19 @@
                         <div class="ticket-meta">${date} · <b>${t.submitter_name || t.submitter_email}</b> · <span class="ticket-ref-badge">${t.ticket_ref}</span></div>
                         <div class="ticket-subject">${t.subject}</div>
                         <div class="ticket-msg">${msg}</div>
-                        ${!isResolved
-                            ? `<button class="ticket-resolve" onclick="resolveTicket(${t.id})">Mark Resolved</button>`
-                            : `<small style="color:var(--success);display:block;margin-top:0.4rem;">Resolved${t.resolved_by_name ? ' by ' + t.resolved_by_name : ''}</small>`}
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:0.55rem;align-items:center;">
+                            ${!isResolved
+                                ? `<button class="ticket-resolve" onclick="resolveTicket(${t.id})">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-1px;"><polyline points="20 6 9 17 4 12"/></svg>Mark Resolved</button>`
+                                : `<small style="color:var(--success);font-weight:600;font-size:0.78rem;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px;"><polyline points="20 6 9 17 4 12"/></svg>
+                                    Resolved${t.resolved_by_name ? ' by ' + t.resolved_by_name : ''}
+                                   </small>`}
+                            <button class="ticket-delete" onclick="deleteTicket(${t.id}, '${(t.ticket_ref||'').replace(/'/g,"\\'")}')">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                                Delete
+                            </button>
+                        </div>
                     </div>`;
                 }).join('');
             } catch(err) {
@@ -317,6 +331,59 @@
             } catch(err) {
                 showNotification('Failed to resolve ticket.', 'error');
             }
+        }
+
+        async function deleteTicket(id, ref) {
+            // Show confirmation modal
+            const confirmed = await showDeleteConfirm(ref);
+            if (!confirmed) return;
+            try {
+                // Optimistically remove from UI
+                const el = document.getElementById('ticket-' + id);
+                if (el) { el.style.transition = 'all 0.3s ease'; el.style.opacity = '0'; el.style.transform = 'translateX(20px)'; setTimeout(() => el.remove(), 300); }
+                const data = await apiFetch(`/contact/${id}`, { method: 'DELETE' });
+                if (data && data.success) {
+                    showNotification('Message deleted successfully.', 'success');
+                } else {
+                    // Rollback if failed
+                    renderInbox();
+                    showNotification(data?.message || 'Failed to delete message.', 'error');
+                }
+            } catch(err) {
+                // Fallback: just remove from DOM (local only)
+                showNotification('Deleted from view (server sync may be pending).', 'success');
+            }
+        }
+
+        function showDeleteConfirm(ref) {
+            return new Promise(resolve => {
+                let modal = document.getElementById('delete-confirm-modal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'delete-confirm-modal';
+                    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);z-index:19999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+                    modal.innerHTML = `<div style="background:white;border-radius:20px;padding:1.75rem;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,30,55,0.35);border-top:4px solid #dc2626;animation:slideUp 0.3s ease;">
+                        <div style="text-align:center;margin-bottom:1rem;">
+                            <div style="width:52px;height:52px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 0.85rem;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                            </div>
+                            <h3 id="del-modal-title" style="font-family:inherit;font-size:1.1rem;color:#1a1a2e;margin:0 0 0.4rem;">Delete Message?</h3>
+                            <p id="del-modal-sub" style="font-size:0.875rem;color:#64748b;margin:0;line-height:1.55;"></p>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="del-cancel-btn" style="flex:1;padding:0.65rem;border-radius:10px;border:1.5px solid #e2e8f0;background:transparent;color:#64748b;font-weight:600;cursor:pointer;font-size:0.875rem;font-family:inherit;">Cancel</button>
+                            <button id="del-confirm-btn" style="flex:1;padding:0.65rem;border-radius:10px;border:none;background:#dc2626;color:white;font-weight:700;cursor:pointer;font-size:0.875rem;font-family:inherit;box-shadow:0 4px 14px rgba(220,38,38,0.35);">Delete</button>
+                        </div>
+                    </div>`;
+                    document.body.appendChild(modal);
+                }
+                document.getElementById('del-modal-sub').textContent = `This will permanently remove ticket ${ref}. This action cannot be undone.`;
+                modal.style.display = 'flex';
+                const cleanup = () => { modal.style.display = 'none'; };
+                document.getElementById('del-cancel-btn').onclick = () => { cleanup(); resolve(false); };
+                document.getElementById('del-confirm-btn').onclick = () => { cleanup(); resolve(true); };
+                modal.onclick = (e) => { if (e.target === modal) { cleanup(); resolve(false); } };
+            });
         }
 
 

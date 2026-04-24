@@ -76,4 +76,22 @@ router.post('/:id/resolve', authMiddleware, adminOnly, async (req, res) => {
     }
 });
 
+// ── DELETE /api/contact/:id ───────────────────────────────────
+// Admin only — permanently delete a ticket/message
+router.delete('/:id', authMiddleware, adminOnly, async (req, res) => {
+    try {
+        const [result] = await db.query(
+            `DELETE FROM contact_tickets WHERE id = ?`,
+            [req.params.id]
+        );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Ticket not found.' });
+        }
+        res.json({ success: true, message: 'Ticket deleted successfully.' });
+    } catch (err) {
+        console.error('Contact DELETE error:', err);
+        res.status(500).json({ success: false, message: 'Server error.' });
+    }
+});
+
 module.exports = router;
