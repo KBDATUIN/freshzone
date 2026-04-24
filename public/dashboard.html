@@ -587,6 +587,8 @@
 
         // Track which zones currently have active alerts
         const activeAlerts = {};
+        // Source-of-truth open event state per zone (Detected / Acknowledged)
+        const openEventStatusByZone = {};
         // Track last event IDs seen to avoid double-notifying
         const seenEventIds = new Set(JSON.parse(localStorage.getItem('fz-seen-events') || '[]'));
 
@@ -628,11 +630,24 @@
             const category = data.aqi_category || 'Good';
             const pm25     = parseFloat(data.pm2_5 || 0).toFixed(1);
             const recordedAt = data.recorded_at ? new Date(data.recorded_at).toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila' }) : '—';
+            const openStatus = openEventStatusByZone[zoneCode] || null;
 
             // Update status
             const resolveBtn = z.resolveBtn ? document.getElementById(z.resolveBtn) : null;
 
-            if (smoke && !acknowledgedZones.has(zoneCode)) {
+            if (openStatus === 'Acknowledged') {
+                // Event is acknowledged in DB — keep this state even while PM remains high
+                card.className = 'location-card clear';
+                dot.className  = 'status-dot dot-clear';
+                statusText.innerHTML = '<svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acknowledged — Awaiting Resolution';
+                statusText.style.color = '#f39c12';
+                aqiBadge.className = 'aqi-badge aqi-moderate';
+                aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
+                if (ackBtn) ackBtn.style.display = 'none';
+                if (resolveBtn) resolveBtn.style.display = 'block';
+                activeAlerts[zoneCode] = false;
+
+            } else if (openStatus === 'Detected' || (smoke && !acknowledgedZones.has(zoneCode))) {
                 card.className = 'location-card detecting';
                 dot.className  = 'status-dot dot-detecting';
                 statusText.innerHTML = '<strong><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> VAPE AEROSOL DETECTED</strong>';
@@ -658,19 +673,6 @@
                 // Update bottom nav badge
                 const monitorLink = document.querySelector('#fz-bottom-nav a[href="dashboard.html"]');
                 if (monitorLink) monitorLink.classList.add('has-alert');
-
-            } else if (smoke && acknowledgedZones.has(zoneCode)) {
-                // Acknowledged — show resolve button for everyone
-                card.className = 'location-card clear';
-                dot.className  = 'status-dot dot-clear';
-                statusText.innerHTML = '<svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acknowledged — Awaiting Resolution';
-                statusText.style.color = '#f39c12';
-                aqiBadge.className = 'aqi-badge aqi-moderate';
-                aqiBadge.textContent = `AQI: ${aqi || '—'} — ${category}`;
-                if (ackBtn) ackBtn.style.display = 'none';
-                // Show resolve button for ALL logged-in users
-                if (resolveBtn) resolveBtn.style.display = 'block';
-                activeAlerts[zoneCode] = false;
 
             } else {
                 // Sensor is genuinely clear
@@ -740,11 +742,30 @@
 
                 // Rebuild acknowledged state from DB — this is the source of truth
                 acknowledgedZones.clear();
+                // Clear maps to avoid stale IDs/status between polls
+                Object.keys(zoneEventIds).forEach(k => delete zoneEventIds[k]);
+                Object.keys(openEventStatusByZone).forEach(k => delete openEventStatusByZone[k]);
+
+                // Pick one active event per node. Prioritize "Detected" if both exist.
+                const latestPerNode = {};
                 data.data.forEach(event => {
                     if (!event.node_code) return;
+                    const current = latestPerNode[event.node_code];
+                    if (!current) {
+                        latestPerNode[event.node_code] = event;
+                        return;
+                    }
+                    if (current.event_status !== 'Detected' && event.event_status === 'Detected') {
+                        latestPerNode[event.node_code] = event;
+                    }
+                });
+
+                Object.values(latestPerNode).forEach(event => {
+                    if (!event?.node_code) return;
 
                     // Store event ID for resolve button
                     zoneEventIds[event.node_code] = event.id;
+                    openEventStatusByZone[event.node_code] = event.event_status;
 
                     // If DB says Acknowledged, mark zone locally so renderZone shows resolve btn
                     if (event.event_status === 'Acknowledged') {
@@ -766,25 +787,33 @@
         async function acknowledgeAlert(nodeCode, locationName) {
             const z = ZONES[nodeCode];
             const ackBtn = z ? document.getElementById(z.ackBtn) : null;
+            let eventId = zoneEventIds[nodeCode];
 
             // Disable button immediately to prevent double-click
             if (ackBtn) { ackBtn.disabled = true; ackBtn.textContent = 'Acknowledging…'; }
 
             try {
-                const eventsData = await apiFetch('/readings/open-events');
-                if (!eventsData || !eventsData.success) {
+                // Fallback refresh only if poll has not yet filled local event map
+                if (!eventId) {
+                    const eventsData = await apiFetch('/readings/open-events');
+                    if (eventsData?.success) {
+                        const match = eventsData.data.find(e => e.node_code === nodeCode);
+                        if (match?.id) {
+                            eventId = match.id;
+                            zoneEventIds[nodeCode] = match.id;
+                            openEventStatusByZone[nodeCode] = match.event_status;
+                        }
+                    }
+                }
+
+                if (!eventId) {
+                    showNotification('This alert is already handled or syncing. Refreshing…', 'info', 1800);
+                    setTimeout(() => { fetchOpenEvents(); fetchLiveData(); }, 500);
                     if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = 'Acknowledge Alert'; }
                     return;
                 }
 
-                const event = eventsData.data.find(e => e.node_code === nodeCode);
-                if (!event) {
-                    showNotification('No active alert found for this zone.', 'warning');
-                    if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = 'Acknowledge Alert'; }
-                    return;
-                }
-
-                const result = await apiFetch(`/readings/acknowledge/${event.id}`, {
+                const result = await apiFetch(`/readings/acknowledge/${eventId}`, {
                     method: 'POST',
                     body: JSON.stringify({ notes: `Acknowledged by ${user.full_name || user.name}` })
                 });
@@ -794,6 +823,8 @@
 
                     // Update local state immediately (DB will confirm on next fetchOpenEvents poll)
                     acknowledgedZones.add(nodeCode);
+                    openEventStatusByZone[nodeCode] = 'Acknowledged';
+                    zoneEventIds[nodeCode] = eventId;
 
                     // Update card immediately — show resolve button
                     if (z) {
@@ -890,6 +921,7 @@
                     // Remove from local acknowledged set — DB is now Cleared
                     acknowledgedZones.delete(nodeCode);
                     delete zoneEventIds[nodeCode];
+                    delete openEventStatusByZone[nodeCode];
 
                     // Update card to clear
                     if (z) {
