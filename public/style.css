@@ -946,6 +946,29 @@ th { white-space:nowrap; }
     margin-left:auto !important;
 }
 .nav-controls .hamburger { display:none; }
+.nav-controls > label.push-toggle-wrap,
+.nav-controls > .push-toggle-wrap {
+    display:inline-flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:0.55rem !important;
+    min-height:38px !important;
+    margin:0 !important;
+    padding:0 !important;
+    line-height:0 !important;
+}
+.nav-controls > label.push-toggle-wrap .push-toggle-icon,
+.nav-controls > .push-toggle-wrap .push-toggle-icon,
+.nav-controls > label.push-toggle-wrap .push-toggle-switch,
+.nav-controls > .push-toggle-wrap .push-toggle-switch {
+    align-self:center !important;
+    margin:0 !important;
+}
+.nav-controls > label.push-toggle-wrap .push-toggle-label,
+.nav-controls > .push-toggle-wrap .push-toggle-label {
+    display:none !important;
+}
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width:900px) {
