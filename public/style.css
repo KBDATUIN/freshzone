@@ -931,11 +931,17 @@ th { white-space:nowrap; }
 #edit-btn { display:inline-flex !important; align-items:center !important; gap:6px !important; text-transform:none !important; letter-spacing:normal !important; }
 #edit-btn::after { display:none !important; }
 
+/* ── NAV CONTROLS (user pill + dark toggle + push toggle) ────── */
+.nav-controls {
+    display:flex; align-items:center; gap:10px; flex-shrink:0; margin-left:auto;
+}
+
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width:900px) {
     .nav-links { display:none; }
     .hamburger { display:flex; }
-    .nav-user { display:none; }
+    .nav-user  { display:none; }
+    .nav-controls { gap:8px; }
 }
 @media (max-width:768px) {
     nav { padding:0 1rem; }
