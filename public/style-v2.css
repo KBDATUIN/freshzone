@@ -612,6 +612,13 @@ tbody tr:hover{
 }
 .notification.show{ animation: fzNotifIn .5s var(--fz-spring) both; }
 @keyframes fzNotifIn{ from{ opacity:0; transform: translateY(-20px) scale(.92); } to{ opacity:1; transform:none; } }
+@media (max-width: 768px){
+  .notification.show{ animation: fzNotifInMobile .45s var(--fz-spring) both !important; }
+}
+@keyframes fzNotifInMobile{
+  from{ opacity:0; transform: translateX(-50%) translateY(-18px) scale(.94); }
+  to{ opacity:1; transform: translateX(-50%) translateY(0) scale(1); }
+}
 
 /* ── 14. SCROLLBAR ─────────────────────────────────────────── */
 ::-webkit-scrollbar{ width: 10px !important; height: 10px !important; }
