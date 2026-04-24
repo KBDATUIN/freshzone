@@ -1792,6 +1792,42 @@ nav {
     border-color: rgba(34,211,238,0.08) !important;
 }
 
+/* ══ Shared page masthead (Dashboard + History) — same frosted card as other app pages ══ */
+.fz-masthead {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(165deg, #e8f4fc 0%, #d0ebf7 50%, #c5e8f4 100%) !important;
+    border: 1px solid rgba(0, 100, 150, 0.16) !important;
+    box-shadow: 0 4px 28px rgba(0, 45, 90, 0.1), 0 1px 0 rgba(255, 255, 255, 0.65) inset !important;
+    border-radius: 20px !important;
+}
+.fz-masthead::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #00b4d8, #0ecfef, #7dd3fc, #a78bfa);
+    opacity: 0.9;
+    pointer-events: none;
+}
+.fz-masthead::after {
+    content: "";
+    position: absolute;
+    top: -40%; right: -15%;
+    width: 50%; height: 120%;
+    background: radial-gradient(ellipse, rgba(0, 180, 216, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+}
+[data-theme="dark"] .fz-masthead {
+    background: linear-gradient(165deg, rgba(10, 24, 42, 0.96) 0%, rgba(6, 18, 35, 0.98) 100%) !important;
+    border-color: rgba(34, 211, 238, 0.2) !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(34, 211, 238, 0.08) !important;
+}
+[data-theme="dark"] .fz-masthead::after {
+    background: radial-gradient(ellipse, rgba(34, 211, 238, 0.12) 0%, transparent 70%);
+}
+/* Per-stat number colors: see style-v2.css (loads after) */
+
 /* ── TABLE IMPROVEMENTS ─────────────────────────────────────────── */
 .log-container {
     border-radius: 18px !important;
