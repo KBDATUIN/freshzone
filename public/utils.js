@@ -122,18 +122,18 @@ function initSessionTimeout() {
 // ── HOTKEY SYSTEM ─────────────────────────────────────────────
 function initHotkeys(pageKey) {
     const map = {
-        dashboard: { H:'history.html', P:'profile.html', C:'contact.html' },
-        history:   { M:'dashboard.html', P:'profile.html', C:'contact.html' },
-        about:     { M:'dashboard.html', H:'history.html', P:'profile.html', C:'contact.html' },
-        profile:   { M:'dashboard.html', H:'history.html', C:'contact.html' },
-        contact:   { M:'dashboard.html', H:'history.html', P:'profile.html' },
+        dashboard: { H:'history.html', P:'profile.html', C:'contact.html', A:'about.html' },
+        history:   { M:'dashboard.html', P:'profile.html', C:'contact.html', A:'about.html' },
+        about:     { M:'dashboard.html', H:'history.html', P:'profile.html', C:'contact.html', A:'about.html' },
+        profile:   { M:'dashboard.html', H:'history.html', C:'contact.html', A:'about.html' },
+        contact:   { M:'dashboard.html', H:'history.html', P:'profile.html', A:'about.html' },
     };
     const labels = {
-        dashboard: { H:'History', P:'Profile', C:'Contact' },
-        history:   { M:'Dashboard', P:'Profile', C:'Contact' },
-        about:     { M:'Dashboard', H:'History', P:'Profile', C:'Contact' },
-        profile:   { M:'Dashboard', H:'History', C:'Contact' },
-        contact:   { M:'Dashboard', H:'History', P:'Profile' },
+        dashboard: { H:'History', P:'Profile', C:'Contact', A:'About' },
+        history:   { M:'Dashboard', P:'Profile', C:'Contact', A:'About' },
+        about:     { M:'Dashboard', H:'History', P:'Profile', C:'Contact', A:'About' },
+        profile:   { M:'Dashboard', H:'History', C:'Contact', A:'About' },
+        contact:   { M:'Dashboard', H:'History', P:'Profile', A:'About' },
     };
     const keys = map[pageKey] || {};
     const keyLabels = labels[pageKey] || {};
