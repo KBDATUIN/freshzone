@@ -278,28 +278,26 @@ footer {
         grid-column: 1 / -1 !important;
     }
 
-    /* Session pill — icon left-aligned, text wraps naturally below on mobile */
+    /* Session pill — always one line on mobile, just smaller font */
     .dashboard-hero-session {
-        font-size: 0.82rem !important;
-        padding: 0.45rem 0.85rem 0.45rem 0.65rem !important;
+        font-size: 0.72rem !important;
+        padding: 0.4rem 0.8rem 0.4rem 0.6rem !important;
         flex-wrap: nowrap !important;
-        align-items: flex-start !important;
-        text-align: left !important;
-        justify-content: flex-start !important;
-        max-width: calc(100vw - 2.5rem) !important;
-        white-space: normal !important;   /* allow text to wrap — never truncate */
+        align-items: center !important;
+        white-space: nowrap !important;
         overflow: visible !important;
-        border-radius: 14px !important;
+        border-radius: 999px !important;
+        max-width: 100% !important;
     }
     .dashboard-hero-session #hero-session-text {
-        white-space: normal !important;   /* full name always visible */
+        white-space: nowrap !important;
         overflow: visible !important;
         text-overflow: unset !important;
-        word-break: break-word !important;
-        line-height: 1.4 !important;
     }
     .dashboard-hero-session svg {
-        margin-top: 2px !important;      /* align icon with first line of text */
+        width: 13px !important;
+        height: 13px !important;
+        margin-top: 0 !important;
     }
 
     /* Live sensor strip — already 1-col grid from 768px query; just tighten gap */
