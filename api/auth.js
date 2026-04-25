@@ -19,7 +19,7 @@ function getJwtCookieOptions() {
     return {
         httpOnly: true,
         secure: isProduction,
-        sameSite: 'strict',
+        sameSite: isProduction ? 'none' : 'lax',
         maxAge: 8 * 60 * 60 * 1000,
         path: '/',
     };
@@ -342,8 +342,10 @@ router.get('/session', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-    res.clearCookie(JWT_COOKIE_NAME, { path: '/' });
-    res.clearCookie('fz_csrf', { path: '/' });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const clearOpts = { path: '/', sameSite: isProduction ? 'none' : 'lax', secure: isProduction };
+    res.clearCookie(JWT_COOKIE_NAME, clearOpts);
+    res.clearCookie('fz_csrf', clearOpts);
     return res.json({ success: true, message: 'Logged out.' });
 });
 

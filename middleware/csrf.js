@@ -12,7 +12,7 @@ function getCookieOptions() {
     return {
         httpOnly: false,
         secure: isProduction,
-        sameSite: 'strict',
+        sameSite: isProduction ? 'none' : 'lax',
         maxAge: 8 * 60 * 60 * 1000,
         path: '/',
     };
