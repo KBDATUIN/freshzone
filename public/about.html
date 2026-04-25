@@ -209,7 +209,7 @@
         .glass-card .about-team-grid,
         .glass-card .values-grid {
             display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+            grid-template-columns: repeat(3, 1fr) !important;
             gap: 1rem !important;
             align-items: stretch !important;
         }
@@ -274,12 +274,26 @@
             margin: 0 !important;
             color: #5a8a9f !important;
         }
-        @media (max-width: 680px) {
+        @media (max-width: 900px) {
+            .glass-card .about-tech-grid,
+            .glass-card .about-team-grid,
+            .glass-card .values-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .glass-card .about-tech-grid,
+            .glass-card .about-team-grid,
+            .glass-card .values-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0.8rem !important;
+            }
             .glass-card .about-tech-pill,
             .glass-card .about-team-card {
                 flex-direction: column !important;
                 align-items: stretch !important;
                 padding: 1rem !important;
+                min-height: auto !important;
             }
             .glass-card .about-tech-icon,
             .glass-card .about-team-avatar {
