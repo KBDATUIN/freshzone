@@ -310,6 +310,40 @@
             .nav-controls .hamburger { display: flex !important; }
             .nav-user { display: none !important; }
         }
+
+        /* ── MOBILE HISTORY SCROLL FIX ─────────────────────────── */
+        html, body {
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            min-height: 100% !important;
+        }
+        .container {
+            min-width: 100% !important;
+            overflow: visible !important;
+        }
+        .log-container {
+            overflow-x: auto !important;
+            overflow-y: visible !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100% !important;
+        }
+        .log-container table {
+            min-width: 100% !important;
+            width: 100% !important;
+            table-layout: auto !important;
+        }
+        .log-container th,
+        .log-container td {
+            white-space: normal !important;
+        }
+        @media (max-width: 768px) {
+            .filter-bar { overflow: visible !important; }
+            .log-container { max-width: 100% !important; }
+            .mobile-nav-drawer {
+                max-height: 100dvh !important;
+                height: 100dvh !important;
+            }
+        }
     </style>
 </head>
 <body>
