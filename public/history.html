@@ -204,14 +204,11 @@
         .filter-input-wrap input,
         .filter-input-wrap select {
             width: 100%;
-            padding-right: 2.8rem;
-        }
-        .filter-input-wrap input[type="date"] {
-            padding-right: 3.2rem;
+            padding-right: 2rem;
         }
         .filter-inline-clear {
             position: absolute !important;
-            right: 8px !important;
+            right: 6px !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
             width: 20px !important;
@@ -310,40 +307,6 @@
             .nav-controls .hamburger { display: flex !important; }
             .nav-user { display: none !important; }
         }
-
-        /* ── MOBILE HISTORY SCROLL FIX ─────────────────────────── */
-        html, body {
-            overflow-x: hidden !important;
-            overflow-y: auto !important;
-            min-height: 100% !important;
-        }
-        .container {
-            min-width: 100% !important;
-            overflow: visible !important;
-        }
-        .log-container {
-            overflow-x: auto !important;
-            overflow-y: visible !important;
-            -webkit-overflow-scrolling: touch !important;
-            width: 100% !important;
-        }
-        .log-container table {
-            min-width: 100% !important;
-            width: 100% !important;
-            table-layout: auto !important;
-        }
-        .log-container th,
-        .log-container td {
-            white-space: normal !important;
-        }
-        @media (max-width: 768px) {
-            .filter-bar { overflow: visible !important; }
-            .log-container { max-width: 100% !important; }
-            .mobile-nav-drawer {
-                max-height: 100dvh !important;
-                height: 100dvh !important;
-            }
-        }
     </style>
 </head>
 <body>
@@ -394,7 +357,6 @@
             <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
             <a href="history.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
-            <a href="about.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> About</a>
             <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
             <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
             <div class="mobile-nav-divider"></div>
