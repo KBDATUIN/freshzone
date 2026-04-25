@@ -135,6 +135,89 @@
         .about-team-card p {
             color: #38607b;
         }
+        .glass-card .about-tech-grid,
+        .glass-card .about-team-grid,
+        .glass-card .values-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+            gap: 1rem !important;
+            align-items: stretch !important;
+        }
+        .glass-card .about-tech-pill,
+        .glass-card .about-team-card {
+            background: rgba(255,255,255,0.94) !important;
+            border: 1px solid rgba(0,107,150,0.12) !important;
+            border-radius: 18px !important;
+            padding: 1rem 1rem 1rem 0.85rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.95rem !important;
+            min-height: 110px !important;
+            transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+        }
+        .glass-card .about-tech-pill:hover,
+        .glass-card .about-team-card:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 18px 38px rgba(0, 40, 70, 0.12) !important;
+        }
+        .glass-card .about-tech-pill > div,
+        .glass-card .about-team-card > div,
+        .glass-card .about-team-card > p {
+            min-width: 0 !important;
+        }
+        .glass-card .about-tech-icon,
+        .glass-card .about-team-avatar {
+            width: 48px !important;
+            height: 48px !important;
+            min-width: 48px !important;
+            min-height: 48px !important;
+            border-radius: 16px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: white !important;
+            font-weight: 700 !important;
+            background: linear-gradient(135deg, #0077a8, #00c8e8) !important;
+        }
+        .glass-card .about-tech-icon svg {
+            width: 22px !important;
+            height: 22px !important;
+        }
+        .glass-card .about-tech-icon {
+            padding: 0.65rem !important;
+        }
+        .glass-card .about-team-avatar {
+            font-size: 0.9rem !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            justify-content: center !important;
+            font-family: 'Space Grotesk', monospace, sans-serif !important;
+            background: linear-gradient(135deg, #0077a8, #00c8e8) !important;
+        }
+        .glass-card .about-team-card {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 1.15rem !important;
+            min-height: auto !important;
+        }
+        .glass-card .about-team-card p {
+            margin: 0 !important;
+            color: #5a8a9f !important;
+        }
+        @media (max-width: 680px) {
+            .glass-card .about-tech-pill,
+            .glass-card .about-team-card {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                padding: 1rem !important;
+            }
+            .glass-card .about-tech-icon,
+            .glass-card .about-team-avatar {
+                width: 52px !important;
+                height: 52px !important;
+                margin-bottom: 0.45rem !important;
+            }
+        }
         .timeline-dot {
             position: absolute;
             left: -2rem;
