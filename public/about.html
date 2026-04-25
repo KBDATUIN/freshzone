@@ -102,13 +102,83 @@
             margin-bottom: 1.5rem;
             padding-bottom: 0.25rem;
         }
-        .about-hero h1,
-        .about-hero p {
+        .about-hero {
+            text-align: center;
+            padding: 3rem 1.5rem 2rem;
+        }
+        .about-hero img {
+            height: 72px;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 6px 20px rgba(0,180,216,0.35));
+            animation: float 6s ease-in-out infinite;
+        }
+        .about-hero h1 {
+            font-family: 'Clash Display', 'Syne', sans-serif !important;
+            font-size: 2.4rem;
+            font-weight: 800;
             color: #f8fcff;
             text-shadow: 0 12px 24px rgba(0,0,0,0.18);
+            margin: 0 0 1rem;
+            line-height: 1.2;
         }
-        .about-hero { text-align:center; padding: 2rem 1rem 1.5rem; }
-        .about-hero p { max-width: 680px; margin: 0 auto; }
+        .about-hero p {
+            font-size: 1.05rem;
+            color: #d0e8f2;
+            text-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.65;
+            font-weight: 500;
+        }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+        .about-stat-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 2.5rem 0;
+            padding: 0;
+        }
+        .about-stat-item {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 1.25rem 0.9rem;
+            text-align: center;
+            transition: all 0.28s cubic-bezier(0.22,1,0.36,1);
+        }
+        .about-stat-item:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(0,180,216,0.28);
+            transform: translateY(-4px);
+        }
+        .about-stat-num {
+            display: block;
+            font-family: 'Space Grotesk', monospace !important;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #00d4ff;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.04em;
+        }
+        .about-stat-label {
+            display: block;
+            font-size: 0.82rem;
+            color: #a8d5e8;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        [data-theme="dark"] .about-stat-item {
+            background: rgba(0,180,216,0.06);
+            border-color: rgba(34,211,238,0.15);
+        }
+        [data-theme="dark"] .about-stat-item:hover {
+            background: rgba(0,180,216,0.09);
+            border-color: rgba(34,211,238,0.25);
+        }
+        [data-theme="dark"] .about-stat-num { color: #38c8e8; }
+        [data-theme="dark"] .about-stat-label { color: rgba(160,210,230,0.8); }
         .about-mission-card {
             background: #f8fcff !important;
             border-color: rgba(0,107,150,0.12) !important;
@@ -365,12 +435,12 @@
 
         <!-- ── HERO ─────────────────────────────────────────── -->
         <div class="about-hero animate-in">
-            <img src="logo1.png" alt="FreshZone" style="height:72px;margin-bottom:1.25rem;filter:drop-shadow(0 6px 20px rgba(0,180,216,0.35));">
+            <img src="logo1.png" alt="FreshZone">
             <h1>About FreshZone</h1>
             <p>A campus-grade IoT air quality monitoring system built to detect vape aerosols in real time — keeping shared spaces safer for everyone.</p>
         </div>
 
-        <!-- ── KEY STATS STRIP ─────────────────────────────── -->
+        <!-- ── KEY STATS ─────────────────────────────────── -->
         <div class="about-stat-strip animate-in" style="animation-delay:0.1s;">
             <div class="about-stat-item">
                 <span class="about-stat-num">3</span>
