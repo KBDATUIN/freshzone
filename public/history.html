@@ -204,35 +204,53 @@
         .filter-input-wrap input,
         .filter-input-wrap select {
             width: 100%;
-            padding-right: 2rem;
+            padding-right: 2.25rem;
         }
+        /* ── X CLEAR BUTTON — fixed, always circular, no overlap ── */
         .filter-inline-clear {
             position: absolute !important;
-            right: 6px !important;
+            right: 7px !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            width: 20px !important;
-            height: 20px !important;
-            min-width: unset !important;
+            width: 22px !important;
+            height: 22px !important;
+            min-width: 22px !important;
+            max-width: 22px !important;
+            min-height: 22px !important;
+            max-height: 22px !important;
             padding: 0 !important;
             margin: 0 !important;
             border: none !important;
             border-radius: 50% !important;
-            background: #94a3b8 !important;
+            background: rgba(100,116,139,0.75) !important;
             color: white !important;
-            font-size: 0.6rem !important;
             cursor: pointer !important;
             box-shadow: none !important;
             text-transform: none !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            flex-shrink: 0 !important;
+            z-index: 5 !important;
+            transition: background 0.18s !important;
+            overflow: hidden !important;
             line-height: 1 !important;
-            z-index: 2 !important;
-            transition: background 0.2s !important;
+            font-size: 0 !important; /* hide any text fallback */
         }
-        .filter-inline-clear:hover { background: #64748b !important; }
+        .filter-inline-clear:hover { background: rgba(51,65,85,0.9) !important; }
+        .filter-inline-clear:active { transform: translateY(-50%) scale(0.9) !important; }
         .filter-inline-clear::after { display: none !important; }
+        .filter-inline-clear::before { display: none !important; }
+        /* The SVG inside the X button */
+        .filter-inline-clear svg {
+            width: 11px !important;
+            height: 11px !important;
+            flex-shrink: 0 !important;
+            display: block !important;
+            stroke: white !important;
+            fill: none !important;
+            pointer-events: none !important;
+        }
 
         /* Button label parts — always visible */
         .fab-icon { display: inline-flex; align-items: center; flex-shrink: 0; }
@@ -400,7 +418,7 @@
                     <label for="filter-search"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search</label>
                     <div class="filter-input-wrap">
                         <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable();updateClearBtns()">
-                        <button class="filter-inline-clear" id="clear-search" onclick="clearField('filter-search')" title="Clear search" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                        <button class="filter-inline-clear" id="clear-search" onclick="clearField('filter-search')" title="Clear search" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     </div>
                 </div>
 
@@ -413,7 +431,7 @@
                             <option value="Acknowledged">Acknowledged</option>
                             <option value="Cleared">Cleared</option>
                         </select>
-                        <button class="filter-inline-clear" id="clear-status" onclick="clearField('filter-status')" title="Clear status" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                        <button class="filter-inline-clear" id="clear-status" onclick="clearField('filter-status')" title="Clear status" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     </div>
                 </div>
 
@@ -421,7 +439,7 @@
                     <label for="filter-date"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Date</label>
                     <div class="filter-input-wrap">
                         <input type="date" id="filter-date" onchange="renderTable();updateClearBtns()">
-                        <button class="filter-inline-clear" id="clear-date" onclick="clearField('filter-date')" title="Clear date" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                        <button class="filter-inline-clear" id="clear-date" onclick="clearField('filter-date')" title="Clear date" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     </div>
                 </div>
 
