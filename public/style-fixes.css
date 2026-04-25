@@ -220,6 +220,29 @@ footer {
     .aq-guide-grid {
         grid-template-columns: 1fr !important;
     }
+
+    /* On tablet/mobile — sensor strip goes to 1 column */
+    .live-sensor-strip {
+        grid-template-columns: 1fr !important;
+    }
+    .live-sensor-item {
+        /* Compact, content-height only — no empty white space */
+        padding: 0.55rem 0.7rem !important;
+        min-height: unset !important;
+        height: auto !important;
+    }
+
+    /* AQI bands: 2-col on mobile for compact look */
+    .aqi-bands {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    /* Guide head: stack title + chip vertically */
+    .aq-guide-head {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.4rem !important;
+    }
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -255,19 +278,26 @@ footer {
         grid-column: 1 / -1 !important;
     }
 
-    /* Session pill wraps */
+    /* Session pill — one line, scales down on mobile, never overflows */
     .dashboard-hero-session {
-        font-size: 0.78rem !important;
-        padding: 0.45rem 0.85rem !important;
-        flex-wrap: wrap !important;
-        text-align: center !important;
-        justify-content: center !important;
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.85rem 0.4rem 0.65rem !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+    .dashboard-hero-session svg {
+        width: 13px !important;
+        height: 13px !important;
+    }
+    .dashboard-hero-session #hero-session-text {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
 
-    /* Live sensor strip wraps */
+    /* Live sensor strip — already 1-col grid from 768px query; just tighten gap */
     .live-sensor-strip {
-        flex-direction: column !important;
-        gap: 0.5rem !important;
+        gap: 0.4rem !important;
     }
 }
 
@@ -443,6 +473,38 @@ footer {
     overflow: hidden !important;
 }
 
+/* ── FIX: h1 long words break instead of overflowing ────────── */
+.hero h1, .fz-masthead h1, .dashboard-masthead h1 {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    max-width: 100% !important;
+}
+
+/* ── FIX: tagline and eyebrow stay inside card ───────────────── */
+.dashboard-hero-eyebrow,
+.dashboard-hero-tagline {
+    max-width: 100% !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* ── FIX: session pill never wider than its parent ───────────── */
+.dashboard-hero-session {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+}
+.dashboard-hero-session #hero-session-text {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+}
+
 /* ── FILTER BAR CONTAINER ────────────────────────────────────── */
 .filter-bar {
     box-sizing: border-box !important;
@@ -472,20 +534,26 @@ footer {
     }
 }
 
-/* ── AQI GUIDE SECTION — prevent overflow ────────────────────── */
+/* ── AQI GUIDE SECTION — layout fix ─────────────────────────── */
 .aq-guide {
-    overflow: hidden !important;
+    overflow: visible !important;    /* was hidden — caused clipping */
+    box-sizing: border-box !important;
 }
+
+/* Desktop: 3-col grid (matches style-v2 design) */
 .live-sensor-strip {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 0.75rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
     width: 100% !important;
+    box-sizing: border-box !important;
+    align-items: start !important;   /* prevents cards stretching tall */
 }
 .live-sensor-item {
-    flex: 1 1 180px !important;
-    min-width: 150px !important;
     box-sizing: border-box !important;
+    align-self: start !important;    /* each card only as tall as its content */
+    height: auto !important;
+    min-height: unset !important;
 }
 
 /* ── HISTORY PAGE: STAT BOXES WITH ICONS ────────────────────── */
@@ -602,4 +670,95 @@ footer {
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.22s ease,
                 background 0.2s ease !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AIR QUALITY GUIDE — MOBILE POLISH
+   Fixes: huge empty card space, ugly stacking, inconsistent sizing
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Ensure the aq-guide section fits cleanly on all viewports */
+.aq-guide {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* live-sensor-item: content-fit height, never stretch */
+.live-sensor-item {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    height: auto !important;
+    min-height: unset !important;
+    align-self: start !important;
+}
+
+/* PM label (strong tag) — consistent spacing */
+.live-sensor-item strong {
+    margin-bottom: 0.2rem !important;
+    line-height: 1.2 !important;
+}
+
+/* AQI bands — consistent pill height, readable on small screens */
+.aqi-band {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.45rem 0.25rem !important;
+    height: auto !important;
+    min-height: unset !important;
+}
+
+@media (max-width: 480px) {
+    /* Section padding tighter on small phones */
+    .aq-guide {
+        padding: 0.85rem 0.75rem 0.9rem !important;
+        border-radius: 14px !important;
+    }
+
+    /* Guide title smaller */
+    .aq-guide h3 {
+        font-size: 0.92rem !important;
+    }
+
+    /* AQI bands: wrap to 3 on tiny phones */
+    .aqi-bands {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 0.35rem !important;
+    }
+    .aqi-band {
+        font-size: 0.6rem !important;
+        border-radius: 8px !important;
+        padding: 0.4rem 0.2rem !important;
+    }
+    .aqi-band span {
+        font-size: 0.56rem !important;
+    }
+
+    /* Sensor strip tighter */
+    .live-sensor-strip {
+        gap: 0.35rem !important;
+        margin-top: 0.65rem !important;
+    }
+    .live-sensor-item {
+        padding: 0.5rem 0.65rem !important;
+        font-size: 0.73rem !important;
+        border-radius: 10px !important;
+    }
+    .live-sensor-item strong {
+        font-size: 0.68rem !important;
+    }
+
+    /* Aq cards — tighter */
+    .aq-card {
+        padding: 0.65rem 0.7rem !important;
+        border-radius: 10px !important;
+    }
+    .aq-card h4 {
+        font-size: 0.82rem !important;
+    }
+    .aq-card p {
+        font-size: 0.73rem !important;
+    }
 }

@@ -856,6 +856,14 @@ tbody tr:hover{
 [data-theme="dark"] .live-sensor-item strong { color:#67e8f9; }
 @media (max-width: 880px) {
   .aq-guide-grid { grid-template-columns:1fr; }
-  .aqi-bands { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .live-sensor-strip { grid-template-columns:1fr; }
+  .aqi-bands { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .live-sensor-strip {
+    grid-template-columns: 1fr;
+    align-items: start;   /* prevents empty space inside cards */
+  }
+  .live-sensor-item {
+    align-self: start;
+    height: auto;
+    min-height: unset;
+  }
 }
