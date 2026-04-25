@@ -7,6 +7,8 @@ const db       = require('../db');
 const { authMiddleware, adminOnly } = require('../middleware/auth');
 const { sendAlertEmail } = require('../mailer');
 const { sendPushToAll }  = require('./push');
+const { verifyNodeHmac } = require('../middleware/device-auth');
+const logger = require('../logger');
 
 // ── AQI Calculator ───────────────────────────────────────────
 function calculateAQI(pm25) {
@@ -31,11 +33,16 @@ function isValidReading(val, min, max) {
 }
 
 // ── POST /api/readings — ESP32 pushes sensor data ─────────────
-router.post('/', async (req, res) => {
+router.post('/', verifyNodeHmac, async (req, res) => {
     // --- API key auth ---
     const apiKey = req.headers['x-api-key'];
-    if (!apiKey || apiKey !== process.env.ESP32_API_KEY) {
+    const isLegacyAllowed = process.env.ALLOW_LEGACY_ESP32_KEY === 'true';
+    if (isLegacyAllowed && (!apiKey || apiKey !== process.env.ESP32_API_KEY) && !req.deviceAuth) {
         return res.status(401).json({ success: false, message: 'Invalid API key.' });
+    }
+
+    if (!isLegacyAllowed && !req.deviceAuth) {
+        return res.status(401).json({ success: false, message: 'Missing per-device authentication.' });
     }
 
     // --- Parse & coerce values from ESP32 (may arrive as strings) ---
@@ -206,7 +213,7 @@ router.post('/', async (req, res) => {
         });
 
     } catch (err) {
-        console.error('[readings POST] Error:', err.message);
+        logger.error({ err }, '[readings POST] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });

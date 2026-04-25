@@ -436,10 +436,13 @@
 <script>
     // Auth guard
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    const token = localStorage.getItem('fz-token');
-    if (!currentUser || !token) {
-        alert('No user logged in!');
-        window.location.href = 'auth.html';
+    if (!currentUser) {
+        hydrateSessionUser().then((user) => {
+            if (!user) {
+                alert('No user logged in!');
+                window.location.href = 'auth.html';
+            }
+        });
     }
 
     // ── CROPPER STATE ──────────────────────────────────────────
@@ -706,7 +709,6 @@
             const data = await apiFetch('/profile', { method: 'DELETE' });
             if (data && data.success) {
                 localStorage.removeItem('currentUser');
-                localStorage.removeItem('fz-token');
                 showNotification('Account deleted. Redirecting to login…', 'success', 3000);
                 setTimeout(() => window.location.href = 'auth.html', 1200);
             } else {

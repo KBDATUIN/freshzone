@@ -1,10 +1,8 @@
 
 // ── AUTO LOGIN: check if already logged in ────────────────────
-(function checkAutoLogin() {
-    const token = localStorage.getItem('fz-token');
-    const user  = localStorage.getItem('currentUser');
-    if (token && user) {
-        // Token exists — go straight to dashboard (JWT expiry handled by server)
+(async function checkAutoLogin() {
+    const user = await hydrateSessionUser();
+    if (user) {
         window.location.href = 'dashboard.html';
     }
 })();
@@ -198,15 +196,19 @@ async function login() {
     btn.textContent = 'Signing in…'; btn.disabled = true;
 
     try {
+        const csrfToken = await ensureCsrfToken();
         const res  = await fetch(`${API}/api/auth/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
+            },
+            credentials: 'include',
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
 
         if (data.success) {
-            localStorage.setItem('fz-token', data.token);
             localStorage.setItem('currentUser', JSON.stringify(data.user));
             if (remember) localStorage.setItem('fz-remember', email);
             else          localStorage.removeItem('fz-remember');
@@ -282,9 +284,14 @@ async function sendOTP(type) {
     if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
 
     try {
+        const csrfToken = await ensureCsrfToken();
         const res  = await fetch(`${API}/api/auth/send-otp`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
+            },
+            credentials: 'include',
             body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -335,9 +342,14 @@ async function resendOTP(type) {
             payload.password   = document.getElementById('signup-password').value.trim();
         }
 
+        const csrfToken = await ensureCsrfToken();
         const res  = await fetch(`${API}/api/auth/send-otp`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
+            },
+            credentials: 'include',
             body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -373,9 +385,14 @@ async function verifyOTP(type) {
     }
 
     try {
+        const csrfToken = await ensureCsrfToken();
         const res  = await fetch(`${API}/api/auth/verify-otp`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
+            },
+            credentials: 'include',
             body: JSON.stringify({ email: currentEmail, otp, newPassword })
         });
         const data = await res.json();

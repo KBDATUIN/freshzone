@@ -8,6 +8,8 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include "mbedtls/md.h"
+#include <time.h>
 
 // ── WiFi Credentials ─────────────────────────────────────────
 // ⚠️ CHANGE THESE to your actual WiFi name and password
@@ -17,7 +19,8 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 // ── FreshZone Server ─────────────────────────────────────────
 // ⚠️ CHANGE THIS if your ngrok URL changes
 const char* SERVER_URL = "https://unreceptive-pseudocharitable-jorge.ngrok-free.dev/api/readings";
-const char* API_KEY    = "freshzone-esp32-key-2026";
+const char* DEVICE_KEY_ID = "zone1-v1";
+const char* DEVICE_SECRET = "REPLACE_WITH_ZONE1_SECRET";
 
 // ── Zone Identity ─────────────────────────────────────────────
 // Change to "ESP32-ZONE2" for the second unit
@@ -37,6 +40,8 @@ HardwareSerial pmsSerial(2);
 #define READ_INTERVAL_MS   1000   // Read sensor every 1 second
 
 unsigned long lastSendTime = 0;
+
+String hmacSha256Hex(const String &message, const char* secret);
 
 // ── PMS7003 Data Structure ───────────────────────────────────
 struct PMS7003Data {
@@ -125,7 +130,8 @@ void sendToServer(PMS7003Data &data) {
   HTTPClient http;
   http.begin(SERVER_URL);
   http.addHeader("Content-Type", "application/json");
-  http.addHeader("x-api-key", API_KEY);
+  http.addHeader("x-node-code", NODE_CODE);
+  http.addHeader("x-key-id", DEVICE_KEY_ID);
   // Required by ngrok to skip browser warning
   http.addHeader("ngrok-skip-browser-warning", "true");
 
@@ -138,6 +144,14 @@ void sendToServer(PMS7003Data &data) {
 
   String payload;
   serializeJson(doc, payload);
+
+  // Canonical signature input: <unix_timestamp>.<json_payload>
+  const String timestamp = String((unsigned long)(time(nullptr)));
+  const String signingInput = timestamp + "." + payload;
+  String signature = hmacSha256Hex(signingInput, DEVICE_SECRET);
+
+  http.addHeader("x-timestamp", timestamp);
+  http.addHeader("x-signature", signature);
 
   Serial.print("📤 Sending: ");
   Serial.println(payload);
@@ -155,6 +169,28 @@ void sendToServer(PMS7003Data &data) {
   }
 
   http.end();
+}
+
+String hmacSha256Hex(const String &message, const char* secret) {
+  byte hmacResult[32];
+  mbedtls_md_context_t ctx;
+  const mbedtls_md_info_t* info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+
+  mbedtls_md_init(&ctx);
+  mbedtls_md_setup(&ctx, info, 1);
+  mbedtls_md_hmac_starts(&ctx, (const unsigned char*)secret, strlen(secret));
+  mbedtls_md_hmac_update(&ctx, (const unsigned char*)message.c_str(), message.length());
+  mbedtls_md_hmac_finish(&ctx, hmacResult);
+  mbedtls_md_free(&ctx);
+
+  String hex;
+  hex.reserve(64);
+  for (int i = 0; i < 32; i++) {
+    if (hmacResult[i] < 16) hex += "0";
+    hex += String(hmacResult[i], HEX);
+  }
+  hex.toLowerCase();
+  return hex;
 }
 
 // ── Setup ────────────────────────────────────────────────────
@@ -175,6 +211,7 @@ void setup() {
   Serial.print("📍 Node: "); Serial.println(NODE_CODE);
 
   connectWiFi();
+  configTime(0, 0, "pool.ntp.org", "time.google.com");
 }
 
 // ── Loop ─────────────────────────────────────────────────────

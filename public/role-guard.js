@@ -6,8 +6,12 @@
 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
 if (!currentUser) {
-    alert('Please login first.');
-    window.location.href = 'auth.html';
+    hydrateSessionUser().then((user) => {
+        if (!user) {
+            alert('Please login first.');
+            window.location.href = 'auth.html';
+        }
+    });
 }
 
 function isAdmin() {

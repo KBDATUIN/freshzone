@@ -3,23 +3,55 @@
 // ============================================================
 
 const API = 'https://freshzone-production.up.railway.app';
+let csrfTokenCache = null;
+
+async function ensureCsrfToken() {
+    if (csrfTokenCache) return csrfTokenCache;
+    const res = await fetch(`${API}/api/auth/csrf-token`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+    const data = await res.json();
+    if (data?.csrfToken) {
+        csrfTokenCache = data.csrfToken;
+    }
+    return csrfTokenCache;
+}
 
 // ── API HELPER ────────────────────────────────────────────────
 async function apiFetch(endpoint, options = {}) {
-    const token = localStorage.getItem('fz-token');
+    const method = (options.method || 'GET').toUpperCase();
+    const needsCsrf = !['GET', 'HEAD', 'OPTIONS'].includes(method);
+    const csrfToken = needsCsrf ? await ensureCsrfToken() : null;
     const headers = {
         'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
         ...(options.headers || {}),
     };
-    const res = await fetch(`${API}/api${endpoint}`, { ...options, headers });
+    const res = await fetch(`${API}/api${endpoint}`, { ...options, headers, credentials: 'include' });
     if (res.status === 401) {
-        localStorage.removeItem('fz-token');
         localStorage.removeItem('currentUser');
         window.location.href = 'auth.html';
         return;
     }
+    if (res.status === 403 && needsCsrf) {
+        csrfTokenCache = null;
+    }
     return res.json();
+}
+
+async function hydrateSessionUser() {
+    try {
+        await ensureCsrfToken();
+        const res = await fetch(`${API}/api/auth/session`, { credentials: 'include' });
+        const data = await res.json();
+        if (res.ok && data?.success && data.user) {
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+            return data.user;
+        }
+    } catch (err) {}
+    localStorage.removeItem('currentUser');
+    return null;
 }
 
 // ── NOTIFICATION ─────────────────────────────────────────────
@@ -35,11 +67,14 @@ function showNotification(message, type = 'info', duration = 3000) {
 function openLogoutModal()  { const m = document.getElementById('logoutModal'); if(m) m.style.display='flex'; }
 function closeLogoutModal() { const m = document.getElementById('logoutModal'); if(m) m.style.display='none'; }
 function confirmLogout() {
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('fz-token');
-    closeLogoutModal();
-    showNotification('Logged out successfully.', 'success');
-    setTimeout(() => { window.location.href = 'auth.html'; }, 1200);
+    apiFetch('/auth/logout', { method: 'POST' })
+        .catch(() => null)
+        .finally(() => {
+            localStorage.removeItem('currentUser');
+            closeLogoutModal();
+            showNotification('Logged out successfully.', 'success');
+            setTimeout(() => { window.location.href = 'auth.html'; }, 1200);
+        });
 }
 
 // ── DARK MODE ─────────────────────────────────────────────────
@@ -136,7 +171,6 @@ function resetIdleTimer() {
     }, IDLE_LIMIT - WARN_BEFORE);
     _idleTimer = setTimeout(() => {
         localStorage.removeItem('currentUser');
-        localStorage.removeItem('fz-token');
         window.location.href = 'auth.html';
     }, IDLE_LIMIT);
 }
@@ -258,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initDarkMode();
     initSessionTimeout();
     runEntranceAnimations();
+    hydrateSessionUser();
 });
 
 // ── WEB PUSH NOTIFICATIONS ────────────────────────────────────

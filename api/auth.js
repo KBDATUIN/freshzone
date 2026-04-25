@@ -7,9 +7,23 @@ const jwt      = require('jsonwebtoken');
 const router   = express.Router();
 const db       = require('../db');
 const { sendOTPEmail } = require('../mailer');
+const logger = require('../logger');
+const { ensureCsrfCookie, csrfTokenHandler } = require('../middleware/csrf');
 
-const otpStore   = new Map();
 const otpAttempts = new Map(); // Track OTP guessing attempts
+
+const JWT_COOKIE_NAME = 'fz_token';
+
+function getJwtCookieOptions() {
+    const isProduction = process.env.NODE_ENV === 'production';
+    return {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'strict',
+        maxAge: 8 * 60 * 60 * 1000,
+        path: '/',
+    };
+}
 
 // ── Input sanitizers ─────────────────────────────────────────
 function sanitizeStr(val, maxLen = 100) {
@@ -120,10 +134,12 @@ router.post('/login', async (req, res) => {
         );
 
         const { password_hash, ...safeUser } = user;
-        return res.json({ success: true, token, user: safeUser });
+
+        res.cookie(JWT_COOKIE_NAME, token, getJwtCookieOptions());
+        return res.json({ success: true, user: safeUser });
 
     } catch (err) {
-        console.error('[login] Error:', err.message);
+        logger.error({ err }, '[login] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
@@ -194,29 +210,30 @@ router.post('/send-otp', async (req, res) => {
 
     try {
         const otp     = generateCode();
-        const expires = Date.now() + 60 * 1000;
+        const expires = new Date(Date.now() + 60 * 1000);
 
         const signupUserData = type === 'signup' ? { firstName, lastName, employeeId, contact, position, password } : null;
         const displayName = type === 'signup' ? `${firstName} ${lastName}`.trim() : 'User';
 
-        otpStore.set(email, {
-            otp, expires, type,
-            attempts: 0, // Track wrong OTP attempts
-            userData: signupUserData
-        });
+        await db.query('DELETE FROM auth_otp_store WHERE email = ? AND otp_type = ?', [email, type]);
+        await db.query(
+            `INSERT INTO auth_otp_store (email, otp_code, otp_type, expires_at, attempts, payload_json)
+             VALUES (?, ?, ?, ?, 0, ?)`,
+            [email, otp, type, expires, signupUserData ? JSON.stringify(signupUserData) : null]
+        );
 
         try {
             await sendOTPEmail(email, displayName || 'User', otp, type);
-            console.log(`[send-otp] Email sent to ${email}`);
+            logger.info({ email, type }, '[send-otp] Email sent');
         } catch (mailErr) {
-            console.error('[send-otp] Email failed:', mailErr.message);
+            logger.error({ err: mailErr, email, type }, '[send-otp] Email failed');
             return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again later.' });
         }
 
         res.json({ success: true, message: `OTP sent to ${email}` });
 
     } catch (err) {
-        console.error('[send-otp] Error:', err.message);
+        logger.error({ err }, '[send-otp] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
@@ -236,30 +253,40 @@ router.post('/verify-otp', async (req, res) => {
     if (!/^\d{6}$/.test(otp))
         return res.status(400).json({ success: false, message: 'OTP must be a 6-digit number.' });
 
-    const stored = otpStore.get(email);
-    if (!stored)
-        return res.status(400).json({ success: false, message: 'No OTP found. Please request a new one.' });
-
-    if (Date.now() > stored.expires) {
-        otpStore.delete(email);
-        return res.status(400).json({ success: false, message: 'OTP expired. Please request a new one.' });
-    }
-
-    // Lock out after 5 wrong OTP attempts
-    stored.attempts = (stored.attempts || 0) + 1;
-    if (stored.attempts > 5) {
-        otpStore.delete(email);
-        return res.status(429).json({ success: false, message: 'Too many incorrect attempts. Please request a new OTP.' });
-    }
-
-    if (stored.otp !== otp)
-        return res.status(400).json({ success: false, message: `Incorrect OTP code. ${5 - stored.attempts} attempts remaining.` });
-
-    otpStore.delete(email);
-
     try {
-        if (stored.type === 'signup') {
-            const { firstName, lastName, employeeId, contact, position, password } = stored.userData;
+        const [otpRows] = await db.query(
+            `SELECT id, otp_code, otp_type, expires_at, attempts, payload_json
+             FROM auth_otp_store
+             WHERE email = ?
+             ORDER BY created_at DESC
+             LIMIT 1`,
+            [email]
+        );
+        const stored = otpRows[0];
+        if (!stored)
+            return res.status(400).json({ success: false, message: 'No OTP found. Please request a new one.' });
+
+        if (Date.now() > new Date(stored.expires_at).getTime()) {
+            await db.query('DELETE FROM auth_otp_store WHERE id = ?', [stored.id]);
+            return res.status(400).json({ success: false, message: 'OTP expired. Please request a new one.' });
+        }
+
+        // Lock out after 5 wrong OTP attempts
+        const attempts = (stored.attempts || 0) + 1;
+        await db.query('UPDATE auth_otp_store SET attempts = ? WHERE id = ?', [attempts, stored.id]);
+        if (attempts > 5) {
+            await db.query('DELETE FROM auth_otp_store WHERE id = ?', [stored.id]);
+            return res.status(429).json({ success: false, message: 'Too many incorrect attempts. Please request a new OTP.' });
+        }
+
+        if (stored.otp_code !== otp)
+            return res.status(400).json({ success: false, message: `Incorrect OTP code. ${5 - attempts} attempts remaining.` });
+
+        await db.query('DELETE FROM auth_otp_store WHERE id = ?', [stored.id]);
+
+        if (stored.otp_type === 'signup') {
+            const parsedPayload = stored.payload_json ? JSON.parse(stored.payload_json) : {};
+            const { firstName, lastName, employeeId, contact, position, password } = parsedPayload;
             const fullName = `${firstName} ${lastName}`;
 
             // Final duplicate check before insert
@@ -276,7 +303,7 @@ router.post('/verify-otp', async (req, res) => {
             return res.json({ success: true, message: 'Account created successfully! You can now log in.' });
         }
 
-        if (stored.type === 'reset') {
+        if (stored.otp_type === 'reset') {
             if (!newPassword)
                 return res.status(400).json({ success: false, message: 'New password is required.' });
             if (!isValidPassword(newPassword))
@@ -288,11 +315,36 @@ router.post('/verify-otp', async (req, res) => {
         }
 
     } catch (err) {
-        console.error('[verify-otp] DB error:', err.message, err.code || '');
+        logger.error({ err }, '[verify-otp] DB error');
         let message = 'Server error.';
         if (err.code === 'ER_DUP_ENTRY') message = 'An account with this email or employee ID already exists.';
         res.status(500).json({ success: false, message });
     }
+});
+
+router.get('/csrf-token', ensureCsrfCookie, csrfTokenHandler);
+
+router.get('/session', async (req, res) => {
+    const token = req.cookies?.[JWT_COOKIE_NAME];
+    if (!token) return res.status(401).json({ success: false, message: 'No active session.' });
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const [rows] = await db.query(
+            `SELECT id, employee_id, full_name, email, contact_number, position, photo_url
+             FROM accounts WHERE id = ? AND is_active = 1 LIMIT 1`,
+            [decoded.id]
+        );
+        if (!rows.length) return res.status(401).json({ success: false, message: 'Session not valid.' });
+        return res.json({ success: true, user: rows[0] });
+    } catch (err) {
+        return res.status(401).json({ success: false, message: 'Session expired.' });
+    }
+});
+
+router.post('/logout', (req, res) => {
+    res.clearCookie(JWT_COOKIE_NAME, { path: '/' });
+    res.clearCookie('fz_csrf', { path: '/' });
+    return res.json({ success: true, message: 'Logged out.' });
 });
 
 module.exports = router;
