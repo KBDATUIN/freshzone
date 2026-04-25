@@ -250,7 +250,7 @@ nav{
 .stat-box:hover{ transform: translateY(-6px); box-shadow: var(--fz-elev-2) !important; }
 
 /* ── 6. BUTTONS — neon glow, ripple-ready, focus ring ──────── */
-button:not(.dark-toggle):not(.hamburger):not(.mobile-nav-close):not(.push-toggle-switch):not(.eye-btn){
+button:not(.dark-toggle):not(.hamburger):not(.mobile-nav-close):not(.push-toggle-switch):not(.eye-btn):not(.filter-inline-clear):not(.fz-bn-tab):not(.mobile-nav-logout):not(.mobile-nav-close):not(.auth-tab){
   border-radius: 14px !important;
   font-weight: 700 !important;
   letter-spacing: .015em !important;
@@ -651,7 +651,7 @@ tbody tr:hover{
   .stats-grid{ grid-template-columns: 1fr 1fr !important; gap: .7rem !important; }
   .stat-box{ padding: 1.15rem .85rem !important; }
   .stat-box h3{ font-size: 1.7rem !important; }
-  button:not(.dark-toggle):not(.hamburger):not(.mobile-nav-close):not(.push-toggle-switch):not(.eye-btn){
+  button:not(.dark-toggle):not(.hamburger):not(.mobile-nav-close):not(.push-toggle-switch):not(.eye-btn):not(.filter-inline-clear):not(.fz-bn-tab):not(.mobile-nav-logout):not(.mobile-nav-close):not(.auth-tab){
     min-height: 48px !important;
   }
   .mobile-nav-drawer a{ min-height: 52px !important; font-size: .96rem !important; border-radius: 12px !important; }

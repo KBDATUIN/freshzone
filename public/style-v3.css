@@ -469,3 +469,138 @@ p, small { color: var(--gray, #5a7a8a); }
 [data-theme="dark"] .aqi-moderate { background: rgba(245,158,11,0.14) !important; color: #fcd34d !important; }
 [data-theme="dark"] .aqi-alert    { background: rgba(239,68,68,0.14) !important;  color: #fca5a5 !important; }
 [data-theme="dark"] .aqi-offline  { background: rgba(148,163,184,0.1) !important; color: #94a3b8 !important; }
+
+/* ── HISTORY HERO — readable text on white card ────────────── */
+.page-hero.fz-masthead,
+.page-hero {
+    background: rgba(240,252,255,0.98) !important;
+    border: 1.5px solid rgba(0,120,180,0.18) !important;
+    border-radius: 20px !important;
+    padding: 1.75rem 1.5rem !important;
+    box-shadow: 0 8px 32px rgba(0,60,110,0.14) !important;
+}
+.page-hero h1,
+.page-hero.fz-masthead h1 {
+    color: #002840 !important;
+    -webkit-text-fill-color: #002840 !important;
+    font-weight: 800 !important;
+    font-size: 1.55rem !important;
+    letter-spacing: -0.025em !important;
+    text-shadow: none !important;
+}
+.page-hero p,
+.page-hero.fz-masthead p {
+    color: #2e5a72 !important;
+    -webkit-text-fill-color: #2e5a72 !important;
+    font-size: 0.96rem !important;
+    text-shadow: none !important;
+    margin-top: 0.3rem !important;
+    max-width: 580px !important;
+    line-height: 1.6 !important;
+}
+[data-theme="dark"] .page-hero,
+[data-theme="dark"] .page-hero.fz-masthead {
+    background: rgba(10,20,36,0.98) !important;
+    border-color: rgba(34,211,238,0.14) !important;
+}
+[data-theme="dark"] .page-hero h1,
+[data-theme="dark"] .page-hero.fz-masthead h1 {
+    color: #e2f0f8 !important;
+    -webkit-text-fill-color: #e2f0f8 !important;
+}
+[data-theme="dark"] .page-hero p,
+[data-theme="dark"] .page-hero.fz-masthead p {
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* ── X BUTTON — enforce circle, override ALL inherited button rules ── */
+button.filter-inline-clear {
+    /* Exact square = perfect circle */
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    max-width: 22px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    /* The key fix — override the 14px from button:not() rule */
+    border-radius: 50% !important;
+    border: none !important;
+    /* Layout */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    /* Appearance */
+    background: rgba(92,110,128,0.78) !important;
+    color: white !important;
+    box-shadow: none !important;
+    /* Position */
+    position: absolute !important;
+    right: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    /* Misc */
+    cursor: pointer !important;
+    z-index: 10 !important;
+    overflow: hidden !important;
+    outline: none !important;
+    line-height: 22px !important;
+    font-size: 0 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    vertical-align: unset !important;
+    aspect-ratio: 1 / 1 !important;
+    transition: background 0.15s ease !important;
+}
+button.filter-inline-clear:hover {
+    background: rgba(51,65,85,0.95) !important;
+    transform: translateY(-50%) !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+button.filter-inline-clear:active {
+    transform: translateY(-50%) scale(0.88) !important;
+}
+button.filter-inline-clear::after,
+button.filter-inline-clear::before { display: none !important; }
+
+/* SVG inside X button — locked 11x11 */
+button.filter-inline-clear svg {
+    width: 11px !important;
+    height: 11px !important;
+    min-width: 11px !important;
+    max-width: 11px !important;
+    min-height: 11px !important;
+    max-height: 11px !important;
+    flex-shrink: 0 !important;
+    display: block !important;
+    stroke: white !important;
+    fill: none !important;
+    stroke-width: 2.5 !important;
+    pointer-events: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* Mobile — identical, no exceptions */
+@media (max-width: 768px) {
+    button.filter-inline-clear {
+        width: 22px !important;
+        height: 22px !important;
+        min-width: 22px !important;
+        max-width: 22px !important;
+        min-height: 22px !important;
+        max-height: 22px !important;
+        border-radius: 50% !important;
+        aspect-ratio: 1 / 1 !important;
+    }
+    button.filter-inline-clear svg {
+        width: 11px !important;
+        height: 11px !important;
+        max-width: 11px !important;
+        max-height: 11px !important;
+    }
+}
