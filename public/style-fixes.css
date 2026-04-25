@@ -278,21 +278,28 @@ footer {
         grid-column: 1 / -1 !important;
     }
 
-    /* Session pill — icon always stays inline beside text on mobile */
+    /* Session pill — icon left-aligned, text wraps naturally below on mobile */
     .dashboard-hero-session {
-        font-size: 0.78rem !important;
+        font-size: 0.82rem !important;
         padding: 0.45rem 0.85rem 0.45rem 0.65rem !important;
-        flex-wrap: nowrap !important;        /* was wrap — caused icon to stack on top */
+        flex-wrap: nowrap !important;
+        align-items: flex-start !important;
         text-align: left !important;
         justify-content: flex-start !important;
-        max-width: calc(100vw - 3rem) !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
+        max-width: calc(100vw - 2.5rem) !important;
+        white-space: normal !important;   /* allow text to wrap — never truncate */
+        overflow: visible !important;
+        border-radius: 14px !important;
     }
     .dashboard-hero-session #hero-session-text {
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
+        white-space: normal !important;   /* full name always visible */
+        overflow: visible !important;
+        text-overflow: unset !important;
+        word-break: break-word !important;
+        line-height: 1.4 !important;
+    }
+    .dashboard-hero-session svg {
+        margin-top: 2px !important;      /* align icon with first line of text */
     }
 
     /* Live sensor strip — already 1-col grid from 768px query; just tighten gap */

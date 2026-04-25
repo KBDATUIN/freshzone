@@ -195,14 +195,16 @@
             .dashboard-hero-tagline { margin-left: 0; margin-right: 0; }
         }
         .dashboard-hero-session {
-            display: inline-flex; align-items: center; gap: 0.45rem;
+            display: inline-flex; align-items: flex-start; gap: 0.45rem;
             flex-wrap: nowrap;
-            margin: 0.9rem 0 1.1rem; padding: 0.5rem 1rem 0.5rem 0.75rem; border-radius: 999px;
+            margin: 0.9rem 0 1.1rem; padding: 0.5rem 1rem 0.5rem 0.75rem;
+            border-radius: 16px; /* rounded rect so text can wrap without looking weird */
             background: rgba(255, 255, 255, 0.55);
             border: 1px solid rgba(0, 100, 150, 0.14);
             font-size: 0.86rem; font-weight: 600; color: #0c4a6e; font-family: 'Outfit', sans-serif;
             box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
             max-width: 100%; box-sizing: border-box;
+            width: fit-content;
         }
         [data-theme="dark"] .dashboard-hero-session {
             background: rgba(0, 0, 0, 0.25);
@@ -210,10 +212,24 @@
             color: #e2e8f0;
             box-shadow: none;
         }
-        .dashboard-hero-session svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.8; }
-        .dashboard-hero-session #hero-session-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .dashboard-hero-session svg {
+            width: 15px; height: 15px;
+            flex-shrink: 0;
+            opacity: 0.8;
+            margin-top: 2px; /* vertically align icon with first line of text */
+        }
+        .dashboard-hero-session #hero-session-text {
+            white-space: normal; /* allow text to wrap — no truncation */
+            line-height: 1.4;
+            word-break: break-word;
+        }
         @media (max-width: 480px) {
-            .dashboard-hero-session { font-size: 0.8rem; padding: 0.45rem 0.85rem 0.45rem 0.65rem; max-width: calc(100vw - 3rem); }
+            .dashboard-hero-session {
+                font-size: 0.82rem;
+                padding: 0.45rem 0.85rem 0.45rem 0.65rem;
+                max-width: calc(100vw - 2.5rem);
+                border-radius: 14px;
+            }
         }
         .dashboard-masthead__grid {
             display: grid; grid-template-columns: 1fr; gap: 1.25rem; align-items: center;
