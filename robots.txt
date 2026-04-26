@@ -1,0 +1,28 @@
+# FreshZone - Campus Vape Aerosol Detection System
+# Robots.txt for SEO and crawling control
+
+User-agent: *
+Allow: /
+Allow: /dashboard
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+
+# Block API endpoints and authentication pages
+Disallow: /api/
+Disallow: /auth.html
+Disallow: /profile.html
+Disallow: /history.html
+Disallow: /offline.html
+Disallow: /smoke.html
+
+# Block static assets that don't need indexing
+Disallow: /*.js$
+Disallow: /*.css$
+
+# Sitemap location
+Sitemap: https://freshzone.space/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

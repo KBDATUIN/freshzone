@@ -105,18 +105,89 @@ router.post('/change-password', authMiddleware, async (req, res) => {
 });
 
 // ── DELETE /api/profile ───────────────────────────────────
+// SOFT DELETE — marks account as inactive with 30-day recovery window
 router.delete('/', authMiddleware, async (req, res) => {
     try {
         const [rows] = await db.query('SELECT email FROM accounts WHERE id = ? AND is_active = 1', [req.user.id]);
         if (!rows.length)
             return res.status(404).json({ success: false, message: 'Account not found.' });
 
-        await db.query('DELETE FROM login_attempts WHERE email = ?', [rows[0].email]);
-        await db.query('DELETE FROM accounts WHERE id = ?', [req.user.id]);
+        await db.query(
+            `UPDATE accounts SET is_active = 0, deleted_at = NOW(), deletion_reason = 'user_request' WHERE id = ?`,
+            [req.user.id]
+        );
 
-        res.json({ success: true, message: 'Account deleted permanently.' });
+        res.json({ success: true, message: 'Account deactivated. You have 30 days to recover it by contacting support.' });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error.' });
+    }
+});
+
+// ── POST /api/profile/hard-delete ──────────────────────────
+// GDPR RIGHT TO ERASURE — permanently deletes all user data
+router.post('/hard-delete', authMiddleware, async (req, res) => {
+    const confirmation = typeof req.body.confirmation === 'string' ? req.body.confirmation : '';
+
+    if (confirmation !== 'DELETE MY DATA PERMANENTLY')
+        return res.status(400).json({
+            success: false,
+            message: 'Please provide confirmation: "DELETE MY DATA PERMANENTLY"'
+        });
+
+    try {
+        const [rows] = await db.query('SELECT email FROM accounts WHERE id = ?', [req.user.id]);
+        if (!rows.length)
+            return res.status(404).json({ success: false, message: 'Account not found.' });
+
+        const userId = req.user.id;
+        const email = rows[0].email;
+        let deletedCount = 0;
+
+        // Delete push subscriptions
+        const [pushSubResult] = await db.query('DELETE FROM push_subscriptions WHERE account_id = ?', [userId]);
+        deletedCount += pushSubResult.affectedRows || 0;
+
+        // Delete device login alerts
+        const [deviceAlertResult] = await db.query('DELETE FROM device_login_alerts WHERE account_id = ?', [userId]);
+        deletedCount += deviceAlertResult.affectedRows || 0;
+
+        // Delete known devices
+        const [knownDevResult] = await db.query('DELETE FROM known_devices WHERE account_id = ?', [userId]);
+        deletedCount += knownDevResult.affectedRows || 0;
+
+        // Delete push notifications by email
+        const [pushNotifResult] = await db.query('DELETE FROM push_notifications WHERE recipient_email = ?', [email]);
+        deletedCount += pushNotifResult.affectedRows || 0;
+
+        // Anonymize detection events (remove acknowledged_by link)
+        await db.query('UPDATE detection_events SET acknowledged_by = NULL WHERE acknowledged_by = ?', [userId]);
+
+        // Delete login attempts
+        const [loginAttemptResult] = await db.query('DELETE FROM login_attempts WHERE email = ?', [email]);
+        deletedCount += loginAttemptResult.affectedRows || 0;
+
+        // Delete system logs
+        const [sysLogResult] = await db.query('DELETE FROM system_logs WHERE account_id = ?', [userId]);
+        deletedCount += sysLogResult.affectedRows || 0;
+
+        // Delete contact tickets
+        const [ticketResult] = await db.query('DELETE FROM contact_tickets WHERE account_id = ?', [userId]);
+        deletedCount += ticketResult.affectedRows || 0;
+
+        // Hard delete the account
+        const [accountResult] = await db.query('DELETE FROM accounts WHERE id = ?', [userId]);
+        deletedCount += accountResult.affectedRows || 0;
+
+        // Log to audit table
+        await db.query(
+            `INSERT INTO data_retention_audit (table_name, records_deleted, retention_days_applied, cutoff_date, status, executed_by, error_message)
+             VALUES ('accounts', ?, 0, NOW(), 'completed', 'gdpr_api', ?)`,
+            [deletedCount, `User data erased for: ${email}`]
+        );
+
+        res.json({ success: true, message: `All personal data permanently erased. ${deletedCount} records deleted.` });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Server error during data erasure.' });
     }
 });
 

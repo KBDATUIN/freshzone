@@ -223,6 +223,18 @@ cron.schedule('0 * * * *', async () => {
     catch (err) { logger.error({ err }, 'Cleanup fail'); }
 });
 
+// ── DATA RETENTION CLEANUP ───────────────────────────────────
+// Runs daily at 2:00 AM to enforce GDPR/privacy retention policies
+cron.schedule('0 2 * * *', async () => {
+    try {
+        logger.info('[Data Retention] Starting scheduled cleanup...');
+        await db.query("CALL sp_run_all_retention_cleanups()");
+        logger.info('[Data Retention] Cleanup completed successfully');
+    } catch (err) {
+        logger.error({ err }, '[Data Retention] Cleanup failed');
+    }
+});
+
 async function ensureSecurityTables() {
     await db.query(
         `CREATE TABLE IF NOT EXISTS auth_otp_store (

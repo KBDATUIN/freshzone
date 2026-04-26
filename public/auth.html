@@ -20,6 +20,49 @@
     <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
     <link rel="stylesheet" href="/pwa.css">
     <link rel="stylesheet" href="style-fixes.css">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://freshzone.space/">
+    <meta property="og:title" content="FreshZone | Secure Access">
+    <meta property="og:description" content="Real-time campus vape aerosol detection monitoring — powered by IoT sensors">
+    <meta property="og:image" content="https://freshzone.space/og-image.png">
+    <meta property="og:site_name" content="FreshZone">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://freshzone.space/">
+    <meta name="twitter:title" content="FreshZone | Secure Access">
+    <meta name="twitter:description" content="Real-time campus vape aerosol detection monitoring — powered by IoT sensors">
+    <meta name="twitter:image" content="https://freshzone.space/og-image.png">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "FreshZone",
+        "description": "Real-time campus vape aerosol detection system for monitoring air quality",
+        "url": "https://freshzone.space",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web",
+        "browserRequirements": "Requires JavaScript",
+        "publisher": {
+            "@type": "Organization",
+            "name": "FreshZone",
+            "url": "https://freshzone.space",
+            "logo": "https://freshzone.space/logo1.png",
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Data Protection Officer",
+                "email": "dpo@freshzone.space"
+            }
+        },
+        "datePublished": "2026-04-26",
+        "dateModified": "2026-04-26"
+    }
+    </script>
     <style>
         /* Auth page: OTP centering */
         #signup-otp-input, #reset-otp-input {
@@ -273,6 +316,11 @@
 
         <footer class="auth-footer">
             <p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p>
+            <p style="font-size:0.78rem;color:var(--gray);margin-top:0.35rem;">
+                <a href="privacy.html" style="color:var(--primary);text-decoration:none;margin:0 0.4rem;">Privacy</a> · 
+                <a href="terms.html" style="color:var(--primary);text-decoration:none;margin:0 0.4rem;">Terms</a> · 
+                DPO: <a href="mailto:dpo@freshzone.space" style="color:var(--primary);">dpo@freshzone.space</a>
+            </p>
         </footer>
     </div>
 </div>
@@ -316,6 +364,7 @@ function showView(id) {
 <script src="utils.js"></script>
 <script src="auth.js"></script>
 <script src="/pwa.js" defer></script>
+<script src="cookie-consent.js" defer></script>
     <script defer src="enhance.js"></script>
 </body>
 </html>
