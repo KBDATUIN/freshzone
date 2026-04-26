@@ -111,19 +111,18 @@
             .fz-cookie-card {
                 position: fixed;
                 left: max(1rem, env(safe-area-inset-left));
-                right: max(1rem, env(safe-area-inset-right));
                 bottom: max(1rem, env(safe-area-inset-bottom));
                 z-index: 10000;
-                width: min(100%, 760px);
-                margin: 0 auto;
-                padding: 1.55rem 1.7rem;
+                width: min(calc(100vw - 2rem), 540px);
+                margin: 0;
+                padding: 1.2rem 1.25rem;
                 border-radius: 18px;
                 background: #ffffff;
                 color: #1f2937;
                 border: 2px solid rgba(15, 23, 42, 0.72);
                 box-shadow: 12px 12px 0 rgba(15, 23, 42, 0.12);
                 display: grid;
-                gap: 1.2rem;
+                gap: 0.95rem;
                 align-items: center;
             }
             .fz-cookie-copy h2,
@@ -135,7 +134,7 @@
                 line-height: 1.15;
             }
             .fz-cookie-copy h2 {
-                font-size: clamp(1.55rem, 2.4vw, 1.9rem);
+                font-size: clamp(1.2rem, 2vw, 1.6rem);
                 font-weight: 800;
             }
             .fz-cookie-text,
@@ -148,8 +147,9 @@
                 line-height: 1.55;
             }
             .fz-cookie-text {
-                max-width: 29rem;
-                margin-top: 0.75rem;
+                max-width: 22rem;
+                margin-top: 0.55rem;
+                font-size: 0.9rem;
             }
             .fz-cookie-text a {
                 color: var(--primary, #004e7a);
@@ -167,7 +167,7 @@
                 flex-wrap: wrap;
             }
             .fz-cookie-actions {
-                margin-top: 1rem;
+                margin-top: 0.85rem;
             }
             .fz-cookie-btn,
             .fz-cookie-close {
@@ -177,13 +177,13 @@
             }
             .fz-cookie-btn {
                 width: auto;
-                min-width: 138px;
-                min-height: 48px;
+                min-width: 126px;
+                min-height: 44px;
                 margin: 0;
-                padding: 0.82rem 1.25rem;
+                padding: 0.72rem 1rem;
                 border-radius: 12px;
                 font-family: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
-                font-size: 0.95rem;
+                font-size: 0.9rem;
                 font-weight: 800;
                 letter-spacing: 0;
                 box-shadow: none;
@@ -204,17 +204,19 @@
             }
             .fz-cookie-close {
                 position: absolute;
-                top: 1rem;
-                right: 1rem;
-                width: 2.15rem;
-                height: 2.15rem;
+                top: 0.8rem;
+                left: 0.8rem;
+                width: 2rem;
+                height: 2rem;
                 padding: 0;
                 margin: 0;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 color: #1f2937;
-                background: transparent;
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
                 border-radius: 999px;
             }
             .fz-cookie-close svg {
@@ -226,10 +228,12 @@
             .fz-cookie-art {
                 display: grid;
                 place-items: center;
+                justify-self: start;
+                padding-left: 0.25rem;
             }
             .fz-cookie-circle {
                 position: relative;
-                width: 8.8rem;
+                width: 6.5rem;
                 aspect-ratio: 1;
                 border-radius: 50%;
                 background: #f6b266;
@@ -255,7 +259,7 @@
             .c12 { top: 77%; left: 57%; }
             .fz-cookie-panel {
                 grid-column: 1 / -1;
-                padding-top: 0.35rem;
+                padding-top: 0.25rem;
                 border-top: 1px solid #e5eaf0;
             }
             .fz-cookie-panel-head h3 {
@@ -358,31 +362,36 @@
             @media (min-width: 700px) {
                 .fz-cookie-card {
                     grid-template-columns: minmax(0, 1fr) auto;
-                    gap: 1.5rem;
+                    gap: 1rem;
+                    align-items: start;
+                }
+                .fz-cookie-copy {
+                    padding-left: 2.35rem;
                 }
             }
             @media (max-width: 699px) {
                 .fz-cookie-art {
-                    order: -1;
+                    order: 2;
+                    justify-self: start;
                 }
                 .fz-cookie-circle {
-                    width: 7.1rem;
+                    width: 5.8rem;
                 }
             }
             @media (max-width: 640px) {
                 .fz-cookie-card {
                     left: max(0.75rem, env(safe-area-inset-left));
-                    right: max(0.75rem, env(safe-area-inset-right));
                     bottom: max(0.75rem, env(safe-area-inset-bottom));
-                    padding: 1.2rem;
+                    width: min(calc(100vw - 1.5rem), 420px);
+                    padding: 1rem;
                     border-radius: 18px;
                     box-shadow: 8px 8px 0 rgba(15, 23, 42, 0.12);
                 }
                 .fz-cookie-copy h2 {
-                    font-size: 1.45rem;
+                    font-size: 1.22rem;
                 }
                 .fz-cookie-text {
-                    font-size: 0.92rem;
+                    font-size: 0.88rem;
                 }
                 .fz-cookie-actions,
                 .fz-cookie-panel-actions {
@@ -394,6 +403,9 @@
                 }
                 .fz-cookie-pref-card {
                     align-items: flex-start;
+                }
+                .fz-cookie-copy {
+                    padding-left: 2.1rem;
                 }
             }
         </style>
