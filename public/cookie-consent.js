@@ -19,41 +19,43 @@
     const markup = `
         <div id="${ROOT_ID}" hidden>
             <section id="cookie-consent-card" class="fz-cookie-card" role="dialog" aria-modal="false" aria-labelledby="fz-cookie-title">
-                <button type="button" id="cookie-close-btn" class="fz-cookie-close" aria-label="Close cookie notice">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M6 6L18 18M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
+                <div class="fz-cookie-main">
+                    <button type="button" id="cookie-close-btn" class="fz-cookie-close" aria-label="Close cookie notice">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6 6L18 18M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
 
-                <div class="fz-cookie-copy">
-                    <h2 id="fz-cookie-title">Cookies</h2>
-                    <p class="fz-cookie-text">
-                        We use cookies and similar technologies to personalize your experience, remember settings,
-                        and keep FreshZone running smoothly. By clicking accept, you agree as outlined in our
-                        <a href="privacy.html#cookies">Cookies Policy</a>.
-                    </p>
-
-                    <div class="fz-cookie-actions">
-                        <button type="button" id="cookie-accept-btn" class="fz-cookie-btn fz-cookie-btn-primary">Accept</button>
-                        <button type="button" id="cookie-preferences-btn" class="fz-cookie-btn fz-cookie-btn-secondary" aria-expanded="false">Preferences</button>
+                    <div class="fz-cookie-art" aria-hidden="true">
+                        <span class="fz-cookie-circle">
+                            <span class="fz-cookie-chip c1"></span>
+                            <span class="fz-cookie-chip c2"></span>
+                            <span class="fz-cookie-chip c3"></span>
+                            <span class="fz-cookie-chip c4"></span>
+                            <span class="fz-cookie-chip c5"></span>
+                            <span class="fz-cookie-chip c6"></span>
+                            <span class="fz-cookie-chip c7"></span>
+                            <span class="fz-cookie-chip c8"></span>
+                            <span class="fz-cookie-chip c9"></span>
+                            <span class="fz-cookie-chip c10"></span>
+                            <span class="fz-cookie-chip c11"></span>
+                            <span class="fz-cookie-chip c12"></span>
+                        </span>
                     </div>
-                </div>
 
-                <div class="fz-cookie-art" aria-hidden="true">
-                    <span class="fz-cookie-circle">
-                        <span class="fz-cookie-chip c1"></span>
-                        <span class="fz-cookie-chip c2"></span>
-                        <span class="fz-cookie-chip c3"></span>
-                        <span class="fz-cookie-chip c4"></span>
-                        <span class="fz-cookie-chip c5"></span>
-                        <span class="fz-cookie-chip c6"></span>
-                        <span class="fz-cookie-chip c7"></span>
-                        <span class="fz-cookie-chip c8"></span>
-                        <span class="fz-cookie-chip c9"></span>
-                        <span class="fz-cookie-chip c10"></span>
-                        <span class="fz-cookie-chip c11"></span>
-                        <span class="fz-cookie-chip c12"></span>
-                    </span>
+                    <div class="fz-cookie-copy">
+                        <h2 id="fz-cookie-title">Cookies</h2>
+                        <p class="fz-cookie-text">
+                            We use cookies and similar technologies to personalize your experience, remember settings,
+                            and keep FreshZone running smoothly. By clicking accept, you agree as outlined in our
+                            <a href="privacy.html#cookies">Cookies Policy</a>.
+                        </p>
+
+                        <div class="fz-cookie-actions">
+                            <button type="button" id="cookie-accept-btn" class="fz-cookie-btn fz-cookie-btn-primary">Accept</button>
+                            <button type="button" id="cookie-preferences-btn" class="fz-cookie-btn fz-cookie-btn-secondary" aria-expanded="false">Preferences</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="cookie-preferences-panel" class="fz-cookie-panel" hidden>
@@ -123,7 +125,14 @@
                 box-shadow: 12px 12px 0 rgba(15, 23, 42, 0.12);
                 display: grid;
                 gap: 0.95rem;
-                align-items: center;
+            }
+            .fz-cookie-main {
+                display: grid;
+                grid-template-columns: 92px minmax(0, 1fr);
+                gap: 1rem;
+                align-items: start;
+                min-width: 0;
+                position: relative;
             }
             .fz-cookie-copy h2,
             .fz-cookie-panel-head h3,
@@ -147,8 +156,8 @@
                 line-height: 1.55;
             }
             .fz-cookie-text {
-                max-width: 22rem;
-                margin-top: 0.55rem;
+                max-width: 100%;
+                margin-top: 0.45rem;
                 font-size: 0.9rem;
             }
             .fz-cookie-text a {
@@ -167,7 +176,7 @@
                 flex-wrap: wrap;
             }
             .fz-cookie-actions {
-                margin-top: 0.85rem;
+                margin-top: 0.8rem;
             }
             .fz-cookie-btn,
             .fz-cookie-close {
@@ -204,8 +213,8 @@
             }
             .fz-cookie-close {
                 position: absolute;
-                top: 0.8rem;
-                left: 0.8rem;
+                top: 0;
+                left: 0;
                 width: 2rem;
                 height: 2rem;
                 padding: 0;
@@ -218,6 +227,7 @@
                 border: 1px solid #e5e7eb;
                 box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
                 border-radius: 999px;
+                z-index: 1;
             }
             .fz-cookie-close svg {
                 width: 1rem;
@@ -226,14 +236,16 @@
                 pointer-events: none;
             }
             .fz-cookie-art {
-                display: grid;
-                place-items: center;
-                justify-self: start;
-                padding-left: 0.25rem;
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                width: 92px;
+                min-height: 100%;
+                padding-top: 2.2rem;
             }
             .fz-cookie-circle {
                 position: relative;
-                width: 6.5rem;
+                width: 5.85rem;
                 aspect-ratio: 1;
                 border-radius: 50%;
                 background: #f6b266;
@@ -359,23 +371,28 @@
             .fz-cookie-panel-actions .fz-cookie-btn {
                 flex: 1 1 180px;
             }
-            @media (min-width: 700px) {
-                .fz-cookie-card {
-                    grid-template-columns: minmax(0, 1fr) auto;
-                    gap: 1rem;
-                    align-items: start;
+            @media (max-width: 699px) {
+                .fz-cookie-main {
+                    grid-template-columns: 1fr;
+                    gap: 0.85rem;
+                }
+                .fz-cookie-close {
+                    top: 0;
+                    left: 0;
+                }
+                .fz-cookie-art {
+                    width: auto;
+                    min-height: auto;
+                    padding-top: 0;
+                    justify-content: flex-start;
+                    padding-left: 0.15rem;
+                    order: 2;
                 }
                 .fz-cookie-copy {
-                    padding-left: 2.35rem;
-                }
-            }
-            @media (max-width: 699px) {
-                .fz-cookie-art {
-                    order: 2;
-                    justify-self: start;
+                    padding-left: 2.25rem;
                 }
                 .fz-cookie-circle {
-                    width: 5.8rem;
+                    width: 5.5rem;
                 }
             }
             @media (max-width: 640px) {
@@ -403,9 +420,6 @@
                 }
                 .fz-cookie-pref-card {
                     align-items: flex-start;
-                }
-                .fz-cookie-copy {
-                    padding-left: 2.1rem;
                 }
             }
         </style>
