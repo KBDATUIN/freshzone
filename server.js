@@ -150,7 +150,8 @@ app.use('/api/readings', esp32Limiter, require('./api/readings'));
 app.use('/api/history',               require('./api/history'));
 app.use('/api/profile',               require('./api/profile'));
 app.use('/api/contact',               require('./api/contact'));
-app.use('/api/push',     pushLimiter,   require('./api/push'));
+app.use('/api/push',        pushLimiter,   require('./api/push'));
+app.use('/api/calibration',               require('./api/calibration'));
 
 // ── DASHBOARD STATS ───────────────────────────────────────────
 app.get('/api/stats/dashboard', async (req, res) => {
