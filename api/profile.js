@@ -44,7 +44,7 @@ router.get('/', authMiddleware, async (req, res) => {
 router.put('/', authMiddleware, async (req, res) => {
     const full_name        = sanitizeStr(req.body.full_name, 100);
     const contact_number   = sanitizeStr(req.body.contact_number, 20);
-    const emergency_contact = sanitizeStr(req.body.emergency_contact, 20);
+    const emergency_contact = sanitizeStr(req.body.emergency_contact, 100);
     const photo_url        = typeof req.body.photo_url === 'string'
         ? req.body.photo_url.slice(0, 500000) // Allow base64 photos up to ~375KB
         : null;
@@ -54,9 +54,6 @@ router.put('/', authMiddleware, async (req, res) => {
 
     if (contact_number && !isValidPhone(contact_number))
         return res.status(400).json({ success: false, message: 'Invalid contact number format.' });
-
-    if (emergency_contact && !isValidPhone(emergency_contact))
-        return res.status(400).json({ success: false, message: 'Invalid emergency contact format.' });
 
     try {
         await db.query(

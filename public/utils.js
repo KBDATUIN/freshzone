@@ -7,47 +7,12 @@ const API = window.location.hostname === 'localhost' || window.location.hostname
     ? 'http://localhost:3000' 
     : 'https://freshzone-production.up.railway.app';
 
-let csrfTokenCache = null;
-let csrfTokenPromise = null;
 let sessionUserPromise = null;
 
-async function ensureCsrfToken() {
-    if (csrfTokenCache) return csrfTokenCache;
-    if (csrfTokenPromise) return csrfTokenPromise;
-    csrfTokenPromise = (async () => {
-        try {
-            const res = await fetch(`${API}/api/auth/csrf-token`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-            if (!res.ok) throw new Error(`CSRF request failed (${res.status})`);
-            const data = await res.json();
-            if (data?.csrfToken) {
-                csrfTokenCache = data.csrfToken;
-            }
-        } catch (err) {
-            console.error('[PWA] CSRF Fetch Error:', err.message);
-        } finally {
-            csrfTokenPromise = null;
-        }
-        return csrfTokenCache;
-    })();
-    return csrfTokenPromise;
-}
-
-function clearCsrfTokenCache() {
-    csrfTokenCache = null;
-    csrfTokenPromise = null;
-}
-
 // ── API HELPER ────────────────────────────────────────────────
-async function apiFetch(endpoint, options = {}, isRetry = false) {
-    const method = (options.method || 'GET').toUpperCase();
-    const needsCsrf = !['GET', 'HEAD', 'OPTIONS'].includes(method);
-    const csrfToken = needsCsrf ? await ensureCsrfToken() : null;
+async function apiFetch(endpoint, options = {}) {
     const headers = {
         'Content-Type': 'application/json',
-        ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
         ...(options.headers || {}),
     };
     const res = await fetch(`${API}/api${endpoint}`, { ...options, headers, credentials: 'include' });
@@ -55,18 +20,6 @@ async function apiFetch(endpoint, options = {}, isRetry = false) {
         localStorage.removeItem('currentUser');
         window.location.href = 'auth.html';
         return;
-    }
-    if (res.status === 403 && needsCsrf && !isRetry) {
-        let payload = null;
-        try {
-            payload = await res.clone().json();
-        } catch (err) {}
-
-        if (payload?.message === 'CSRF token validation failed.') {
-            clearCsrfTokenCache();
-            await ensureCsrfToken();
-            return apiFetch(endpoint, options, true);
-        }
     }
     return res.json();
 }
@@ -120,7 +73,6 @@ function confirmLogout() {
         .catch(() => null)
         .finally(() => {
             localStorage.removeItem('currentUser');
-            clearCsrfTokenCache();
             sessionUserPromise = null;
             closeLogoutModal();
             showNotification('Logged out successfully.', 'success');

@@ -196,13 +196,9 @@ async function login() {
     btn.textContent = 'Signing in…'; btn.disabled = true;
 
     try {
-        const csrfToken = await ensureCsrfToken();
         const res  = await fetch(`${API}/api/auth/login`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
-            },
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({ email, password })
         });
@@ -284,13 +280,9 @@ async function sendOTP(type) {
     if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
 
     try {
-        const csrfToken = await ensureCsrfToken();
         const res  = await fetch(`${API}/api/auth/send-otp`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
-            },
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify(payload)
         });
@@ -342,13 +334,9 @@ async function resendOTP(type) {
             payload.password   = document.getElementById('signup-password').value.trim();
         }
 
-        const csrfToken = await ensureCsrfToken();
         const res  = await fetch(`${API}/api/auth/send-otp`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
-            },
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify(payload)
         });
@@ -385,13 +373,9 @@ async function verifyOTP(type) {
     }
 
     try {
-        const csrfToken = await ensureCsrfToken();
         const res  = await fetch(`${API}/api/auth/verify-otp`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
-            },
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({ email: currentEmail, otp, newPassword })
         });

@@ -14,7 +14,7 @@ const Sentry = require('@sentry/node');
 const db         = require('./db');
 const { sendAlertEmail } = require('./mailer');
 const logger = require('./logger');
-const { ensureCsrfCookie, csrfProtection } = require('./middleware/csrf');
+const { ensureCsrfCookie } = require('./middleware/csrf');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -139,7 +139,6 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: true }));
 app.use(ensureCsrfCookie);
-app.use('/api', csrfProtection);
 
 // ── STATIC FILES ─────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
