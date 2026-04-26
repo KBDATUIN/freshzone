@@ -3,9 +3,13 @@
 // ============================================================
 const { Resend } = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-console.log('[mailer] Using Resend for email delivery');
+if (resend) {
+    console.log('[mailer] Using Resend for email delivery');
+} else {
+    console.log('[mailer] RESEND_API_KEY not set, email delivery disabled');
+}
 
 function formatPm1(pm1) {
     if (pm1 === null || pm1 === undefined || pm1 === '') return '—';
@@ -16,6 +20,10 @@ function formatPm1(pm1) {
 
 /** Alert emails show PM1.0 only (dashboard still shows PM1 / PM2.5 / PM10). */
 async function sendAlertEmail(to, name, location, pm1, category) {
+    if (!resend) {
+        console.log('[mailer] Cannot send alert email - Resend not configured');
+        return;
+    }
     const pm1Str = formatPm1(pm1);
     const html = `
     <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;background:#f8f9fa;border-radius:12px;overflow:hidden;">
@@ -51,6 +59,10 @@ async function sendAlertEmail(to, name, location, pm1, category) {
 }
 
 async function sendOTPEmail(to, name, otp, type) {
+    if (!resend) {
+        console.log('[mailer] Cannot send OTP email - Resend not configured');
+        return;
+    }
     const isReset  = type === 'reset';
     const subject  = isReset ? 'FreshZone — Password Reset Code' : 'FreshZone — Email Verification Code';
     const headline = isReset ? 'Reset your password' : 'Verify your email';

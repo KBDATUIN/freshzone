@@ -7,11 +7,20 @@ const webpush  = require('web-push');
 const db       = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 
-webpush.setVapidDetails(
-    'mailto:freshzone.alerts@gmail.com',
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
-);
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+
+// Only configure VAPID if keys are provided
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+        'mailto:freshzone.alerts@gmail.com',
+        VAPID_PUBLIC_KEY,
+        VAPID_PRIVATE_KEY
+    );
+    console.log('[push] Web push notifications configured');
+} else {
+    console.log('[push] VAPID keys not set, push notifications disabled');
+}
 
 // ── GET /api/push/vapid-public-key ───────────────────────────
 router.get('/vapid-public-key', (req, res) => {

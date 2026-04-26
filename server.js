@@ -112,10 +112,11 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com"],
+            scriptSrcAttr: ["'self'", "'unsafe-inline'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://api.fontshare.com", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "blob:", "https://ui-avatars.com"],
-            connectSrc: ["'self'", "https://freshzone-production.up.railway.app", "https://freshzone.space", "https://www.freshzone.space"],
+            connectSrc: ["'self'", "https://freshzone-production.up.railway.app", "https://freshzone.space", "https://www.freshzone.space", "https://fonts.googleapis.com", "https://api.fontshare.com", "https://cdnjs.cloudflare.com"],
             fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://api.fontshare.com", "https://cdnjs.cloudflare.com"],
             objectSrc: ["'none'"],
             frameAncestors: ["'none'"],
