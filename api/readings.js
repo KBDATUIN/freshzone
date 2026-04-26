@@ -10,6 +10,18 @@ const { sendPushToAll }  = require('./push');
 const { verifyNodeHmac } = require('../middleware/device-auth');
 const logger = require('../logger');
 
+// ── SSE client registry ──────────────────────────────────────
+// Map of res objects keyed by a unique client ID
+const sseClients = new Map();
+let sseClientId = 0;
+
+function broadcastSSE(data) {
+    const payload = 'data: ' + JSON.stringify(data) + '\n\n';
+    for (const [, res] of sseClients) {
+        try { res.write(payload); } catch (_) {}
+    }
+}
+
 // ── AQI Calculator ───────────────────────────────────────────
 function calculateAQI(pm25) {
     const breakpoints = [
