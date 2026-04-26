@@ -93,6 +93,7 @@
     "share_target": {
         "action": "/dashboard.html",
         "method": "GET",
+        "enctype": "application/x-www-form-urlencoded",
         "params": {
             "title": "title",
             "text": "body"

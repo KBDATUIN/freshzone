@@ -44,10 +44,13 @@
 
 // ── INSTALL PROMPT ─────────────────────────────────────────────
 let deferredInstallPrompt = null;
+let installPromptShown = false;
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
+    
+    console.log('[PWA] beforeinstallprompt event captured');
 
     const isMobile = window.innerWidth <= 900;
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
@@ -60,7 +63,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
         return;
     }
 
-    if (!isStandalone && isMobile && !dismissed) {
+    // Only show banner once per session
+    if (!isStandalone && isMobile && !dismissed && !installPromptShown) {
+        installPromptShown = true;
         setTimeout(showInstallBanner, 4000);
     }
 });
