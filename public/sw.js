@@ -7,7 +7,7 @@
 //    - HTML pages: Network-first with offline page fallback
 // ============================================================
 
-const CACHE_NAME = 'freshzone-v5';
+const CACHE_NAME = 'freshzone-v6';
 const OFFLINE_PAGE = '/offline.html';
 
 // Static assets to pre-cache (core app shell)
