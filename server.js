@@ -66,6 +66,10 @@ const authLimiter = rateLimit({
     message: { success: false, message: 'Too many login attempts, please try again later.' },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => {
+        const p = req.path;
+        return p === '/csrf-token' || p === '/session' || p === '/logout';
+    },
 });
 
 const pushLimiter = rateLimit({

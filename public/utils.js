@@ -8,24 +8,36 @@ const API = window.location.hostname === 'localhost' || window.location.hostname
     : 'https://freshzone-production.up.railway.app';
 
 let csrfTokenCache = null;
+let csrfTokenPromise = null;
+let sessionUserPromise = null;
 
 async function ensureCsrfToken() {
     if (csrfTokenCache) return csrfTokenCache;
-    try {
-        const res = await fetch(`${API}/api/auth/csrf-token`, {
-            method: 'GET',
-            credentials: 'include',
-        });
-        if (!res.ok) throw new Error('CSRF request failed');
-        const data = await res.json();
-        if (data?.csrfToken) {
-            csrfTokenCache = data.csrfToken;
+    if (csrfTokenPromise) return csrfTokenPromise;
+    csrfTokenPromise = (async () => {
+        try {
+            const res = await fetch(`${API}/api/auth/csrf-token`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (!res.ok) throw new Error(`CSRF request failed (${res.status})`);
+            const data = await res.json();
+            if (data?.csrfToken) {
+                csrfTokenCache = data.csrfToken;
+            }
+        } catch (err) {
+            console.error('[PWA] CSRF Fetch Error:', err.message);
+        } finally {
+            csrfTokenPromise = null;
         }
-    } catch (err) {
-        console.error('[PWA] CSRF Fetch Error:', err.message);
-        // Fallback or retry logic could go here
-    }
-    return csrfTokenCache;
+        return csrfTokenCache;
+    })();
+    return csrfTokenPromise;
+}
+
+function clearCsrfTokenCache() {
+    csrfTokenCache = null;
+    csrfTokenPromise = null;
 }
 
 // ── API HELPER ────────────────────────────────────────────────
@@ -44,26 +56,51 @@ async function apiFetch(endpoint, options = {}, isRetry = false) {
         window.location.href = 'auth.html';
         return;
     }
-    // If CSRF check failed, clear cache and retry once
     if (res.status === 403 && needsCsrf && !isRetry) {
-        csrfTokenCache = null;
-        return apiFetch(endpoint, options, true);
+        let payload = null;
+        try {
+            payload = await res.clone().json();
+        } catch (err) {}
+
+        if (payload?.message === 'CSRF token validation failed.') {
+            clearCsrfTokenCache();
+            await ensureCsrfToken();
+            return apiFetch(endpoint, options, true);
+        }
     }
     return res.json();
 }
 
 async function hydrateSessionUser() {
-    try {
-        await ensureCsrfToken();
-        const res = await fetch(`${API}/api/auth/session`, { credentials: 'include' });
-        const data = await res.json();
-        if (res.ok && data?.success && data.user) {
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
-            return data.user;
+    const cachedUser = localStorage.getItem('currentUser');
+    if (cachedUser) {
+        try {
+            return JSON.parse(cachedUser);
+        } catch (err) {
+            localStorage.removeItem('currentUser');
         }
-    } catch (err) {}
-    localStorage.removeItem('currentUser');
-    return null;
+    }
+
+    if (sessionUserPromise) return sessionUserPromise;
+
+    sessionUserPromise = (async () => {
+        try {
+            const res = await fetch(`${API}/api/auth/session`, { credentials: 'include' });
+            const data = await res.json();
+            if (res.ok && data?.success && data.user) {
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                return data.user;
+            }
+        } catch (err) {}
+        localStorage.removeItem('currentUser');
+        return null;
+    })();
+
+    try {
+        return await sessionUserPromise;
+    } finally {
+        sessionUserPromise = null;
+    }
 }
 
 // ── NOTIFICATION ─────────────────────────────────────────────
@@ -83,7 +120,8 @@ function confirmLogout() {
         .catch(() => null)
         .finally(() => {
             localStorage.removeItem('currentUser');
-            csrfTokenCache = null; // Clear CSRF cache on logout to prevent reuse errors
+            clearCsrfTokenCache();
+            sessionUserPromise = null;
             closeLogoutModal();
             showNotification('Logged out successfully.', 'success');
             setTimeout(() => { window.location.href = 'auth.html'; }, 1200);
