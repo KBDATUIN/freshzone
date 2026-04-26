@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <style>/* Anti-flash */html{background:linear-gradient(135deg,#90e0ef,#00b4d8,#004e7a);}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
@@ -773,9 +773,6 @@
                 aqiBadge.className     = 'aqi-badge aqi-offline';
                 pmDiv.innerHTML        = '';
                 ts.textContent = data.last_seen ? ('Last seen: ' + formatTS(data.last_seen)) : 'No data received';
-                // Hide sparkline when offline
-                const sparkCanvas = document.getElementById('sparkline-' + zoneCode.replace('ESP32-', '').toLowerCase());
-                if (sparkCanvas) sparkCanvas.classList.remove('visible');
 
 
 
@@ -784,6 +781,9 @@
 
 
                 if (ackBtn) ackBtn.style.display = 'none';
+                // Hide sparkline when sensor is offline
+                const _spkCanvas = document.getElementById(zoneCode === 'ESP32-ZONE1' ? 'sparkline-zone1' : 'sparkline-zone2');
+                if (_spkCanvas) _spkCanvas.classList.remove('visible');
                 return;
             }
 
@@ -866,9 +866,8 @@
                 <span class="pm-chip">PM2.5: ${pm25} µg/m³</span>
                 <span class="pm-chip">PM10: ${parseFloat(data.pm10 || 0).toFixed(1)} µg/m³</span>
             `;
-
-            // Feed sparkline with latest PM2.5
-            _updateSparkline(zoneCode, pm25);
+            // Update sparkline with live PM2.5 value
+            if (typeof _updateSparkline === 'function') _updateSparkline(zoneCode, pm25);
 
 
 
@@ -1236,6 +1235,7 @@
 
         function _updateSparkline(zoneCode, pm25) {
             const arr = _sparkData[zoneCode];
+            if (!arr) return;
             arr.push(parseFloat(pm25) || 0);
             if (arr.length > SPARK_MAX) arr.shift();
             const chart = _sparkCharts[zoneCode];
@@ -1246,7 +1246,7 @@
             chart.data.datasets[0].borderColor = isAlert ? '#ef4444' : '#00b4d8';
             chart.data.datasets[0].backgroundColor = isAlert ? 'rgba(239,68,68,0.10)' : 'rgba(0,180,216,0.10)';
             chart.update('none');
-            // Show the canvas now that we have real data
+            // Reveal the canvas now that we have real data
             const canvasId = zoneCode === 'ESP32-ZONE1' ? 'sparkline-zone1' : 'sparkline-zone2';
             const canvas = document.getElementById(canvasId);
             if (canvas) canvas.classList.add('visible');
@@ -1262,6 +1262,8 @@
             };
             document.head.appendChild(s);
         })();
+
+
     </script>
     <script src="/pwa.js" defer></script>
     <script defer src="enhance.js"></script>
