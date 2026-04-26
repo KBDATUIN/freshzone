@@ -127,6 +127,11 @@ router.post('/login', async (req, res) => {
 
         await db.query('UPDATE accounts SET last_login = NOW() WHERE id = ?', [user.id]);
 
+        if (!process.env.JWT_SECRET) {
+            logger.error('JWT_SECRET is not defined in environment variables');
+            return res.status(500).json({ success: false, message: 'Authentication configuration error.' });
+        }
+
         const token = jwt.sign(
             { id: user.id, email: user.email, position: user.position, name: user.full_name },
             process.env.JWT_SECRET,

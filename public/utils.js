@@ -29,7 +29,7 @@ async function ensureCsrfToken() {
 }
 
 // ── API HELPER ────────────────────────────────────────────────
-async function apiFetch(endpoint, options = {}) {
+async function apiFetch(endpoint, options = {}, isRetry = false) {
     const method = (options.method || 'GET').toUpperCase();
     const needsCsrf = !['GET', 'HEAD', 'OPTIONS'].includes(method);
     const csrfToken = needsCsrf ? await ensureCsrfToken() : null;
@@ -44,8 +44,10 @@ async function apiFetch(endpoint, options = {}) {
         window.location.href = 'auth.html';
         return;
     }
-    if (res.status === 403 && needsCsrf) {
+    // If CSRF check failed, clear cache and retry once
+    if (res.status === 403 && needsCsrf && !isRetry) {
         csrfTokenCache = null;
+        return apiFetch(endpoint, options, true);
     }
     return res.json();
 }

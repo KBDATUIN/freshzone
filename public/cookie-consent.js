@@ -166,7 +166,6 @@
             analyticsToggle.checked = isAnalyticsEnabled();
             preferenceToggle.checked = localStorage.getItem('preference-cookies') !== 'false';
             modal.style.display = 'flex';
-            modal.style.display = 'flex';
         });
 
         // Close modal
