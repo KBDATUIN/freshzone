@@ -81,6 +81,7 @@ function confirmLogout() {
         .catch(() => null)
         .finally(() => {
             localStorage.removeItem('currentUser');
+            csrfTokenCache = null; // Clear CSRF cache on logout to prevent reuse errors
             closeLogoutModal();
             showNotification('Logged out successfully.', 'success');
             setTimeout(() => { window.location.href = 'auth.html'; }, 1200);
