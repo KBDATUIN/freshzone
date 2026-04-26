@@ -157,6 +157,8 @@ router.post('/send-otp', async (req, res) => {
     const lastName  = sanitizeStr(req.body.lastName, 50);
     const employeeId = sanitizeStr(req.body.employeeId, 30);
     const contact   = sanitizeStr(req.body.contact, 20);
+    if (contact && !/^(\+63|0)9\d{9}$/.test(contact))
+        return res.status(400).json({ success: false, message: 'Invalid contact number. Use format 09XXXXXXXXX or +639XXXXXXXXX.' });
     const position  = sanitizeStr(req.body.position, 50);
     const password  = typeof req.body.password === 'string' ? req.body.password.slice(0, 128) : '';
 

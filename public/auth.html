@@ -145,8 +145,8 @@
 
             <!-- Tab Switcher -->
             <div class="auth-tabs" id="auth-tabs" role="tablist" aria-label="Authentication mode">
-                <button class="auth-tab active" id="tab-login"   onclick="switchTab('login')"  role="tab" aria-selected="true"  aria-controls="login-view">Sign In</button>
-                <button class="auth-tab"        id="tab-signup"  onclick="switchTab('signup')" role="tab" aria-selected="false" aria-controls="signup-view">Create Account</button>
+                <button class="auth-tab active" id="tab-login"   role="tab" aria-selected="true"  aria-controls="login-view">Sign In</button>
+                <button class="auth-tab"        id="tab-signup"  role="tab" aria-selected="false" aria-controls="signup-view">Create Account</button>
             </div>
 
             <!-- ═══ LOGIN VIEW ═══ -->
@@ -159,7 +159,7 @@
                     <label for="login-password">Password</label>
                     <div class="input-password-wrap">
                         <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-                        <button type="button" class="eye-btn" onclick="togglePassword('login-password', this)" aria-label="Toggle password visibility">
+                        <button type="button" class="eye-btn" aria-label="Toggle password visibility">
                             <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                         </button>
@@ -170,15 +170,15 @@
                         <input type="checkbox" id="remember-me" checked>
                         <span>Stay logged in</span>
                     </label>
-                    <span id="biometric-hint" style="display:none;font-size:0.78rem;color:var(--secondary);cursor:pointer;font-weight:600;" onclick="tryBiometricLogin()">🔒 Use fingerprint</span>
-                    <span class="auth-forgot" onclick="switchTab('forgot')">Forgot password?</span>
+                    <span id="biometric-hint" style="display:none;font-size:0.78rem;color:var(--secondary);cursor:pointer;font-weight:600;">🔒 Use fingerprint</span>
+                    <span class="auth-forgot">Forgot password?</span>
                 </div>
-                <button class="btn-primary" onclick="login()" style="margin-top:1.1rem;">
+                <button class="btn-primary" style="margin-top:1.1rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                     Sign In
                 </button>
                 <div class="auth-extra-links">
-                    <p>New here? <span onclick="switchTab('signup')" class="text-link">Create account</span></p>
+                    <p>New here? <span data-switch-tab="signup" class="text-link">Create account</span></p>
                 </div>
             </div>
 
@@ -205,7 +205,7 @@
                     <label for="signup-password">Password</label>
                     <div class="input-password-wrap">
                         <input type="password" id="signup-password" placeholder="Min. 8 characters" autocomplete="new-password">
-                        <button type="button" class="eye-btn" onclick="togglePassword('signup-password', this)" aria-label="Toggle password visibility">
+                        <button type="button" class="eye-btn" aria-label="Toggle password visibility">
                             <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                         </button>
@@ -213,7 +213,7 @@
                     <div class="pw-strength-bar" id="signup-pw-bar"></div>
                     <span class="pw-strength-label" id="signup-pw-label"></span>
                 </div>
-                <button id="signup-btn" class="btn-primary" onclick="sendOTP('signup')" style="margin-top:1.1rem;">
+                <button id="signup-btn" class="btn-primary" style="margin-top:1.1rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
                     Send Verification OTP
                 </button>
@@ -226,16 +226,16 @@
                     </div>
                     <div class="input-group"><label for="signup-otp-input">Verification Code</label><input type="text" id="signup-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric"></div>
                     <div class="otp-timer" id="signup-otp-timer"></div>
-                    <button class="btn-success" onclick="verifyOTP('signup')">
+                    <button class="btn-success">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         Verify &amp; Register
                     </button>
-                    <button id="signup-resend-btn" onclick="resendOTP('signup')" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
+                    <button id="signup-resend-btn" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
                         Resend OTP
                     </button>
                 </div>
-                <div class="auth-extra-links"><p>Already have an account? <span onclick="switchTab('login')" class="text-link">Sign In</span></p></div>
+                <div class="auth-extra-links"><p>Already have an account? <span data-switch-tab="login" class="text-link">Sign In</span></p></div>
             </div>
 
             <!-- ═══ FORGOT PASSWORD VIEW ═══ -->
@@ -245,7 +245,7 @@
                     <p style="margin:0;font-size:0.84rem;">Enter your registered email to receive a password reset code.</p>
                 </div>
                 <div class="input-group"><label for="reset-email">Registered Email</label><input type="email" id="reset-email" placeholder="name@gmail.com" autocomplete="email"></div>
-                <button id="reset-btn" class="btn-primary" onclick="sendOTP('reset')" style="margin-top:1rem;">
+                <button id="reset-btn" class="btn-primary" style="margin-top:1rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
                     Send Reset Code
                 </button>
@@ -258,7 +258,7 @@
                     </div>
                     <div class="input-group"><label for="reset-otp-input">OTP Code</label><input type="text" id="reset-otp-input" placeholder="6-digit code" maxlength="6" inputmode="numeric"></div>
                     <div class="otp-timer" id="reset-otp-timer"></div>
-                    <button id="reset-resend-btn" onclick="resendOTP('reset')" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
+                    <button id="reset-resend-btn" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
                         Resend OTP
                     </button>
@@ -266,7 +266,7 @@
                         <label for="reset-new-password">New Password</label>
                         <div class="input-password-wrap">
                             <input type="password" id="reset-new-password" placeholder="Enter new password" autocomplete="new-password">
-                            <button type="button" class="eye-btn" onclick="togglePassword('reset-new-password', this)" aria-label="Toggle password visibility">
+                            <button type="button" class="eye-btn" aria-label="Toggle password visibility">
                                 <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                 <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                             </button>
@@ -274,13 +274,13 @@
                         <div class="pw-strength-bar" id="reset-pw-bar"></div>
                         <span class="pw-strength-label" id="reset-pw-label"></span>
                     </div>
-                    <button class="btn-primary" onclick="verifyOTP('reset')" style="margin-top:1rem;">
+                    <button class="btn-primary" style="margin-top:1rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         Update Password
                     </button>
                 </div>
                 <div class="auth-extra-links">
-                    <p><span onclick="switchTab('login')" class="text-link">← Back to Sign In</span></p>
+                    <p><span data-switch-tab="login" class="text-link">← Back to Sign In</span></p>
                 </div>
             </div>
         </main>
@@ -309,7 +309,7 @@
         <!-- Dark mode toggle -->
         <div class="auth-dark-toggle-wrap">
             <span class="auth-dark-label">Appearance</span>
-            <button id="auth-dark-toggle" class="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">
+            <button id="auth-dark-toggle" class="dark-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </button>
         </div>

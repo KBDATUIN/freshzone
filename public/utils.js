@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  utils.js — FreshZone shared utilities
 // ============================================================
 
@@ -365,6 +365,38 @@ function urlBase64ToUint8Array(base64String) {
     const output  = new Uint8Array(rawData.length);
     for (let i = 0; i < rawData.length; ++i) output[i] = rawData.charCodeAt(i);
     return output;
+}
+
+// â”€â”€ NAV BUILDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Builds and injects the full <nav> + mobile drawer into
+// an element with id="nav-placeholder". Call loadNav('dashboard')
+// etc. to apply the active class to the matching link.
+// Not called automatically â€” add to individual pages when ready.
+function loadNav(activeLink) {
+    var placeholder = document.getElementById('nav-placeholder');
+    if (!placeholder) return;
+
+    var links = [
+        { key: 'dashboard', href: 'dashboard.html', label: 'Dashboard' },
+        { key: 'history',   href: 'history.html',   label: 'History'   },
+        { key: 'about',     href: 'about.html',     label: 'About'     },
+        { key: 'profile',   href: 'profile.html',   label: 'Profile'   },
+        { key: 'contact',   href: 'contact.html',   label: 'Contact'   },
+    ];
+
+    var desktopLinks = links.map(function(l) {
+        return '<a href="' + l.href + '"' + (l.key === activeLink ? ' class="active"' : '') + '>' + l.label + '</a>';
+    }).join('\n                ');
+
+    var mobileLinks = links.map(function(l) {
+        return '<a href="' + l.href + '"' + (l.key === activeLink ? ' class="active"' : '') + '>' + l.label + '</a>';
+    }).join('\n            ');
+
+    var html = '\n    <nav role="navigation" aria-label="Main navigation">\n        <div class="nav-container">\n            <a href="dashboard.html" class="logo" aria-label="FreshZone Home"><img src="logo1.png" alt="FreshZone Logo"></a>\n            <div class="nav-links" id="desktop-nav">\n                ' + desktopLinks + '\n                <a href="#" onclick="openLogoutModal();return false;">Logout</a>\n            </div>\n            <div class="nav-controls">\n                <div class="nav-user" id="nav-user-display"><span class="nav-user-dot"></span><span id="nav-user-name">\u2014</span></div>\n                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>\n                <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications"><span class="push-toggle-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><div class="push-toggle-switch" id="push-btn" onclick="togglePushNotifications()" role="button" tabindex="0" onkeydown="if(event.key===''Enter''||event.key==='' '')togglePushNotifications()"><div class="push-toggle-knob"></div></div><span class="push-toggle-label" id="push-label">OFF</span></label>\n                <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>\n            </div>\n        </div>\n    </nav>\n\n    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true" aria-label="Navigation menu">\n        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">\n            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>\n            ' + mobileLinks + '\n            <div class="mobile-nav-divider"></div>\n            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout">Logout</a>\n            <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn">Notifications</a>\n        </div>\n    </div>';
+
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    placeholder.replaceWith.apply(placeholder, Array.from(tmp.childNodes));
 }
 
 // ── LOADING STATE HELPERS ─────────────────────────────────────

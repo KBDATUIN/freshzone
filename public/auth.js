@@ -9,29 +9,72 @@
 
 // ── BIOMETRIC / CREDENTIAL AUTO-FILL ─────────────────────────
 async function tryBiometricLogin() {
-    // Use Credential Management API — autofills saved browser password if available
     if (!window.PasswordCredential && !window.FederatedCredential) return;
-
     try {
-        const cred = await navigator.credentials.get({
-            password: true,
-            mediation: 'optional'   // shows picker if multiple accounts saved
-        });
-
+        const cred = await navigator.credentials.get({ password: true, mediation: 'optional' });
         if (cred && cred.id && cred.password) {
-            // Fill the form and auto-submit
             const emailField = document.getElementById('login-email');
             const passField  = document.getElementById('login-password');
             if (emailField) emailField.value = cred.id;
             if (passField)  passField.value  = cred.password;
-
-            // Auto-login after short delay so user sees it filled
             setTimeout(() => login(), 600);
         }
-    } catch(e) {
-        // Biometric not available or user cancelled — silent fail
-    }
+    } catch(e) {}
 }
+
+// ── BUTTON WIRING (replaces onclick="" attributes in auth.html) ─
+document.addEventListener('DOMContentLoaded', () => {
+    // Tab switchers
+    document.getElementById('tab-login')  ?.addEventListener('click', () => switchTab('login'));
+    document.getElementById('tab-signup') ?.addEventListener('click', () => switchTab('signup'));
+
+    // Forgot password link (span)
+    document.querySelector('.auth-forgot')?.addEventListener('click', () => switchTab('forgot'));
+
+    // Back to sign in link inside forgot view
+    document.getElementById('back-to-login')?.addEventListener('click', () => switchTab('login'));
+
+    // Sign In button
+    document.querySelector('#login-view .btn-primary')?.addEventListener('click', login);
+
+    // Sign Up OTP button
+    document.getElementById('signup-btn')?.addEventListener('click', () => sendOTP('signup'));
+
+    // Verify & Register button
+    document.querySelector('#signup-otp-section .btn-success')?.addEventListener('click', () => verifyOTP('signup'));
+
+    // Resend OTP — signup
+    document.getElementById('signup-resend-btn')?.addEventListener('click', () => resendOTP('signup'));
+
+    // Forgot — Send Reset Code button
+    document.getElementById('reset-btn')?.addEventListener('click', () => sendOTP('reset'));
+
+    // Forgot — Update Password button
+    document.querySelector('#reset-otp-section .btn-primary')?.addEventListener('click', () => verifyOTP('reset'));
+
+    // Resend OTP — reset
+    document.getElementById('reset-resend-btn')?.addEventListener('click', () => resendOTP('reset'));
+
+    // Eye toggle buttons — login, signup, reset
+    document.querySelectorAll('.eye-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const wrap  = this.closest('.input-password-wrap');
+            const input = wrap?.querySelector('input');
+            if (input) togglePassword(input.id, this);
+        });
+    });
+
+    // Dark mode toggle on auth page
+    document.getElementById('auth-dark-toggle')?.addEventListener('click', toggleDarkMode);
+
+    // Biometric hint
+    document.getElementById('biometric-hint')?.addEventListener('click', tryBiometricLogin);
+
+    // "Create account" / "Sign In" text links
+    document.querySelectorAll('[data-switch-tab]').forEach(el => {
+        el.addEventListener('click', () => switchTab(el.dataset.switchTab));
+    });
+});
 
 // ============================================================
 //  auth.js (UPDATED) — 60s OTP, resend support, Node.js API
