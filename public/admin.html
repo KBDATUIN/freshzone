@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>/* Anti-flash */html{background:linear-gradient(135deg,#90e0ef,#00b4d8,#004e7a);}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshZone | Admin</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-v2.css">
+    <link rel="stylesheet" href="style-v3.css">
+    <link rel="stylesheet" href="style-fixes.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#004e7a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+    <link rel="stylesheet" href="/pwa.css">
+    <style>
+        .icon { display:inline-block; width:1em; height:1em; vertical-align:-0.125em; flex-shrink:0; }
+        .nav-icon { width:1.05rem; height:1.05rem; margin-right:5px; vertical-align:-0.15em; opacity:0.85; }
+        .btn-icon { width:0.9rem; height:0.9rem; margin-right:4px; vertical-align:-0.1em; }
+        .h-icon   { width:1.1rem; height:1.1rem; margin-right:6px; vertical-align:-0.18em; }
+        .nav-container {
+            display:flex !important; flex-wrap:nowrap !important; align-items:center !important;
+            gap:0 !important; height:100% !important; max-width:1200px !important;
+            margin:0 auto !important; padding:0 !important;
+        }
+        .nav-container .logo { flex-shrink:0 !important; margin-right:1.25rem !important; }
+        .nav-links {
+            display:flex !important; flex:1 1 auto !important; min-width:0 !important;
+            align-items:center !important; flex-wrap:nowrap !important;
+            gap:0.15rem !important; overflow:visible !important;
+        }
+        .nav-controls {
+            display:flex !important; flex-shrink:0 !important; flex-wrap:nowrap !important;
+            align-items:center !important; gap:10px !important; margin-left:auto !important;
+        }
+        .nav-controls .hamburger { display:none !important; }
+        @media (max-width:900px) {
+            .nav-links { display:none !important; }
+            .nav-controls .hamburger { display:flex !important; }
+            .nav-user { display:none !important; }
+        }
+
+        /* Admin table */
+        .admin-header {
+            display:flex; align-items:center; justify-content:space-between;
+            flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;
+        }
+        .admin-header h1 { margin:0; font-size:1.5rem; color:var(--primary); }
+        .admin-header p  { margin:0; color:var(--gray); font-size:0.88rem; }
+
+        .toggle-btn {
+            padding:5px 14px; border:none; border-radius:8px; font-size:0.78rem;
+            font-weight:700; cursor:pointer; transition:all 0.2s; width:auto; margin:0;
+            display:inline-flex; align-items:center; gap:5px;
+        }
+        .toggle-btn.activate   { background:#dcfce7; color:#15803d; }
+        .toggle-btn.deactivate { background:#fee2e2; color:#dc2626; }
+        .toggle-btn:hover { filter:brightness(0.92); transform:none; box-shadow:none; }
+        .toggle-btn::after { display:none !important; }
+
+        .status-pill {
+            display:inline-block; padding:2px 10px; border-radius:99px;
+            font-size:0.72rem; font-weight:700;
+        }
+        .status-pill.active   { background:#dcfce7; color:#15803d; }
+        .status-pill.inactive { background:#fee2e2; color:#dc2626; }
+
+        .admin-access-denied {
+            text-align:center; padding:3rem 1rem; color:var(--danger);
+            font-size:1rem; font-weight:600;
+        }
+    </style>
+</head>
+<body>
+
+<nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+        <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
+            <img src="logo1.png" alt="FreshZone Logo">
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="history.html">History</a>
+            <a href="about.html">About</a>
+            <a href="profile.html">Profile</a>
+            <a href="contact.html">Contact</a>
+            <a href="admin.html" class="active">Admin</a>
+            <a href="#" onclick="openLogoutModal();return false;">Logout</a>
+        </div>
+        <div class="nav-controls">
+            <div class="nav-user" id="nav-user-display">
+                <span class="nav-user-dot"></span>
+                <span id="nav-user-name">—</span>
+            </div>
+            <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
+        <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="history.html">History</a>
+        <a href="about.html">About</a>
+        <a href="profile.html">Profile</a>
+        <a href="contact.html">Contact</a>
+        <a href="admin.html" class="active">Admin</a>
+        <div class="mobile-nav-divider"></div>
+        <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout">Logout</a>
+    </div>
+</div>
+
+<div class="container" style="position:relative;z-index:10;">
+
+    <div id="access-denied-msg" class="admin-access-denied" style="display:none;">
+        Access denied. Administrator role required.
+    </div>
+
+    <div id="admin-content" style="display:none;">
+        <div class="admin-header">
+            <div>
+                <h1>User Management</h1>
+                <p>Activate or deactivate staff and administrator accounts.</p>
+            </div>
+        </div>
+
+        <div class="log-container">
+            <table id="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Employee ID</th>
+                        <th>Position</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody">
+                    <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gray);">Loading users…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div id="session-warning" role="status"></div>
+<div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+<div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+    <div class="modal-content-custom">
+        <h3 id="logout-title">Confirm Logout</h3>
+        <p>Are you sure you want to log out of FreshZone?</p>
+        <div class="modal-btn-group">
+            <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+            <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p>
+</footer>
+
+<script src="utils.js"></script>
+<script>
+    // Auth guard — admin only
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; }
+
+    if (user?.position !== 'Administrator') {
+        document.getElementById('access-denied-msg').style.display = 'block';
+    } else {
+        document.getElementById('admin-content').style.display = 'block';
+        loadUsers();
+    }
+
+    const nameEl = document.getElementById('nav-user-name');
+    if (nameEl) nameEl.textContent = user?.full_name || user?.name || 'User';
+
+    async function loadUsers() {
+        try {
+            const data = await apiFetch('/profile/all-users');
+            if (!data || !data.success) {
+                showNotification(data?.message || 'Failed to load users.', 'error');
+                return;
+            }
+            renderUsers(data.users);
+        } catch(e) {
+            showNotification('Connection error loading users.', 'error');
+        }
+    }
+
+    function renderUsers(users) {
+        const tbody = document.getElementById('users-tbody');
+        if (!users || !users.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gray);">No users found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = users.map(u => `
+            <tr id="row-${u.id}">
+                <td data-label="Name">${escHtml(u.full_name || '—')}</td>
+                <td data-label="Employee ID">${escHtml(u.employee_id || '—')}</td>
+                <td data-label="Position">${escHtml(u.position || '—')}</td>
+                <td data-label="Status">
+                    <span class="status-pill ${u.is_active ? 'active' : 'inactive'}">
+                        ${u.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+                <td data-label="Action">
+                    <button class="toggle-btn ${u.is_active ? 'deactivate' : 'activate'}"
+                            onclick="toggleUser(${u.id}, ${u.is_active ? 0 : 1})">
+                        ${u.is_active ? 'Deactivate' : 'Activate'}
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function toggleUser(userId, newActive) {
+        try {
+            const data = await apiFetch(`/profile/toggle-active/${userId}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ is_active: newActive })
+            });
+            if (data && data.success) {
+                showNotification(newActive ? 'User activated.' : 'User deactivated.', 'success');
+                loadUsers();
+            } else {
+                showNotification(data?.message || 'Failed to update user.', 'error');
+            }
+        } catch(e) {
+            showNotification('Connection error.', 'error');
+        }
+    }
+
+    function escHtml(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    initHotkeys('dashboard');
+</script>
+<script src="/pwa.js" defer></script>
+<script src="cookie-consent.js?v=3" defer></script>
+</body>
+</html>

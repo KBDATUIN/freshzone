@@ -579,6 +579,7 @@
                 </p>
                 <span class="aqi-badge aqi-offline" id="aqi-zone1">AQI: —</span>
                 <div class="pm-values" id="pm-zone1"></div>
+                <canvas class="zone-sparkline" id="sparkline-zone1" height="48" style="width:100%;margin-top:6px;display:block;"></canvas>
                 <small class="card-timestamp" id="ts-zone1">Last reading: —</small>
                 <button class="ack-btn" id="ack-zone1" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE1','4th Floor Male CR')">
                     Acknowledge Alert
@@ -599,6 +600,7 @@
                 </p>
                 <span class="aqi-badge aqi-offline" id="aqi-zone2">AQI: —</span>
                 <div class="pm-values" id="pm-zone2"></div>
+                <canvas class="zone-sparkline" id="sparkline-zone2" height="48" style="width:100%;margin-top:6px;display:block;"></canvas>
                 <small class="card-timestamp" id="ts-zone2">Last reading: —</small>
                 <button class="ack-btn" id="ack-zone2" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE2','4th Floor Female CR')">
                     Acknowledge Alert
@@ -1188,9 +1190,83 @@
         }
 
         initHotkeys('dashboard');
-        // â”€â”€ CALIBRATION MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-        initHotkeys('dashboard');
+        // -- SPARKLINE CHARTS --------------------------------------------------
+        const _sparkData = { 'ESP32-ZONE1': [], 'ESP32-ZONE2': [] };
+        const _sparkCharts = {};
+        const SPARK_MAX = 12;
+
+        function _initSparkline(zoneCode, canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || !window.Chart) return;
+            _sparkCharts[zoneCode] = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: Array(SPARK_MAX).fill(''),
+                    datasets: [{
+                        data: Array(SPARK_MAX).fill(null),
+                        borderColor: '#00b4d8',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(0,180,216,0.10)',
+                    }]
+                },
+                options: {
+                    animation: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false, min: 0 }
+                    }
+                }
+            });
+        }
+
+        function _updateSparkline(zoneCode, pm25) {
+            const arr = _sparkData[zoneCode];
+            arr.push(parseFloat(pm25) || 0);
+            if (arr.length > SPARK_MAX) arr.shift();
+            const chart = _sparkCharts[zoneCode];
+            if (!chart) return;
+            const padded = Array(SPARK_MAX - arr.length).fill(null).concat(arr);
+            chart.data.datasets[0].data = padded;
+            const isAlert = arr[arr.length - 1] > 12;
+            chart.data.datasets[0].borderColor = isAlert ? '#ef4444' : '#00b4d8';
+            chart.data.datasets[0].backgroundColor = isAlert ? 'rgba(239,68,68,0.10)' : 'rgba(0,180,216,0.10)';
+            chart.update('none');
+        }
+
+        // Load Chart.js then init sparklines
+        (function() {
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+            s.onload = function() {
+                _initSparkline('ESP32-ZONE1', 'sparkline-zone1');
+                _initSparkline('ESP32-ZONE2', 'sparkline-zone2');
+            };
+            document.head.appendChild(s);
+        })();
+
+        // Wrap fetchLiveData to feed sparklines after each poll
+        const _origFetchLiveData = fetchLiveData;
+        fetchLiveData = async function() {
+            await _origFetchLiveData();
+            Object.keys(ZONES).forEach(function(zoneCode) {
+                const z = ZONES[zoneCode];
+                const pmDiv = document.getElementById(z.pm);
+                if (!pmDiv) return;
+                pmDiv.querySelectorAll('.pm-chip').forEach(function(chip) {
+                    if (chip.textContent.startsWith('PM2.5:')) {
+                        const val = parseFloat(chip.textContent.replace('PM2.5:', ''));
+                        if (!isNaN(val)) _updateSparkline(zoneCode, val);
+                    }
+                });
+            });
+        };
     </script>
     <script src="/pwa.js" defer></script>
     <script defer src="enhance.js"></script>

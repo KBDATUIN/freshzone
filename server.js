@@ -2,6 +2,33 @@
 //   server.js — FreshZone Node.js + Express Backend
 // ============================================================
 require('dotenv').config();
+
+// ── ASSET OPTIMISATION UTILITY (dev only, run with --optimize-assets) ──
+// Usage: node server.js --optimize-assets
+// Converts PNG images to WebP at quality 80. Never runs in production.
+if (process.env.NODE_ENV !== 'production' && process.argv.includes('--optimize-assets')) {
+    (async () => {
+        let sharp;
+        try { sharp = require('sharp'); } catch (e) {
+            console.error('[optimize-assets] sharp not installed. Run: npm install sharp');
+            process.exit(1);
+        }
+        const fs   = require('fs');
+        const path = require('path');
+        const targets = ['vape.png', 'logo.png', 'logo1.png'];
+        for (const file of targets) {
+            const src  = path.join(__dirname, 'public', file);
+            const dest = src.replace(/\.png$/i, '.webp');
+            if (!fs.existsSync(src)) { console.log(`[optimize-assets] Skipping ${file} (not found)`); continue; }
+            const beforeBytes = fs.statSync(src).size;
+            await sharp(src).webp({ quality: 80 }).toFile(dest);
+            const afterBytes = fs.statSync(dest).size;
+            console.log(`[optimize-assets] ${file} → ${path.basename(dest)} | ${(beforeBytes/1024).toFixed(1)}KB → ${(afterBytes/1024).toFixed(1)}KB (saved ${((1 - afterBytes/beforeBytes)*100).toFixed(1)}%)`);
+        }
+        console.log('[optimize-assets] Done.');
+        process.exit(0);
+    })();
+}
 const express    = require('express');
 const cors       = require('cors');
 const path       = require('path');
@@ -239,6 +266,39 @@ cron.schedule('0 2 * * *', async () => {
         logger.info('[Data Retention] Cleanup completed successfully');
     } catch (err) {
         logger.error({ err }, '[Data Retention] Cleanup failed');
+    }
+});
+
+// ── UNACKNOWLEDGED ALERT ESCALATION (every 60 seconds) ───────
+// Emails ADMIN_EMAIL for any open event older than 5 min with no acknowledgement
+cron.schedule('* * * * *', async () => {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (!adminEmail) return;
+    try {
+        const [events] = await db.query(
+            `SELECT de.id, de.location_name, de.aqi_category, sr.pm1_0 AS pm1_for_email
+             FROM detection_events de
+             LEFT JOIN sensor_readings sr ON sr.id = de.reading_id
+             WHERE de.event_status = 'Detected'
+               AND de.acknowledged_at IS NULL
+               AND de.detected_at < DATE_SUB(NOW(), INTERVAL 5 MINUTE)`
+        );
+        for (const event of events) {
+            try {
+                await sendAlertEmail(
+                    adminEmail,
+                    'Administrator',
+                    event.location_name,
+                    event.pm1_for_email,
+                    event.aqi_category
+                );
+                logger.warn({ eventId: event.id, location: event.location_name }, '[escalation-60s] Unacknowledged alert escalated to ADMIN_EMAIL');
+            } catch (mailErr) {
+                logger.error({ err: mailErr, eventId: event.id }, '[escalation-60s] Email failed');
+            }
+        }
+    } catch (err) {
+        logger.error({ err }, '[escalation-60s] Query failed');
     }
 });
 
