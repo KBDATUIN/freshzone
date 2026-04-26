@@ -7,7 +7,7 @@
 //    - HTML pages: Network-first with offline page fallback
 // ============================================================
 
-const CACHE_NAME = 'freshzone-v6';
+const CACHE_NAME = 'freshzone-v7';
 const OFFLINE_PAGE = '/offline.html';
 
 // Static assets to pre-cache (core app shell)
@@ -48,22 +48,51 @@ const STATIC_ASSETS = [
 // ── INSTALL ──────────────────────────────────────────────────
 // ============================================================
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('[SW] Pre-caching app shell');
-                return cache.addAll(STATIC_ASSETS);
+    event.waitUntil((async () => {
+        const cache = await caches.open(CACHE_NAME);
+        console.log('[SW] Pre-caching app shell');
+
+        const results = await Promise.allSettled(
+            STATIC_ASSETS.map(async (asset) => {
+                const request = new Request(asset, { cache: 'reload' });
+                const response = await fetch(request);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to precache ${asset}: ${response.status}`);
+                }
+
+                await cache.put(asset, response.clone());
             })
-            .then(() => {
-                console.log('[SW] App shell cached');
-                return self.skipWaiting();
-            })
-            .catch(err => {
-                console.error('[SW] Pre-cache failed:', err);
-                // Still skip waiting even if some assets fail
-                return self.skipWaiting();
-            })
-    );
+        );
+
+        const failedAssets = results
+            .map((result, index) => ({ result, asset: STATIC_ASSETS[index] }))
+            .filter(({ result }) => result.status === 'rejected')
+            .map(({ asset }) => asset);
+
+        if (failedAssets.length) {
+            console.warn('[SW] Some assets failed to precache:', failedAssets);
+        }
+
+        let offlineCached = await cache.match(OFFLINE_PAGE);
+        if (!offlineCached) {
+            const offlineResponse = await fetch(new Request(OFFLINE_PAGE, { cache: 'reload' }));
+            if (offlineResponse.ok) {
+                await cache.put(OFFLINE_PAGE, offlineResponse.clone());
+                offlineCached = offlineResponse;
+            }
+        }
+
+        if (!offlineCached) {
+            throw new Error('Offline page was not cached successfully.');
+        }
+
+        console.log('[SW] App shell cached');
+        await self.skipWaiting();
+    })().catch(err => {
+        console.error('[SW] Pre-cache failed:', err);
+        return self.skipWaiting();
+    }));
 });
 
 // ============================================================
@@ -169,29 +198,28 @@ async function handleNavigation(request) {
         
         return networkResponse;
     } catch (error) {
-        // Network failed, try cache
-        console.log('[SW] Network failed for navigation, trying cache:', request.url);
-        
-        // First try to find the specific page in cache
+        console.log('[SW] Network failed for navigation, serving offline fallback for:', request.url);
+
+        const requestPath = new URL(request.url).pathname;
         const cachedResponse = await caches.match(request);
-        if (cachedResponse) {
-            console.log('[SW] Found cached page:', request.url);
-            return cachedResponse;
-        }
-        
-        // If not found, try to serve the offline page
-        console.log('[SW] No cached page found, serving offline page for:', request.url);
-        
-        // Try multiple ways to get the offline page
-        const offlineResponse = await caches.match(OFFLINE_PAGE) 
+        const offlineResponse = await caches.match(OFFLINE_PAGE)
             || await caches.match('/offline.html')
             || await caches.match('offline.html');
-        
+
+        if (requestPath === OFFLINE_PAGE && cachedResponse) {
+            return cachedResponse;
+        }
+
         if (offlineResponse) {
             console.log('[SW] Serving offline page');
             return offlineResponse;
         }
-        
+
+        if (cachedResponse) {
+            console.log('[SW] Offline page missing, falling back to cached page:', request.url);
+            return cachedResponse;
+        }
+
         // Last resort: create a simple offline response
         console.log('[SW] No offline page cached either, creating fallback');
         return new Response(`

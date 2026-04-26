@@ -589,12 +589,26 @@
         }
 
         // ── RETRY CONNECTION ─────────────────────────────────────
+        function getSafeReturnPath() {
+            const params = new URLSearchParams(window.location.search);
+            const requested = params.get('return') || sessionStorage.getItem('fz-last-online-path') || 'dashboard.html';
+
+            if (!requested || requested.includes('://') || requested.startsWith('//')) {
+                return '/dashboard.html';
+            }
+
+            if (requested.includes('offline.html')) {
+                return '/dashboard.html';
+            }
+
+            return requested.startsWith('/') ? requested : `/${requested.replace(/^\.?\//, '')}`;
+        }
+
         function retryConnection() {
             updateConnectionStatus();
             
             if (navigator.onLine) {
-                // Try to go back to dashboard
-                window.location.href = 'dashboard.html';
+                window.location.href = getSafeReturnPath();
             }
         }
 
@@ -621,6 +635,11 @@
         window.addEventListener('offline', () => {
             updateConnectionStatus();
         });
+
+        const homeButton = document.querySelector('.home-btn');
+        if (homeButton) {
+            homeButton.href = getSafeReturnPath();
+        }
 
         // Initial check
         updateConnectionStatus();

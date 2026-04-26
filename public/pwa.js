@@ -282,6 +282,28 @@ window.FreshZoneSync = {
 
 // ── OFFLINE DETECTION ──────────────────────────────────────────
 (function initOfflineDetection() {
+    function isOfflinePage() {
+        return window.location.pathname.endsWith('/offline.html') || window.location.pathname === '/offline.html';
+    }
+
+    function getCurrentPath() {
+        return `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    }
+
+    function redirectToOfflinePage() {
+        if (isOfflinePage()) return;
+
+        const currentPath = getCurrentPath();
+
+        try {
+            sessionStorage.setItem('fz-last-online-path', currentPath);
+        } catch (err) {
+            console.warn('[PWA] Could not store last online path:', err);
+        }
+
+        window.location.replace(`/offline.html?return=${encodeURIComponent(currentPath)}`);
+    }
+
     function handleOnline() {
         document.body.classList.remove('fz-offline');
         console.log('[PWA] Connection restored');
@@ -300,6 +322,8 @@ window.FreshZoneSync = {
         if (typeof showNotification === 'function') {
             showNotification('You are offline. Changes will sync when reconnected.', 'warning', 4000);
         }
+
+        setTimeout(redirectToOfflinePage, 150);
     }
     
     window.addEventListener('online', handleOnline);
