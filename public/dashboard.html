@@ -509,7 +509,6 @@
                     <span class="nav-user-dot"></span>
                     <span id="nav-user-name">—</span>
                 </div>
-                <button id="lang-toggle-btn" onclick="toggleLang()" title="Switch language" aria-label="Switch language" style="background:transparent;border:1.5px solid var(--primary,#004e7a);color:var(--primary,#004e7a);border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;transition:background 0.2s,color 0.2s;">EN</button>
                 <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
                 <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
                     <span class="push-toggle-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
@@ -544,14 +543,14 @@
             <div class="dashboard-masthead__grid">
                 <div class="dashboard-masthead__main">
                     <p class="dashboard-hero-eyebrow">Clear air · Campus monitoring</p>
-                    <h1><span data-i18n="hero_title">Campus Vape Aerosol Detector</span> <span class="live-badge"><span class="live-dot"></span><span data-i18n="live_badge">LIVE</span></span></h1>
-                    <p class="dashboard-hero-tagline" id="hero-tagline" data-i18n="hero_tagline">Live PM1.0, PM2.5 &amp; PM10 readings from sensors in the 4th Floor comfort rooms.</p>
+                    <h1>Campus Vape Aerosol Detector <span class="live-badge"><span class="live-dot"></span>LIVE</span></h1>
+                    <p class="dashboard-hero-tagline" id="hero-tagline">Live PM1.0, PM2.5 &amp; PM10 readings from sensors in the 4th Floor comfort rooms.</p>
                     <p class="dashboard-hero-session" id="hero-session" role="status">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         <span id="hero-session-text">Loading session…</span>
                     </p>
                     <div class="flex-btn-container">
-                        <a href="history.html" class="btn-hero-history" data-i18n="hero_btn_history">View detection history →</a>
+                        <a href="history.html" class="btn-hero-history">View detection history <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
                 <div class="dashboard-masthead__viz" aria-hidden="true">
@@ -562,7 +561,7 @@
 
         <div class="staff-alert-bar" id="staff-info-bar">
             <span style="display:inline-flex;align-items:center;"><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
-            <span data-i18n="staff_bar" data-i18n-html>You are logged in as <strong>Staff</strong>. Only Administrators can acknowledge vape alerts. You will be notified when a vape aerosol is detected on campus.</span>
+            <span>You are logged in as <strong>Staff</strong>. Only Administrators can acknowledge vape alerts. You will be notified when a vape aerosol is detected on campus.</span>
         </div>
 
         <div class="last-updated-bar" id="last-updated-bar">Fetching sensor data…</div>
@@ -614,24 +613,24 @@
         <section class="aq-guide animate-in" aria-labelledby="aq-guide-title">
             <div class="aq-guide-head">
                 <h3 id="aq-guide-title">Air Quality Guide: PM Sensors & AQI</h3>
-                <span class="aq-guide-chip" data-i18n="aq_guide_chip">Live Sensor Education</span>
+                <span class="aq-guide-chip">Live Sensor Education</span>
             </div>
             <div class="live-sensor-strip">
-                <div class="live-sensor-item"><strong>PM1.0</strong><span data-i18n="pm1_desc">Tiny particles from fresh smoke/aerosol. They can go deep into lungs and spread quickly in enclosed rooms.</span></div>
-                <div class="live-sensor-item"><strong>PM2.5</strong><span data-i18n="pm25_desc">Fine particles used for AQI calculation. Higher PM2.5 means higher short-term respiratory irritation risk.</span></div>
-                <div class="live-sensor-item"><strong>PM10</strong><span data-i18n="pm10_desc">Larger inhalable dust/smoke particles. Useful for understanding overall particulate load in the area.</span></div>
+                <div class="live-sensor-item"><strong>PM1.0</strong>Tiny particles from fresh smoke/aerosol. They can go deep into lungs and spread quickly in enclosed rooms.</div>
+                <div class="live-sensor-item"><strong>PM2.5</strong>Fine particles used for AQI calculation. Higher PM2.5 means higher short-term respiratory irritation risk.</div>
+                <div class="live-sensor-item"><strong>PM10</strong>Larger inhalable dust/smoke particles. Useful for understanding overall particulate load in the area.</div>
             </div>
             <div class="aq-guide-grid">
                 <article class="aq-card">
-                    <h4 data-i18n="aq_card1_title">How sensors work</h4>
+                    <h4>How sensors work</h4>
                     <p>The node uses laser scattering. More airborne particles reflect more light, so FreshZone estimates PM concentration in µg/m³ every few seconds.</p>
                 </article>
                 <article class="aq-card">
-                    <h4 data-i18n="aq_card2_title">How AQI works here</h4>
+                    <h4>How AQI works here</h4>
                     <p>AQI converts PM2.5 into a health index. It gives a quick risk level so staff can react faster without reading raw PM values first.</p>
                 </article>
                 <article class="aq-card">
-                    <h4 data-i18n="aq_card3_title">Why three PM values</h4>
+                    <h4>Why three PM values</h4>
                     <p>PM1.0 catches very fine aerosol, PM2.5 powers alerts and AQI, PM10 adds larger-particle context for ventilation and cleanup decisions.</p>
                 </article>
             </div>
@@ -649,58 +648,37 @@
     <div id="fz-alarm-overlay" style="display:none;">
         <div class="fz-alarm-inner">
             <div class="fz-alarm-icon"><svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:5rem;height:5rem;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13" stroke-width="2"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/></svg></div>
-            <div class="fz-alarm-title" data-i18n="alarm_title">VAPE DETECTED!</div>
+            <div class="fz-alarm-title">VAPE DETECTED!</div>
             <div class="fz-alarm-location" id="fz-alarm-location">—</div>
             <div class="fz-alarm-pm" id="fz-alarm-pm">—</div>
             <div class="fz-alarm-pulse"></div>
-            <button class="fz-alarm-close" onclick="closeAlarmOverlay()" data-i18n="alarm_acknowledge">I Acknowledge</button>
+            <button class="fz-alarm-close" onclick="closeAlarmOverlay()">I Acknowledge</button>
         </div>
     </div>
 
     <div class="staff-response-modal" id="staff-response-modal" role="alertdialog" aria-modal="true" aria-labelledby="staff-modal-title">
         <div class="staff-response-card">
-            <h3 id="staff-modal-title"><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> <span data-i18n="staff_modal_title">Vape Aerosol Detected</span></h3>
+            <h3 id="staff-modal-title"><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Vape Aerosol Detected</h3>
             <span class="location-tag" id="staff-modal-location">—</span>
-            <p id="staff-modal-text" data-i18n="staff_modal_text">A vape aerosol has been detected on campus. Please proceed to the location immediately for inspection.</p>
+            <p id="staff-modal-text">A vape aerosol has been detected on campus. Please proceed to the location immediately for inspection.</p>
             <button class="staff-respond-btn" onclick="staffRespond()">On My Way — Mark Responded</button>
-            <button class="staff-dismiss-btn" onclick="dismissStaffModal()"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> <span data-i18n="staff_dismiss_btn">Dismiss (Alert stays open)</span></button>
+            <button class="staff-dismiss-btn" onclick="dismissStaffModal()"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Dismiss (Alert stays open)</button>
         </div>
     </div>
 
     
     <!-- â”€â”€ CALIBRATION MODAL (admin only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-    <div id="cal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;z-index:12000;" role="dialog" aria-modal="true" aria-labelledby="cal-modal-title">
-        <div style="background:white;border-radius:18px;padding:28px 28px 24px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);border-top:5px solid #0369a1;animation:slideUp 0.35s cubic-bezier(0.175,0.885,0.32,1.1);box-sizing:border-box;">
-            <h3 id="cal-modal-title" style="margin:0 0 4px;color:#0369a1;font-size:1.05rem;font-family:sans-serif;" data-i18n="cal_title">Sensor Calibration</h3>
-            <p style="margin:0 0 4px;color:#0369a1;font-size:0.8rem;font-weight:600;font-family:monospace;" id="cal-node-label"></p>
-            <p style="margin:0 0 16px;color:#64748b;font-size:0.8rem;font-family:sans-serif;" data-i18n="cal_subtitle">Adjust offset and coefficient applied to raw PM readings before AQI calculation.</p>
-            <div style="margin-bottom:14px;">
-                <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;font-family:sans-serif;" data-i18n="cal_offset_label">PM2.5 Offset (Âµg/mÂ³)</label>
-                <input type="number" id="cal-offset" step="0.1" min="-500" max="500" style="width:100%;padding:9px 12px;border:1.5px solid #cbd5e1;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:sans-serif;">
-                <small style="color:#94a3b8;font-size:0.74rem;font-family:sans-serif;" data-i18n="cal_offset_hint">Added to raw PM2.5 value. Use negative to subtract.</small>
-            </div>
-            <div style="margin-bottom:20px;">
-                <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;font-family:sans-serif;" data-i18n="cal_coeff_label">PM2.5 Coefficient (multiplier)</label>
-                <input type="number" id="cal-coeff" step="0.01" min="0.01" max="10" style="width:100%;padding:9px 12px;border:1.5px solid #cbd5e1;border-radius:8px;font-size:0.9rem;box-sizing:border-box;font-family:sans-serif;">
-                <small style="color:#94a3b8;font-size:0.74rem;font-family:sans-serif;" data-i18n="cal_coeff_hint">Raw value is multiplied by this. Default: 1.0</small>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button id="cal-save-btn" onclick="saveCalibration()" style="flex:1;min-width:0;padding:11px;background:#0369a1;color:white;border:none;border-radius:10px;font-weight:700;font-size:0.88rem;cursor:pointer;font-family:sans-serif;transition:0.2s;" data-i18n="cal_save">Save Calibration</button>
-                <button onclick="resetCalibration()" style="padding:11px 12px;background:transparent;color:#64748b;border:1.5px solid #cbd5e1;border-radius:10px;font-size:0.82rem;cursor:pointer;font-family:sans-serif;" data-i18n="cal_reset">Reset to Default</button>
-                <button onclick="closeCalModal()" style="padding:11px 12px;background:transparent;color:#94a3b8;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.82rem;cursor:pointer;font-family:sans-serif;" data-i18n="cal_cancel">Cancel</button>
-            </div>
-        </div>
-    </div>
+
     <div id="session-warning" role="status"></div>
     <div id="notification" class="notification" role="alert" aria-live="polite"></div>
 
     <div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
         <div class="modal-content-custom">
-            <h3 id="logout-title" data-i18n="logout_title">Confirm Logout</h3>
-            <p data-i18n="logout_text">Are you sure you want to log out of FreshZone?</p>
+            <h3 id="logout-title">Confirm Logout</h3>
+            <p>Are you sure you want to log out of FreshZone?</p>
             <div class="modal-btn-group">
-                <button class="confirm-btn" onclick="confirmLogout()" data-i18n="logout_confirm">Yes, Logout</button>
-                <button class="cancel-btn" onclick="closeLogoutModal()" data-i18n="logout_cancel">Cancel</button>
+                <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -715,7 +693,6 @@
     </footer>
 
     <script src="cookie-consent.js?v=3" defer></script>
-    <script src="i18n.js"></script>
 
     <script src="utils.js"></script>
     <script>
@@ -731,15 +708,10 @@
             document.getElementById('staff-info-bar').classList.add('visible');
         }
 
-        // Show calibrate buttons for admin
-        if (isAdmin) {
-            document.querySelectorAll('.cal-btn').forEach(b => b.style.display = 'block');
-        }
-
         // Zone code → card element mapping
         const ZONES = {
-            'ESP32-ZONE1': { card:'card-zone1', dot:'dot-zone1', statusText:'status-text-zone1', aqi:'aqi-zone1', pm:'pm-zone1', ts:'ts-zone1', ackBtn:'ack-zone1', resolveBtn:'resolve-zone1', calBtn:'cal-zone1' },
-            'ESP32-ZONE2': { card:'card-zone2', dot:'dot-zone2', statusText:'status-text-zone2', aqi:'aqi-zone2', pm:'pm-zone2', ts:'ts-zone2', ackBtn:'ack-zone2', resolveBtn:'resolve-zone2', calBtn:'cal-zone2' },
+            'ESP32-ZONE1': { card:'card-zone1', dot:'dot-zone1', statusText:'status-text-zone1', aqi:'aqi-zone1', pm:'pm-zone1', ts:'ts-zone1', ackBtn:'ack-zone1', resolveBtn:'resolve-zone1' },
+            'ESP32-ZONE2': { card:'card-zone2', dot:'dot-zone2', statusText:'status-text-zone2', aqi:'aqi-zone2', pm:'pm-zone2', ts:'ts-zone2', ackBtn:'ack-zone2', resolveBtn:'resolve-zone2' },
         };
         // Track event IDs per zone for resolve (populated from DB via fetchOpenEvents)
         const zoneEventIds = {};
@@ -1198,56 +1170,8 @@
 
         initHotkeys('dashboard');
         // â”€â”€ CALIBRATION MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        let _calNodeCode = null;
 
-        async function openCalModal(nodeCode) {
-            _calNodeCode = nodeCode;
-            document.getElementById('cal-node-label').textContent = nodeCode;
-            try {
-                const data = await apiFetch('/calibration');
-                if (data && data.success) {
-                    const node = data.data.find(n => n.node_code === nodeCode);
-                    document.getElementById('cal-offset').value = node ? node.cal_offset : 0;
-                    document.getElementById('cal-coeff').value  = node ? node.cal_coeff  : 1;
-                }
-            } catch(e) {
-                document.getElementById('cal-offset').value = 0;
-                document.getElementById('cal-coeff').value  = 1;
-            }
-            document.getElementById('cal-modal').style.display = 'flex';
-        }
-
-        function closeCalModal() {
-            document.getElementById('cal-modal').style.display = 'none';
-            _calNodeCode = null;
-        }
-
-        async function saveCalibration() {
-            if (!_calNodeCode) return;
-            const btn    = document.getElementById('cal-save-btn');
-            const offset = parseFloat(document.getElementById('cal-offset').value);
-            const coeff  = parseFloat(document.getElementById('cal-coeff').value);
-            if (isNaN(offset) || isNaN(coeff)) { showNotification('Invalid values.', 'error'); return; }
-            btn.disabled = true; btn.textContent = t('cal_saving');
-            try {
-                const result = await apiFetch('/calibration/' + encodeURIComponent(_calNodeCode), {
-                    method: 'PUT',
-                    body: JSON.stringify({ cal_offset: offset, cal_coeff: coeff })
-                });
-                if (result && result.success) { showNotification(t('cal_success'), 'success'); closeCalModal(); }
-                else showNotification(result?.message || t('cal_error'), 'error');
-            } catch(e) { showNotification(t('cal_error'), 'error'); }
-            finally { btn.disabled = false; btn.textContent = t('cal_save'); }
-        }
-
-        function resetCalibration() {
-            document.getElementById('cal-offset').value = 0;
-            document.getElementById('cal-coeff').value  = 1;
-        }
-
-        document.getElementById('cal-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeCalModal();
-        });
+        initHotkeys('dashboard');
     </script>
     <script src="/pwa.js" defer></script>
     <script defer src="enhance.js"></script>
