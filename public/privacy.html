@@ -666,6 +666,15 @@
                 document.documentElement.setAttribute('data-theme', next);
                 localStorage.setItem('fz-theme', next);
             });
+
+            // Manage cookie preferences button — works whether banner was shown or not
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('[data-cookie-preferences]')) return;
+                e.preventDefault();
+                if (window.FreshZoneCookies) {
+                    window.FreshZoneCookies.showSettings();
+                }
+            });
         })();
     </script>
     <script src="cookie-consent.js?v=3" defer></script>

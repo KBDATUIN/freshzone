@@ -537,15 +537,6 @@
         document.getElementById('cookie-close-btn').addEventListener('click', saveEssentialsOnly);
         document.getElementById('cookie-save-essentials').addEventListener('click', saveEssentialsOnly);
         document.getElementById('cookie-save-btn').addEventListener('click', savePreferencesFromPanel);
-
-        document.addEventListener('click', function (event) {
-            const trigger = event.target.closest('[data-cookie-preferences]');
-            if (!trigger) return;
-            event.preventDefault();
-            const ui = ensureUI();
-            ui.root.hidden = false;
-            openPreferencesPanel(true);
-        });
     }
 
     function openPreferencesPanel(useSavedValues) {
@@ -612,6 +603,17 @@
     } else {
         init();
     }
+
+    // Global listener for [data-cookie-preferences] buttons on any page
+    // Works even when consent was already given and the banner was never shown
+    document.addEventListener('click', function (e) {
+        const trigger = e.target.closest('[data-cookie-preferences]');
+        if (!trigger) return;
+        e.preventDefault();
+        const ui = ensureUI();
+        ui.root.hidden = false;
+        openPreferencesPanel(true);
+    });
 
     window.FreshZoneCookies = {
         getConsent: getConsent,
