@@ -133,37 +133,40 @@ function isRealNamePart(value) {
 function isGmailAddress(email) {
     return /^[^@\s]{1,64}@(?:gmail\.com|googlemail\.com)$/i.test(email);
 }
-
 function isLikelyFakeGmail(email) {
-    return /^[^@\s]{1,64}@(gmail|googlemail)\.[a-z]{2,}$/i.test(email)
-        && !isGmailAddress(email);
+    return /^[^@\s]{1,64}@(gmail|googlemail)\.[a-z]{2,}$/i.test(email) && !isGmailAddress(email);
 }
-
+function isAllowedEmailDomain(email) {
+    const d = (email.split('@')[1] || '').toLowerCase();
+    return /^(gmail\.com|googlemail\.com)$/.test(d)
+        || /\.edu\.ph$/.test(d)
+        || /\.edu$/.test(d)
+        || /\.ac\.ph$/.test(d)
+        || /\.ac\.[a-z]{2,}$/.test(d)
+        || /\.sch\.[a-z]{2,}$/.test(d)
+        || /\.k12\.[a-z]{2,}$/.test(d);
+}
+function getEmailDomainStatus(email) {
+    const d = (email.split('@')[1] || '').toLowerCase();
+    if (/^(gmail\.com|googlemail\.com)$/.test(d))  return { msg: 'Gmail address — accepted.', color: '#22c55e' };
+    if (/\.edu\.ph$/.test(d))                       return { msg: 'School email (edu.ph) — accepted.', color: '#22c55e' };
+    if (/\.edu$/.test(d))                           return { msg: 'Educational email — accepted.', color: '#22c55e' };
+    if (/\.ac\.ph$/.test(d))                        return { msg: 'Academic email (ac.ph) — accepted.', color: '#22c55e' };
+    if (/\.ac\.[a-z]{2,}$/.test(d))                 return { msg: 'Academic email — accepted.', color: '#22c55e' };
+    if (/\.sch\.[a-z]{2,}$/.test(d))                return { msg: 'School email — accepted.', color: '#22c55e' };
+    if (/\.k12\.[a-z]{2,}$/.test(d))                return { msg: 'School email — accepted.', color: '#22c55e' };
+    return { msg: 'Only Gmail or school/institutional emails are allowed (e.g. edu.ph, ac.ph).', color: '#ef4444' };
+}
 function updateSignupEmailStatus() {
     const statusEl = document.getElementById('signup-email-status');
     const email = document.getElementById('signup-email')?.value.trim();
-    if (!statusEl || !email) {
-        if (statusEl) statusEl.textContent = 'Enter your Gmail or school email address.';
-        return;
-    }
-
-    if (!isValidEmail(email)) {
-        statusEl.textContent = 'Enter a valid email address.';
-        statusEl.style.color = '#ef4444';
-        return;
-    }
-    if (isLikelyFakeGmail(email)) {
-        statusEl.textContent = 'This looks like a fake Gmail domain. Use @gmail.com.';
-        statusEl.style.color = '#ef4444';
-        return;
-    }
-    if (isGmailAddress(email)) {
-        statusEl.textContent = 'Valid Gmail address — good to go.';
-        statusEl.style.color = '#22c55e';
-        return;
-    }
-    statusEl.textContent = 'Non-Gmail address detected. This is allowed, but only real Gmail domains are recognized as Gmail.';
-    statusEl.style.color = '#6b7280';
+    if (!statusEl) return;
+    if (!email) { statusEl.textContent = 'Use Gmail or a school email (e.g. edu.ph, ac.ph).'; statusEl.style.color = '#6b7280'; return; }
+    if (!isValidEmail(email)) { statusEl.textContent = 'Enter a valid email address.'; statusEl.style.color = '#ef4444'; return; }
+    if (isLikelyFakeGmail(email)) { statusEl.textContent = 'Fake Gmail domain detected. Use @gmail.com.'; statusEl.style.color = '#ef4444'; return; }
+    const { msg, color } = getEmailDomainStatus(email);
+    statusEl.textContent = msg;
+    statusEl.style.color = color;
 }
 
 // ── PASSWORD STRENGTH ─────────────────────────────────────────
@@ -303,8 +306,10 @@ async function sendOTP(type) {
         else if (!isRealNamePart(lastName))  { setError('signup-last-name',  'Use a real last name only.');         valid=false; }
         if (!employeeId)                    { setError('signup-employeeid', 'Employee ID is required.');     valid=false; }
         else if (employeeId.length < 5)         { setError('signup-employeeid', 'Employee ID must be at least 5 characters.'); valid=false; }
-        if (!email)                         { setError('signup-email',      'Email is required.');           valid=false; }
-        else if (!isValidEmail(email))      { setError('signup-email',      'Enter a valid email.');         valid=false; }
+        if (!email)                         { setError('signup-email',      'Email is required.');                                          valid=false; }
+        else if (!isValidEmail(email))      { setError('signup-email',      'Enter a valid email.');                                        valid=false; }
+        else if (isLikelyFakeGmail(email))  { setError('signup-email',      'Fake Gmail domain. Use @gmail.com.');                          valid=false; }
+        else if (!isAllowedEmailDomain(email)) { setError('signup-email',   'Only Gmail or school emails allowed (e.g. edu.ph, ac.ph).'); valid=false; }
         if (!contact)                       { setError('signup-contact',    'Contact number is required.');  valid=false; }
         else if (!/^[0-9+\-\s()]{7,20}$/.test(contact)) { setError('signup-contact', 'Enter a valid contact number.'); valid=false; }
         if (!position)                      { setError('signup-position',   'Please select your position.'); valid=false; }

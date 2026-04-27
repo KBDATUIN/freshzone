@@ -44,8 +44,15 @@ function isLikelyFakeGmail(email) {
         && !isGmailAddress(email);
 }
 
-function getEmailDomain(email) {
-    return String(email || '').split('@')[1]?.toLowerCase() || '';
+function isAllowedEmailDomain(email) {
+    const d = (email.split('@')[1] || '').toLowerCase();
+    return /^(gmail\.com|googlemail\.com)$/.test(d)
+        || /\.edu\.ph$/.test(d)
+        || /\.edu$/.test(d)
+        || /\.ac\.ph$/.test(d)
+        || /\.ac\.[a-z]{2,}$/.test(d)
+        || /\.sch\.[a-z]{2,}$/.test(d)
+        || /\.k12\.[a-z]{2,}$/.test(d);
 }
 
 function isValidPassword(pw) {
@@ -196,6 +203,8 @@ router.post('/send-otp', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Password must be at least 8 characters with at least one letter and one number.' });
         if (isLikelyFakeGmail(email))
             return res.status(400).json({ success: false, message: 'Please enter a real Gmail address ending in @gmail.com.' });
+        if (!isAllowedEmailDomain(email))
+            return res.status(400).json({ success: false, message: 'Only Gmail or school/institutional emails are allowed (e.g. edu.ph, ac.ph).' });
 
         // Check if email already registered
         const [existing] = await db.query('SELECT id FROM accounts WHERE (email = ? OR employee_id = ?) AND is_active = 1', [email, employeeId]);
