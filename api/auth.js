@@ -299,6 +299,13 @@ router.post('/verify-otp', async (req, res) => {
         if (stored.otp_type === 'signup') {
             const parsedPayload = stored.payload_json ? JSON.parse(stored.payload_json) : {};
             const { firstName, lastName, employeeId, contact, position, password } = parsedPayload;
+
+            // Guard: payload must be complete — if any required field is missing the OTP store is corrupt
+            if (!firstName || !lastName || !employeeId || !position || !password) {
+                logger.error({ parsedPayload }, '[verify-otp] Corrupt payload_json — missing required fields');
+                return res.status(400).json({ success: false, message: 'Registration data is incomplete. Please start over and request a new OTP.' });
+            }
+
             const fullName = `${firstName} ${lastName}`;
 
             // Final duplicate check before insert
@@ -327,10 +334,12 @@ router.post('/verify-otp', async (req, res) => {
         }
 
     } catch (err) {
-        logger.error({ err }, '[verify-otp] DB error');
+        logger.error({ err, message: err.message, code: err.code, sql: err.sql }, '[verify-otp] DB error');
         let message = 'Server error.';
         if (err.code === 'ER_DUP_ENTRY') message = 'An account with this email or employee ID already exists.';
-        res.status(500).json({ success: false, message });
+        if (err.code === 'ER_NO_SUCH_TABLE') message = 'Database configuration error. Contact support.';
+        if (err.code === 'ER_BAD_NULL_ERROR') message = 'Missing required field: ' + (err.message || '');
+        res.status(500).json({ success: false, message, debug: process.env.NODE_ENV !== 'production' ? err.message : undefined });
     }
 });
 
