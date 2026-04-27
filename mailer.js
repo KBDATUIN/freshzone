@@ -82,7 +82,7 @@ async function sendOTPEmail(to, name, otp, type) {
         <div style="text-align:center;margin:28px 0;">
           <span style="font-size:36px;font-weight:700;letter-spacing:10px;color:#00b4d8;background:#e5f6ff;padding:16px 24px;border-radius:12px;">${otp}</span>
         </div>
-        <p style="color:#aaa;font-size:13px;text-align:center;">Expires in <strong>60 seconds</strong>. Do not share.</p>
+        <p style="color:#aaa;font-size:13px;text-align:center;">Expires in <strong>10 minutes</strong>. Do not share this code.</p>
       </div>
     </div>
     `;
