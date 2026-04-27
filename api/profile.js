@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  api/profile.js — View & update user profile, change password
 // ============================================================
 const express = require('express');
@@ -101,20 +101,32 @@ router.post('/change-password', authMiddleware, async (req, res) => {
     }
 });
 
-// ── DELETE /api/profile ───────────────────────────────────
-// SOFT DELETE — marks account as inactive with 30-day recovery window
+// -- DELETE /api/profile -------------------------------------------
+// HARD DELETE -- permanently removes the account and all associated data
 router.delete('/', authMiddleware, async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT email FROM accounts WHERE id = ? AND is_active = 1', [req.user.id]);
+        const [rows] = await db.query('SELECT id, email FROM accounts WHERE id = ?', [req.user.id]);
         if (!rows.length)
             return res.status(404).json({ success: false, message: 'Account not found.' });
 
-        await db.query(
-            `UPDATE accounts SET is_active = 0, deleted_at = NOW(), deletion_reason = 'user_request' WHERE id = ?`,
-            [req.user.id]
-        );
+        const userId = rows[0].id;
+        const email  = rows[0].email;
 
-        res.json({ success: true, message: 'Account deactivated. You have 30 days to recover it by contacting support.' });
+        // Remove all associated data before deleting the account row
+        await db.query('DELETE FROM push_subscriptions    WHERE account_id = ?',     [userId]);
+        await db.query('DELETE FROM device_login_alerts   WHERE account_id = ?',     [userId]);
+        await db.query('DELETE FROM known_devices          WHERE account_id = ?',     [userId]);
+        await db.query('DELETE FROM push_notifications    WHERE recipient_email = ?', [email]);
+        await db.query('DELETE FROM login_attempts         WHERE email = ?',           [email]);
+        await db.query('DELETE FROM system_logs            WHERE account_id = ?',     [userId]);
+        await db.query('DELETE FROM contact_tickets        WHERE account_id = ?',     [userId]);
+        await db.query('DELETE FROM auth_otp_store         WHERE email = ?',           [email]);
+        // Anonymise detection events -- keep the safety record, remove the personal link
+        await db.query('UPDATE detection_events SET acknowledged_by = NULL WHERE acknowledged_by = ?', [userId]);
+        // Hard delete the account row
+        await db.query('DELETE FROM accounts WHERE id = ?', [userId]);
+
+        res.json({ success: true, message: 'Account permanently deleted.' });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error.' });
     }

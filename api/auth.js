@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  api/auth.js — Login, Register, OTP, Password Reset
 // ============================================================
 const express  = require('express');
@@ -196,7 +196,7 @@ router.post('/send-otp', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Please enter a real Gmail address ending in @gmail.com.' });
 
         // Check if email already registered
-        const [existing] = await db.query('SELECT id FROM accounts WHERE email = ? OR employee_id = ?', [email, employeeId]);
+        const [existing] = await db.query('SELECT id FROM accounts WHERE (email = ? OR employee_id = ?) AND is_active = 1', [email, employeeId]);
         if (existing.length)
             return res.status(409).json({ success: false, message: 'An account with this email or employee ID already exists.' });
     }
@@ -300,7 +300,7 @@ router.post('/verify-otp', async (req, res) => {
             const fullName = `${firstName} ${lastName}`;
 
             // Final duplicate check before insert
-            const [dup] = await db.query('SELECT id FROM accounts WHERE email = ? OR employee_id = ?', [email, employeeId]);
+            const [dup] = await db.query('SELECT id FROM accounts WHERE (email = ? OR employee_id = ?) AND is_active = 1', [email, employeeId]);
             if (dup.length)
                 return res.status(409).json({ success: false, message: 'Account already exists.' });
 
