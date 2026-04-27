@@ -1,4 +1,4 @@
-/* ================================================================
+﻿/* ================================================================
    FreshZone — Responsive Fix Layer
    Fixes: horizontal scroll, mobile table, overflow issues
    Applies to: all pages — loaded LAST after style-v3.css
@@ -763,315 +763,17 @@ footer {
     }
 }
 
-/* ── Mobile dashboard fixes ───────────────────────── */
-@media (max-width: 768px) {
-  /* Hero section */
-  .dashboard-masthead__content h1 {
-    font-size: clamp(1.4rem, 5vw, 2rem);
-    line-height: 1.3;
-  }
-  .dashboard-hero-tagline {
-    font-size: 0.9rem;
-    line-height: 1.5;
-  }
-  .flex-btn-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-  }
-  .flex-btn-container .btn,
-  .flex-btn-container a {
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-  }
-
-  /* Sensor cards grid */
-  #sensor-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1rem !important;
-    padding: 0 1rem !important;
-  }
-  .location-card {
-    width: 100% !important;
-    min-width: unset !important;
-    max-width: 100% !important;
-    box-sizing: border-box;
-  }
-
-  /* AQ guide section */
-  .aq-guide-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .live-sensor-strip {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
 
 /* ================================================================
-   GLOBAL OVERFLOW FIX — prevents any element from causing
-   horizontal scroll on mobile
-   ================================================================ */
-html, body {
-  overflow-x: hidden;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-/* ================================================================
-   NAV — prevent nav from overflowing on small screens
-   ================================================================ */
-.nav-container {
-  max-width: 100%;
-  overflow: hidden;
-}
-
-/* ================================================================
-   DASHBOARD MASTHEAD — fix hero card overflow and padding
-   ================================================================ */
-.fz-masthead,
-.dashboard-masthead,
-[class*="masthead"] {
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.dashboard-masthead__content {
-  max-width: 100%;
-  overflow: hidden;
-  padding-right: 0;
-}
-
-/* ================================================================
-   MOBILE — all breakpoints
-   ================================================================ */
-@media (max-width: 900px) {
-  /* Contain the overall page wrapper */
-  .container,
-  [class*="container"],
-  main,
-  section {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-
-  /* Hero card */
-  .fz-masthead,
-  .dashboard-masthead,
-  [class*="masthead"] {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 1rem !important;
-  }
-
-  /* Hero heading — clamp so it never overflows */
-  .dashboard-masthead__content h1,
-  .fz-masthead h1,
-  [class*="masthead"] h1 {
-    font-size: clamp(1.3rem, 5.5vw, 2rem) !important;
-    line-height: 1.25 !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-    white-space: normal !important;
-  }
-
-  /* Tagline */
-  .dashboard-hero-tagline {
-    font-size: clamp(0.8rem, 3.5vw, 1rem) !important;
-    line-height: 1.5 !important;
-    word-break: break-word !important;
-  }
-
-  /* Session pill — "Logged in as..." */
-  .hero-session,
-  [class*="hero-session"] {
-    max-width: 100% !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
-    text-overflow: ellipsis !important;
-  }
-
-  /* CTA button */
-  .flex-btn-container {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 0.5rem !important;
-  }
-
-  .flex-btn-container a,
-  .flex-btn-container .btn,
-  .flex-btn-container button {
-    width: 100% !important;
-    text-align: center !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Sensor cards grid */
-  #sensor-grid,
-  .sensor-grid,
-  [class*="sensor-grid"] {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 1rem !important;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .location-card {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Last updated bar */
-  #last-updated-bar,
-  .last-updated-bar {
-    font-size: 0.75rem !important;
-    text-align: center !important;
-    padding: 0 1rem !important;
-    word-break: break-word !important;
-  }
-
-  /* AQ guide section */
-  .aq-guide-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .live-sensor-strip {
-    flex-direction: column !important;
-    gap: 0.75rem !important;
-  }
-
-  .aqi-bands {
-    grid-template-columns: 1fr 1fr !important;
-  }
-}
-
-@media (max-width: 480px) {
-  /* Extra small phones */
-  .container,
-  [class*="container"],
-  main,
-  section {
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-  }
-
-  .fz-masthead,
-  .dashboard-masthead,
-  [class*="masthead"] {
-    padding: 1.25rem !important;
-    border-radius: 0.75rem !important;
-  }
-
-  .aqi-bands {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ================================================================
-   TARGETED MOBILE FIXES — fixes 1-8
+   DASHBOARD MOBILE & DESKTOP â€” single authoritative block
+   Replaces all previously appended conflicting mobile rules.
    ================================================================ */
 
-/* Fix 1 — Stop eyebrow text from wrapping */
-.dashboard-hero-eyebrow {
-  white-space: nowrap;
-  font-size: clamp(0.55rem, 2vw, 0.72rem);
-  letter-spacing: 0.06em;
-}
+/* Global: prevent horizontal overflow */
+html, body { overflow-x: hidden; max-width: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
 
-/* Fix 2 — Keep LIVE badge inline with title */
-.live-badge {
-  display: inline-flex !important;
-  align-items: center !important;
-  white-space: nowrap !important;
-  flex-shrink: 0 !important;
-}
-
-/* Fix 3 — Show full "Logged in as..." text on mobile */
-.hero-session,
-[class*="hero-session"] {
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
-}
-.hero-session-text,
-#hero-session-text {
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
-}
-
-/* Fix 4 — Remove excess empty space at bottom of hero card */
-.fz-masthead,
-.dashboard-masthead,
-[class*="masthead"] {
-  padding-bottom: 1.25rem !important;
-}
-
-/* Fix 5 — Prevent horizontal overflow globally */
-html, body {
-  overflow-x: hidden;
-  max-width: 100%;
-}
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-/* Fix 6-8 — Mobile layout corrections */
-@media (max-width: 768px) {
-  /* Fix 6 — Scale hero title on mobile */
-  .fz-masthead h1,
-  .dashboard-masthead h1,
-  [class*="masthead"] h1 {
-    font-size: clamp(1.2rem, 5vw, 1.6rem) !important;
-    line-height: 1.2 !important;
-  }
-
-  /* Fix 7 — Constrain hero card width and padding */
-  .fz-masthead,
-  .dashboard-masthead,
-  [class*="masthead"] {
-    width: calc(100% - 2rem) !important;
-    margin: 0 1rem !important;
-    padding: 1.25rem !important;
-    border-radius: 1.25rem !important;
-  }
-
-  /* Fix 8 — Stack sensor cards properly */
-  #sensor-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1rem !important;
-    padding: 0 1rem !important;
-    width: 100% !important;
-  }
-  .location-card {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-}
-
-/* ================================================================
-   FINAL MOBILE OPTIMIZATION — appended last, highest specificity
-   Fixes: sensor-grid columns, h1+badge inline, button wrapping,
-   hero padding, and all mobile alignment issues
-   ================================================================ */
-
-/* ── SENSOR GRID — responsive columns without inline style ───── */
+/* Desktop: sensor grid responsive columns */
 #sensor-grid {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
@@ -1080,20 +782,16 @@ html, body {
     box-sizing: border-box !important;
 }
 
-/* ── H1 + LIVE BADGE — keep badge on same line as title ───────── */
+/* Desktop: h1 flex so LIVE badge stays on same line */
+.dashboard-masthead h1,
 h1:has(.live-badge) {
     display: flex !important;
     align-items: center !important;
     gap: 0.5rem !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
 }
-/* Fallback for browsers that don't support :has() */
-.dashboard-masthead h1 {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    flex-wrap: wrap !important;
-}
+
+/* LIVE badge: never shrink or wrap */
 .live-badge {
     flex-shrink: 0 !important;
     white-space: nowrap !important;
@@ -1101,68 +799,90 @@ h1:has(.live-badge) {
     align-items: center !important;
 }
 
-/* ── HERO BUTTON — never wrap text ───────────────────────────── */
+/* Button: never wrap text */
 .btn-hero-history {
     white-space: nowrap !important;
-    text-align: center !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 0.35rem !important;
 }
 
-/* ================================================================
-   MOBILE BREAKPOINTS — clean single source of truth
-   ================================================================ */
+/* Eyebrow: single line always */
+.dashboard-hero-eyebrow {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Session text: always show full name */
+#hero-session-text {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    min-width: 0;
+}
+
+/* â”€â”€ TABLET (max 900px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (max-width: 900px) {
+    .nav-links { display: none !important; }
+}
+
+/* â”€â”€ MOBILE (max 767px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 767px) {
-    /* Hero card — compact, no excess bottom padding */
-    .hero.fz-masthead.dashboard-masthead,
-    .fz-masthead.dashboard-masthead {
-        padding: 1.5rem 1.25rem 1.25rem !important;
+    /* Container: tight padding, no overflow */
+    .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Hero card: compact, full width, centered */
+    .hero.fz-masthead.dashboard-masthead {
+        padding: 1.4rem 1.1rem 1.2rem !important;
         margin: 0 !important;
         width: 100% !important;
-        border-radius: 1.25rem !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
         text-align: center !important;
-    }
-
-    /* Eyebrow — single line, never wrap */
-    .dashboard-hero-eyebrow {
-        white-space: nowrap !important;
-        font-size: clamp(0.6rem, 2.5vw, 0.75rem) !important;
-        letter-spacing: 0.07em !important;
         overflow: hidden !important;
-        text-overflow: ellipsis !important;
     }
 
-    /* H1 — scale to fit, flex so badge stays inline */
+    /* Eyebrow: scale down, single line */
+    .dashboard-hero-eyebrow {
+        font-size: clamp(0.58rem, 2.2vw, 0.68rem) !important;
+        letter-spacing: 0.1em !important;
+    }
+
+    /* H1: scale to fit, keep badge inline */
     .dashboard-masthead h1 {
-        font-size: clamp(1.2rem, 5.5vw, 1.75rem) !important;
+        font-size: clamp(1.05rem, 4.8vw, 1.45rem) !important;
         line-height: 1.2 !important;
         justify-content: center !important;
         flex-wrap: nowrap !important;
-        gap: 0.4rem !important;
+        gap: 0.35rem !important;
     }
 
-    /* Tagline — readable on small screens */
+    /* Tagline */
     .dashboard-hero-tagline {
-        font-size: clamp(0.78rem, 3.2vw, 0.95rem) !important;
+        font-size: clamp(0.78rem, 3vw, 0.92rem) !important;
         line-height: 1.5 !important;
+        margin-top: 0.35rem !important;
     }
 
-    /* Session pill — show full text, centered */
+    /* Session pill: centered, full width, no truncation */
     .dashboard-hero-session {
         justify-content: center !important;
         max-width: 100% !important;
         width: auto !important;
-    }
-    #hero-session-text {
-        white-space: normal !important;
+        font-size: 0.78rem !important;
+        padding: 0.4rem 0.75rem !important;
+        margin: 0.6rem 0 0.8rem !important;
+        flex-wrap: wrap !important;
         overflow: visible !important;
-        text-overflow: unset !important;
     }
 
-    /* Button — full width, single line */
+    /* Button: full width, single line */
     .flex-btn-container {
         width: 100% !important;
         display: flex !important;
@@ -1172,26 +892,30 @@ h1:has(.live-badge) {
     .btn-hero-history {
         width: 100% !important;
         justify-content: center !important;
-        padding: 0.85rem 1rem !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.88rem !important;
     }
 
-    /* Hide the decorative rings to save space */
+    /* Hide decorative rings on mobile */
     .dashboard-masthead__viz {
         display: none !important;
     }
 
-    /* Grid: single column on mobile */
+    /* Sensor grid: single column */
     #sensor-grid {
         grid-template-columns: 1fr !important;
-        gap: 1rem !important;
+        gap: 0.85rem !important;
         padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
     }
 
-    /* Cards: full width, no min-width fighting */
+    /* Cards: full width */
     .location-card {
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     /* Last updated bar */
@@ -1200,16 +924,35 @@ h1:has(.live-badge) {
         text-align: center !important;
         padding: 0 0.5rem !important;
         line-height: 1.5 !important;
+        word-break: break-word !important;
+    }
+
+    /* AQ guide */
+    .aq-guide-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .live-sensor-strip {
+        grid-template-columns: 1fr !important;
+    }
+    .aqi-bands {
+        grid-template-columns: 1fr 1fr !important;
     }
 }
 
+/* â”€â”€ SMALL PHONES (max 420px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 420px) {
     .dashboard-masthead h1 {
-        font-size: clamp(1.1rem, 5vw, 1.4rem) !important;
+        font-size: clamp(0.95rem, 4.5vw, 1.2rem) !important;
         flex-wrap: wrap !important;
         justify-content: center !important;
     }
     .dashboard-hero-eyebrow {
-        font-size: 0.6rem !important;
+        font-size: 0.58rem !important;
+    }
+    .hero.fz-masthead.dashboard-masthead {
+        padding: 1.1rem 0.9rem 1rem !important;
+    }
+    .aqi-bands {
+        grid-template-columns: 1fr !important;
     }
 }
