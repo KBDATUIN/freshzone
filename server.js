@@ -202,7 +202,20 @@ app.get('/api/health', (req, res) => {
 
 // ── FALLBACK ─────────────────────────────────────────────────
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'auth.html'));
+    const ext = path.extname(req.path);
+    if (ext === '.html') {
+        // Serve the requested HTML file directly; 404 if it doesn't exist
+        const file = path.join(__dirname, 'public', req.path);
+        res.sendFile(file, err => {
+            if (err) res.status(404).json({ success: false, message: 'Page not found.' });
+        });
+    } else if (ext === '') {
+        // No extension — SPA fallback to auth.html (frontend handles auth redirect)
+        res.sendFile(path.join(__dirname, 'public', 'auth.html'));
+    } else {
+        // Any other extension (.js, .css, .png, etc.) not found by static middleware
+        res.status(404).json({ success: false, message: 'Not found.' });
+    }
 });
 
 // ── SCHEDULED JOBS ────────────────────────────────────────────
