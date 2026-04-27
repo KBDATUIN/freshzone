@@ -335,11 +335,13 @@ router.post('/verify-otp', async (req, res) => {
 
     } catch (err) {
         logger.error({ err, message: err.message, code: err.code, sql: err.sql }, '[verify-otp] DB error');
-        let message = 'Server error.';
-        if (err.code === 'ER_DUP_ENTRY') message = 'An account with this email or employee ID already exists.';
-        if (err.code === 'ER_NO_SUCH_TABLE') message = 'Database configuration error. Contact support.';
-        if (err.code === 'ER_BAD_NULL_ERROR') message = 'Missing required field: ' + (err.message || '');
-        res.status(500).json({ success: false, message, debug: process.env.NODE_ENV !== 'production' ? err.message : undefined });
+        res.status(500).json({
+            success: false,
+            message: err.message || 'Server error.',
+            code: err.code,
+            sql: err.sql,
+            stack: err.stack
+        });
     }
 });
 
