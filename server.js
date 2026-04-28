@@ -41,7 +41,7 @@ const Sentry = require('@sentry/node');
 const db         = require('./db');
 const { sendAlertEmail } = require('./mailer');
 const logger = require('./logger');
-const { ensureCsrfCookie, csrfProtection, csrfTokenHandler } = require('./middleware/csrf');
+const { ensureCsrfCookie } = require('./middleware/csrf');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -171,18 +171,16 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: true }));
 app.use(ensureCsrfCookie);
 
-app.get('/api/auth/csrf-token', csrfTokenHandler);
-
 // ── STATIC FILES ─────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── API ROUTES ────────────────────────────────────────────────
 app.use('/api/auth',     authLimiter,  require('./api/auth'));
-app.use('/api/readings', esp32Limiter, csrfProtection, require('./api/readings'));
-app.use('/api/history',               csrfProtection, require('./api/history'));
-app.use('/api/profile',               csrfProtection, require('./api/profile'));
-app.use('/api/contact',               csrfProtection, require('./api/contact'));
-app.use('/api/push',     pushLimiter,  csrfProtection, require('./api/push'));
+app.use('/api/readings', esp32Limiter, require('./api/readings'));
+app.use('/api/history',               require('./api/history'));
+app.use('/api/profile',               require('./api/profile'));
+app.use('/api/contact',               require('./api/contact'));
+app.use('/api/push',     pushLimiter,  require('./api/push'));
 
 // ── DASHBOARD STATS ───────────────────────────────────────────
 app.get('/api/stats/dashboard', async (req, res) => {

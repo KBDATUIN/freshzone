@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>/* Anti-flash */html{background:white;}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
+    <script>(function(){var t=localStorage.getItem('fz-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshZone | History</title>
+    <meta name="description" content="FreshZone — complete archive of campus vape aerosol detection events.">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-v2.css">
+    <link rel="stylesheet" href="style-v3.css">
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#004e7a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FreshZone">
+    <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+    <link rel="stylesheet" href="/pwa.css">
+    <link rel="stylesheet" href="style-fixes.css">
+    <style>
+        /* ── KEYFRAMES ─────────────────────────────────────── */
+        @keyframes rowSlideIn {
+            from { opacity:0; transform:translateX(-18px); }
+            to   { opacity:1; transform:translateX(0); }
+        }
+        @keyframes tagPulse {
+            0%,100% { box-shadow:0 0 0 0 rgba(220,53,69,0.35); }
+            50%     { box-shadow:0 0 0 7px rgba(220,53,69,0); }
+        }
+        @keyframes countPop {
+            from { transform:translateY(8px); opacity:0; }
+            to   { transform:translateY(0);   opacity:1; }
+        }
+
+        /* ── STATS GRID ─────────────────────────────────────── */
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:2rem; }
+        .stat-box h3 {
+            font-size:2rem; display:inline-block;
+            transition:transform 0.4s cubic-bezier(0.4,0,0.2,1), color 0.3s;
+        }
+        .stat-box:hover h3 { transform:scale(1.05); }
+        .stat-box h3.pop { animation:countPop 0.35s cubic-bezier(0.4,0,0.2,1) both; }
+        .stats-grid .stat-box:nth-child(1) { animation-delay:0.10s; }
+        .stats-grid .stat-box:nth-child(2) { animation-delay:0.22s; }
+        .stats-grid .stat-box:nth-child(3) { animation-delay:0.34s; }
+
+        /* ── TABLE ──────────────────────────────────────────── */
+        table { width:100%; border-collapse:collapse; }
+        th,td { padding:1.1rem 1.2rem; text-align:left; border-bottom:1px solid #eee; font-size:0.95rem; }
+        th { background:#f8f9fa; color:var(--gray); font-size:0.85rem; font-weight:600; }
+        tbody tr { transition:background 0.22s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1); }
+        tbody tr:nth-child(even) td { background: rgba(0,180,216,0.03); }
+        th { cursor:pointer; user-select:none; position:relative; }
+        th:hover { background:#edf2f7 !important; color:var(--primary) !important; }
+        th.sort-asc::after  { content:' ↑'; font-size:0.75rem; color:var(--secondary); }
+        th.sort-desc::after { content:' ↓'; font-size:0.75rem; color:var(--secondary); }
+        [data-theme='dark'] th:hover { background:#0d2035 !important; }
+        [data-theme='dark'] tbody tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+        tbody tr:hover td { background:rgba(0,180,216,0.06); }
+        tbody tr:hover    { transform:translateX(5px); }
+        tbody tr.row-animate { opacity:0; animation:rowSlideIn 0.42s cubic-bezier(0.4,0,0.2,1) forwards; }
+        .tag-danger { animation:tagPulse 3s ease-in-out infinite; }
+
+        /* ── FILTER BAR ─────────────────────────────────────── */
+        .filter-bar { display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.5rem; }
+        .filter-bar label { font-size:0.78rem; margin-top:0; margin-bottom:0.2rem; font-weight:600; color:var(--gray); letter-spacing:0.04em; text-transform:uppercase; }
+        .filter-bar input,
+        .filter-bar select { font-size:0.85rem; padding:0.5rem 0.75rem; margin-top:0; border-radius:8px; }
+        .filter-bar button { width:auto; padding:0.52rem 1.2rem; margin-top:0; font-size:0.82rem; border-radius:8px; }
+        .filter-group { display:flex; flex-direction:column; }
+        .export-btn { width:auto; padding:0.52rem 1.1rem; margin-top:0; font-size:0.82rem; border-radius:8px; background:var(--success) !important; }
+
+        /* ── HERO (surface from global .fz-masthead) ────────── */
+        .page-hero {
+            display:flex; flex-direction:column; align-items:center;
+            justify-content:center; padding:2rem;
+            margin-bottom:2rem; text-align:center;
+        }
+        .page-hero h1 { margin-bottom:0.5rem; }
+        .page-hero p  { margin-bottom:1rem; font-size:1rem; color:#555; }
+        .page-hero img { width:160px; height:auto; margin-top:0.5rem; animation:float 6s ease-in-out infinite; }
+        [data-theme="dark"] .page-hero p { color:#a0b8c8; }
+
+        /* ── EMPTY STATE ─────────────────────────────────────── */
+        .empty-row td { text-align:center; color:var(--gray); padding:2.5rem; font-style:italic; }
+
+        /* ── PUSH NOTIFICATION TOGGLE ──────────────────────── */
+        .push-toggle-wrap { display:inline-flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; user-select:none; margin-left:4px; min-height:38px; }
+        .push-toggle-icon { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; line-height:0; margin:0; flex-shrink:0; color:var(--gray); }
+        .push-toggle-icon svg { width:18px; height:18px; display:block; }
+        .push-toggle-switch { position:relative; width:44px; height:24px; background:#ccc; border-radius:12px; cursor:pointer; transition:background 0.25s; outline:none; flex-shrink:0; }
+        .push-toggle-switch:focus-visible { box-shadow:0 0 0 3px rgba(0,200,150,0.4); }
+        .push-toggle-switch.active { background:var(--secondary,#00c896); }
+        .push-toggle-knob { position:absolute; top:3px; left:3px; width:18px; height:18px; background:white; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.25); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); will-change:transform; }
+        .push-toggle-switch.active .push-toggle-knob { transform:translateX(20px); }
+        .push-toggle-label { display:none !important; }
+        @media (max-width: 640px) {
+            .push-toggle-wrap { gap:6px; display: none; }
+            .push-toggle-icon { width:16px; height:16px; }
+            .push-toggle-icon svg { width:16px; height:16px; }
+        }
+
+        /* ── HISTORY PAGE READABILITY TWEAKS ───────────────────────── */
+        .page-hero {
+            background: rgba(240,252,255,0.98) !important;
+            border: 1px solid rgba(0,120,180,0.18) !important;
+            border-radius: 20px !important;
+            padding: 1.75rem 1.5rem !important;
+            box-shadow: 0 8px 32px rgba(0,60,110,0.14) !important;
+        }
+        .page-hero h1 { color: #002840 !important; font-weight: 800 !important; font-size: 1.55rem !important; letter-spacing: -0.025em !important; }
+        .page-hero p { color: #2e5a72 !important; font-size: 0.95rem !important; max-width: 620px !important; margin-top: 0.3rem !important; }
+        [data-theme="dark"] .page-hero { background: rgba(10,20,36,0.98) !important; border-color: rgba(34,211,238,0.12) !important; }
+        [data-theme="dark"] .page-hero h1 { color: #e2f0f8 !important; }
+        [data-theme="dark"] .page-hero p { color: #94a3b8 !important; }
+        .stats-grid .stat-box { background: rgba(255,255,255,0.96); }
+        .aq-guide-head h3 { color: #03314c; }
+        .aq-guide-chip { background: rgba(0,180,216,0.14); color: #005c81; border-radius: 999px; padding: 0.55rem 0.95rem; font-weight: 700; letter-spacing: 0.02em; }
+        .aq-card { background: rgba(255,255,255,0.96); border: 1px solid rgba(0,120,170,0.14); border-radius: 18px; padding: 1.2rem; color: #123248; box-shadow: 0 16px 38px rgba(0,68,100,0.08); }
+        .aq-card h4 { color: #003855; margin-bottom: 0.5rem; }
+        .aq-card p { color: #4d6e80; line-height: 1.65; }
+        .aqi-bands { gap: 0.9rem; }
+        .aqi-band { color: #0f3147; background: rgba(227,247,255,0.95); border: 1px solid rgba(0,120,180,0.14); padding: 0.95rem 1rem; border-radius: 16px; box-shadow: 0 10px 28px rgba(0,70,110,0.08); }
+        .aqi-band span { display: block; margin-top: 0.45rem; font-weight: 700; color: #0b3a53; }
+
+        /* ── FILTER BAR MOBILE FIX ───────────────────── */
+        .filter-inputs-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            flex: 1;
+            width: 100%;
+        }
+        .filter-inputs-row .filter-group {
+            flex: 1;
+            min-width: 130px;
+        }
+        /* ── FILTER ACTIONS ─────────────────────────────────── */
+        .filter-actions-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            align-items: stretch;
+            width: 100%;
+        }
+        .filter-action-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.65rem 1rem !important;
+            margin: 0 !important;
+            font-size: 0.85rem !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+            cursor: pointer;
+            border: none;
+            color: white;
+            box-shadow: none !important;
+            text-transform: none !important;
+            width: auto !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 7px !important;
+            transition: filter 0.15s, transform 0.1s !important;
+            letter-spacing: 0.01em;
+        }
+        .filter-action-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .filter-action-btn:active { transform: translateY(0); }
+        .filter-action-btn::after { display: none !important; }
+
+        .filter-clear-btn  { background: #64748b !important; }
+        .filter-export-btn { background: #16a34a !important; }
+        .filter-danger-btn {
+            background: #e74c3c !important;
+            /* visually separated — always full width */
+            flex: none !important;
+            width: 100% !important;
+            min-width: 100% !important;
+        }
+        .filter-clear-btn:hover  { background: #475569 !important; }
+        .filter-export-btn:hover { background: #15803d !important; }
+        .filter-danger-btn:hover { background: #c0392b !important; }
+
+        /* Danger section with divider */
+        .filter-danger-section {
+            width: 100%;
+            padding-top: 0.75rem;
+            margin-top: 0.25rem;
+            border-top: 1px solid rgba(231,76,60,0.2);
+        }
+        .filter-danger-label {
+            font-size: 0.7rem;
+            color: #e74c3c;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Inline clear button inside input wrap */
+        .filter-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .filter-input-wrap input,
+        .filter-input-wrap select {
+            width: 100%;
+            padding-right: 2.25rem;
+        }
+        /* ── X CLEAR BUTTON — perfect circle, all screen sizes ── */
+        .filter-inline-clear {
+            /* Position */
+            position: absolute !important;
+            right: 8px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            /* Force exact square — border-radius:50% then makes it a circle */
+            width: 22px !important;
+            height: 22px !important;
+            min-width: 22px !important;
+            max-width: 22px !important;
+            min-height: 22px !important;
+            max-height: 22px !important;
+            /* Appearance */
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 50% !important;
+            background: rgba(92,110,128,0.78) !important;
+            color: white !important;
+            /* Layout inside */
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            flex-grow: 0 !important;
+            /* Misc */
+            cursor: pointer !important;
+            box-shadow: none !important;
+            text-transform: none !important;
+            z-index: 10 !important;
+            overflow: hidden !important;
+            line-height: 22px !important;
+            font-size: 0 !important;
+            transition: background 0.15s ease !important;
+            /* Prevent any inherited styles from stretching it */
+            outline: none !important;
+            letter-spacing: 0 !important;
+            vertical-align: unset !important;
+        }
+        .filter-inline-clear:hover { background: rgba(51,65,85,0.95) !important; }
+        .filter-inline-clear:active { transform: translateY(-50%) scale(0.88) !important; }
+        .filter-inline-clear:focus { background: rgba(51,65,85,0.95) !important; }
+        .filter-inline-clear::after { display: none !important; }
+        .filter-inline-clear::before { display: none !important; }
+        /* SVG X icon inside — locked to 11x11 */
+        .filter-inline-clear > svg,
+        .filter-inline-clear svg {
+            width: 11px !important;
+            height: 11px !important;
+            min-width: 11px !important;
+            max-width: 11px !important;
+            flex-shrink: 0 !important;
+            display: block !important;
+            stroke: white !important;
+            fill: none !important;
+            stroke-width: 2.5 !important;
+            pointer-events: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        /* Mobile — same exact rules, no changes */
+        @media (max-width: 600px) {
+            .filter-inline-clear {
+                width: 22px !important;
+                height: 22px !important;
+                min-width: 22px !important;
+                max-width: 22px !important;
+                min-height: 22px !important;
+                max-height: 22px !important;
+                right: 8px !important;
+                border-radius: 50% !important;
+            }
+            .filter-inline-clear > svg,
+            .filter-inline-clear svg {
+                width: 11px !important;
+                height: 11px !important;
+                max-width: 11px !important;
+            }
+        }
+
+        /* Button label parts — always visible */
+        .fab-icon { display: inline-flex; align-items: center; flex-shrink: 0; }
+        .fab-text  { font-size: 0.85rem; }
+
+        @media (max-width: 600px) {
+            .filter-inputs-row { flex-direction: column; gap: 0.6rem; }
+            .filter-inputs-row .filter-group { min-width: auto; }
+            .filter-actions-row { gap: 0.5rem; }
+            .filter-action-btn {
+                flex: 1;
+                min-width: calc(50% - 0.3rem);
+                font-size: 0.8rem !important;
+                padding: 0.65rem 0.6rem !important;
+            }
+            /* On mobile keep text but smaller */
+            .fab-text { font-size: 0.78rem; }
+        }
+        @media (max-width: 360px) {
+            .filter-action-btn { min-width: 100%; flex: none; width: 100% !important; }
+        }
+</style>
+    <style>
+        /* ICON SYSTEM */
+        .icon { display:inline-block; width:1em; height:1em; vertical-align:-0.125em; flex-shrink:0; }
+        .nav-icon { width:1.05rem; height:1.05rem; margin-right:5px; vertical-align:-0.15em; opacity:0.85; }
+        .btn-icon { width:0.9rem; height:0.9rem; margin-right:4px; vertical-align:-0.1em; }
+        .h-icon   { width:1.1rem; height:1.1rem; margin-right:6px; vertical-align:-0.18em; }
+        .sm-icon  { width:0.8rem; height:0.8rem; vertical-align:-0.08em; margin-right:3px; }
+    </style>
+    <style>
+        /* ── NAV LAYOUT — definitive fix (overrides all external CSS) ── */
+        nav {
+            overflow: visible !important;
+        }
+        .nav-container {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 0 !important;
+            height: 100% !important;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+        }
+        .nav-container .logo {
+            flex-shrink: 0 !important;
+            margin-right: 1.25rem !important;
+        }
+        .nav-links {
+            display: flex !important;
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            gap: 0.15rem !important;
+            overflow: visible !important;
+        }
+        .nav-controls {
+            display: flex !important;
+            flex-shrink: 0 !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 10px !important;
+            margin-left: auto !important;
+        }
+        /* hamburger is inside nav-controls – hide on desktop, show on mobile */
+        .nav-controls .hamburger { display: none !important; }
+        @media (max-width: 900px) {
+            .nav-links { display: none !important; }
+            .nav-controls .hamburger { display: flex !important; }
+            .nav-user { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Smoke background — same as dashboard -->
+    <div class="smoke-container" aria-hidden="true">
+        <div class="smoke-particle" style="left:8%;  width:200px;height:200px;animation-delay:0s;"></div>
+        <div class="smoke-particle" style="left:28%; width:140px;height:140px;animation-delay:3s;"></div>
+        <div class="smoke-particle" style="left:55%; width:220px;height:220px;animation-delay:6s;"></div>
+        <div class="smoke-particle" style="left:78%; width:170px;height:170px;animation-delay:1.5s;"></div>
+    </div>
+
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
+                <img src="logo1.png" alt="FreshZone Logo">
+            </a>
+            <div class="nav-links" id="desktop-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="history.html" class="active">History</a>
+                <a href="about.html">About</a>
+                <a href="profile.html">Profile</a>
+                <a href="contact.html">Contact</a>
+                <a href="#" onclick="openLogoutModal();return false;">Logout</a>
+            </div>
+            <div class="nav-controls">
+                <div class="nav-user" id="nav-user-display">
+                    <span class="nav-user-dot"></span>
+                    <span id="nav-user-name">—</span>
+                </div>
+                <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+                <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
+                    <span class="push-toggle-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+                    <div class="push-toggle-switch" id="push-btn" onclick="togglePushNotifications()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')togglePushNotifications()">
+                        <div class="push-toggle-knob"></div>
+                    </div>
+                    <span class="push-toggle-label" id="push-label">OFF</span>
+                </label>
+                <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true">
+        <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
+            <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
+            <a href="history.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
+            <a href="about.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> About</a>
+            <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
+            <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
+            <div class="mobile-nav-divider"></div>
+            <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
+            <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notifications</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-hero fz-masthead">
+            <div>
+                <h1><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;color:var(--secondary);"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg>Detection History</h1>
+                <p>Complete archive of on-campus vape aerosol detection events</p>
+            </div>
+            <img src="vape.png" alt="No Vaping Allowed">
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid animate-in">
+            <div class="stat-box stat--alerts">
+                <p><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-1px;color:var(--danger);"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Today's Alerts</p>
+                <h3 id="stat-today">0</h3>
+            </div>
+            <div class="stat-box stat--records">
+                <p><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-1px;color:var(--secondary);"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Total Records</p>
+                <h3 id="stat-total">0</h3>
+            </div>
+            <div class="stat-box stat--resolved">
+                <p><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-1px;color:var(--success);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Resolved</p>
+                <h3 id="stat-resolved">0</h3>
+            </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+            <!-- Row 1: Filter inputs each with inline clear -->
+            <div class="filter-inputs-row">
+
+                <div class="filter-group">
+                    <label for="filter-search"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search</label>
+                    <div class="filter-input-wrap">
+                        <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable();updateClearBtns()">
+                        <button class="filter-inline-clear" id="clear-search" onclick="clearField('filter-search')" title="Clear search" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-status"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Status</label>
+                    <div class="filter-input-wrap">
+                        <select id="filter-status" onchange="renderTable();updateClearBtns()">
+                            <option value="">All Statuses</option>
+                            <option value="Detected">Detected</option>
+                            <option value="Acknowledged">Acknowledged</option>
+                            <option value="Cleared">Cleared</option>
+                        </select>
+                        <button class="filter-inline-clear" id="clear-status" onclick="clearField('filter-status')" title="Clear status" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-date"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Date</label>
+                    <div class="filter-input-wrap">
+                        <input type="date" id="filter-date" onchange="renderTable();updateClearBtns()">
+                        <button class="filter-inline-clear" id="clear-date" onclick="clearField('filter-date')" title="Clear date" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Row 2: Filter action buttons -->
+            <div class="filter-actions-row">
+                <button class="filter-action-btn filter-clear-btn" onclick="clearFilters()">
+                    <span class="fab-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span>
+                    <span class="fab-text">Reset Filters</span>
+                </button>
+                <button class="filter-action-btn filter-export-btn" onclick="exportCSV()">
+                    <span class="fab-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                    <span class="fab-text">Export to CSV</span>
+                </button>
+            </div>
+
+            <!-- Row 3: Danger zone — separated, admin only -->
+            <div class="filter-danger-section" id="danger-section" style="display:none;">
+                <div class="filter-danger-label">
+                    <svg style="width:0.75rem;height:0.75rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Admin Action — Cannot be undone
+                </div>
+                <button id="clear-all-btn" class="filter-action-btn filter-danger-btn" onclick="clearAllHistory()">
+                    <span class="fab-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></span>
+                    <span class="fab-text">Delete All History</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="log-container">
+            <table role="table" aria-label="Detection history log">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)" title="Sort by detected time"><span class="th-cell"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Detected</span></th>
+                        <th onclick="sortTable(1)" title="Sort by location"><span class="th-cell"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Location</span></th>
+                        <th onclick="sortTable(2)" title="Sort by status"><span class="th-cell"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Status</span></th>
+                        <th title="Time acknowledged"><span class="th-cell"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Acknowledged</span></th>
+                        <th title="Time resolved"><span class="th-cell"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Resolved</span></th>
+                        <th title="Response time"><span class="th-cell"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Response</span></th>
+                        <th onclick="sortTable(6)" title="Sort by staff"><span class="th-cell"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> By</span></th>
+                    </tr>
+                </thead>
+                <tbody id="history-tbody">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <section class="aq-guide animate-in" aria-labelledby="history-aq-guide-title">
+            <div class="aq-guide-head">
+                <h3 id="history-aq-guide-title">Understanding PM & AQI in FreshZone</h3>
+                <span class="aq-guide-chip">For Reports & Audits</span>
+            </div>
+            <div class="aq-guide-grid">
+                <article class="aq-card">
+                    <h4>PM1.0</h4>
+                    <p>Very fine aerosol particles. Useful for spotting fresh vape/smoke plumes in tight spaces.</p>
+                </article>
+                <article class="aq-card">
+                    <h4>PM2.5</h4>
+                    <p>Fine particles linked to health risk and used for AQI classification and alert decisions.</p>
+                </article>
+                <article class="aq-card">
+                    <h4>PM10</h4>
+                    <p>Larger inhalable particles that help contextualize broader dust or smoke contamination.</p>
+                </article>
+            </div>
+            <div class="aqi-bands" role="list" aria-label="AQI level guide">
+                <div class="aqi-band aqi-good" role="listitem">Good<span>0–50</span></div>
+                <div class="aqi-band aqi-moderate2" role="listitem">Moderate<span>51–100</span></div>
+                <div class="aqi-band aqi-sensitive" role="listitem">Sensitive<span>101–150</span></div>
+                <div class="aqi-band aqi-unhealthy" role="listitem">Unhealthy<span>151–200</span></div>
+                <div class="aqi-band aqi-very" role="listitem">Very Unhealthy<span>201+</span></div>
+            </div>
+        </section>
+    </div>
+
+    <div id="session-warning" role="status"></div>
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+    <div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+        <div class="modal-content-custom">
+            <h3 id="logout-title">Confirm Logout</h3>
+            <p>Are you sure you want to log out of FreshZone?</p>
+            <div class="modal-btn-group">
+                <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Confirm Modal -->
+    <div id="clearAllModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="clear-title" style="display:none;">
+        <div class="modal-content-custom">
+            <h3 id="clear-title" style="color:#e74c3c;"><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Delete All History</h3>
+            <p>This will permanently delete <strong>all</strong> detection events, sensor readings, push notifications, system logs, and login attempts. This cannot be undone.</p>
+            <div class="modal-btn-group">
+                <button class="confirm-btn" style="background:#e74c3c;" onclick="confirmClearAll()">Yes, Delete Everything</button>
+                <button class="cancel-btn" onclick="document.getElementById('clearAllModal').style.display='none'">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        title="Back to top" aria-label="Back to top"
+        style="position:fixed;bottom:70px;right:20px;width:42px;height:42px;border-radius:50%;
+               background:var(--primary);color:white;border:none;font-size:1.2rem;cursor:pointer;
+               display:none;align-items:center;justify-content:center;z-index:900;
+               box-shadow:0 4px 14px rgba(0,0,0,0.2);margin:0;padding:0;text-transform:none;">↑</button>
+
+    <footer class="site-footer">
+        <p>
+            © 2026 FreshZone – Campus Vape Aerosol Detection System<br>
+            <a href="terms.html">Terms of Service</a> |
+            <a href="privacy.html">Privacy Policy</a> |
+            DPO: <a href="mailto:dpo@freshzone.space">dpo@freshzone.space</a>
+        </p>
+    </footer>
+
+    <script src="cookie-consent.js?v=3" defer></script>
+
+    <script src="utils.js"></script>
+    <script>
+        // Auth guard
+        let user = null;
+        (async function initUser() {
+            user = await hydrateSessionUser();
+            if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; return; }
+            window._fzCurrentUser = user;
+            if (user.position === 'Administrator') {
+                const ds = document.getElementById('danger-section');
+                if (ds) ds.style.display = '';
+            }
+            const el = document.getElementById('nav-user-name');
+            if (el) el.textContent = user.full_name || user.name || '';
+            loadHistory();
+        })();

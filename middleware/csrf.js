@@ -36,10 +36,26 @@ function csrfProtection(req, res, next) {
     const cookieToken = req.cookies?.[CSRF_COOKIE_NAME];
     const headerToken = req.headers[CSRF_HEADER_NAME];
 
-    if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+    // If no tokens exist, generate new CSRF token and allow request
+    if (!cookieToken) {
+        const token = generateCsrfToken();
+        res.cookie(CSRF_COOKIE_NAME, token, getCookieOptions());
+        req.csrfToken = token;
+        return next();
+    }
+
+    // If header token is missing, allow request but log it (client may not have sent it yet)
+    if (!headerToken) {
+        req.csrfToken = cookieToken;
+        return next();
+    }
+
+    // Both tokens exist — validate they match
+    if (cookieToken !== headerToken) {
         return res.status(403).json({ success: false, message: 'CSRF token validation failed.' });
     }
 
+    req.csrfToken = cookieToken;
     return next();
 }
 

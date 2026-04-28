@@ -8,7 +8,7 @@ const router   = express.Router();
 const db       = require('../db');
 const { sendOTPEmail } = require('../mailer');
 const logger = require('../logger');
-const { ensureCsrfCookie, csrfTokenHandler } = require('../middleware/csrf');
+const { ensureCsrfCookie, csrfProtection, csrfTokenHandler } = require('../middleware/csrf');
 
 const otpAttempts = new Map(); // Track OTP guessing attempts
 
@@ -94,7 +94,7 @@ async function getFailedAttempts(identifier) {
 }
 
 // ── POST /api/auth/login ──────────────────────────────────────
-router.post('/login', async (req, res) => {
+router.post('/login', csrfProtection, async (req, res) => {
     const identifier = sanitizeStr(req.body.email, 255); // accepts email or phone
     const password   = typeof req.body.password === 'string' ? req.body.password.slice(0, 128) : '';
 
@@ -157,7 +157,7 @@ router.post('/login', async (req, res) => {
 });
 
 // ── POST /api/auth/send-otp ───────────────────────────────────
-router.post('/send-otp', async (req, res) => {
+router.post('/send-otp', csrfProtection, async (req, res) => {
     const email     = sanitizeStr(req.body.email, 255);
     const type      = sanitizeStr(req.body.type, 20);
     const firstName = sanitizeStr(req.body.firstName, 50);
@@ -260,7 +260,7 @@ router.post('/send-otp', async (req, res) => {
 });
 
 // ── POST /api/auth/verify-otp ─────────────────────────────────
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp', csrfProtection, async (req, res) => {
     const email       = sanitizeStr(req.body.email, 255);
     const otp         = sanitizeStr(req.body.otp, 10);
     const newPassword = typeof req.body.newPassword === 'string' ? req.body.newPassword.slice(0, 128) : '';
@@ -384,7 +384,7 @@ router.post('/verify-otp', async (req, res) => {
 
 router.get('/csrf-token', ensureCsrfCookie, csrfTokenHandler);
 
-router.get('/session', async (req, res) => {
+router.get('/session', ensureCsrfCookie, async (req, res) => {
     const token = req.cookies?.[JWT_COOKIE_NAME] ||
         (req.headers['authorization']?.startsWith('Bearer ') ? req.headers['authorization'].slice(7) : null);
     if (!token) return res.status(200).json({ loggedIn: false });
@@ -402,7 +402,7 @@ router.get('/session', async (req, res) => {
     }
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', csrfProtection, (req, res) => {
     const isProduction = process.env.NODE_ENV === 'production';
     const clearOpts = { path: '/', sameSite: isProduction ? 'none' : 'lax', secure: isProduction };
     res.clearCookie(JWT_COOKIE_NAME, clearOpts);
