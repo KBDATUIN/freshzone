@@ -65,39 +65,50 @@
     }
     </script>
     <style>
-        /* OTP inputs */
-        #signup-otp-input,#reset-otp-input{text-align:center;font-size:1.6rem;font-weight:800;letter-spacing:0.4em;color:var(--primary);}
-        [data-theme="dark"] #signup-otp-input,[data-theme="dark"] #reset-otp-input{color:#22d3ee;}
-        /* Input spacing */
-        .auth-form-content .input-group{margin-bottom:0.75rem;}
-        /* Remember me */
-        .auth-remember span{font-size:0.8rem;color:var(--gray);font-weight:500;cursor:pointer;}
-        /* Dark toggle */
-        #auth-dark-toggle{border-color:rgba(255,255,255,0.28)!important;color:rgba(255,255,255,0.7)!important;}
-        #auth-dark-toggle:hover{border-color:rgba(255,255,255,0.6)!important;color:white!important;background:rgba(255,255,255,0.1)!important;}
-        /* Trust row */
-        @media(max-width:400px){.auth-trust-row{display:none;}}
-        /* Logo */
-        .auth-logo{filter:drop-shadow(0 4px 16px rgba(0,78,122,0.18));}
-        [data-theme="dark"] .auth-logo{filter:drop-shadow(0 4px 16px rgba(34,211,238,0.12));}
-        /* Eye button — highest specificity inline style wins over all external CSS */
-        .input-password-wrap{position:relative!important;display:block!important;margin-top:0.35rem;}
-        .input-password-wrap input{margin-top:0!important;padding-right:2.8rem!important;width:100%!important;}
-        .eye-btn{position:absolute!important;right:0.75rem!important;top:50%!important;transform:translateY(-50%)!important;width:32px!important;height:32px!important;min-width:unset!important;padding:0!important;margin:0!important;border:none!important;border-radius:6px!important;background:transparent!important;box-shadow:none!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;color:var(--gray)!important;z-index:10!important;}
-        .eye-btn::before,.eye-btn::after{display:none!important;}
-        .eye-btn:hover{background:rgba(0,180,216,0.08)!important;color:var(--secondary)!important;transform:translateY(-50%)!important;box-shadow:none!important;filter:none!important;}
-        .eye-btn:active{transform:translateY(-50%) scale(0.9)!important;}
-        .eye-icon,.eye-off-icon{width:18px!important;height:18px!important;pointer-events:none!important;display:block!important;flex-shrink:0!important;}
-        /* Footer links */
-        .auth-footer p{color:rgba(255,255,255,0.55)!important;font-size:0.78rem!important;}
-        .auth-footer a{color:rgba(255,255,255,0.78)!important;text-decoration:none!important;font-weight:600!important;margin:0 0.3rem!important;transition:color 0.18s ease!important;}
-        .auth-footer a:hover{color:#fff!important;text-shadow:0 0 10px rgba(125,249,255,0.5)!important;}
-        [data-theme="dark"] .auth-footer a{color:#64748b!important;}
-        [data-theme="dark"] .auth-footer a:hover{color:#e2f0f8!important;}
-        /* Header — hide the text h1, keep only logo in card */
-        .auth-header h1{display:none!important;}
-        .auth-header p{display:none!important;}
-        .auth-trust-row{margin-top:0!important;}
+        /* Auth page: OTP centering */
+        #signup-otp-input, #reset-otp-input {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 0.4em;
+            color: var(--primary);
+        }
+        [data-theme="dark"] #signup-otp-input,
+        [data-theme="dark"] #reset-otp-input {
+            color: #22d3ee;
+        }
+        /* Smoother auth input margin */
+        .auth-form-content .input-group {
+            margin-bottom: 0.7rem;
+        }
+        /* auth logo shadow */
+        .auth-logo {
+            filter: drop-shadow(0 4px 16px rgba(0,78,122,0.18));
+        }
+        [data-theme="dark"] .auth-logo {
+            filter: drop-shadow(0 4px 16px rgba(34,211,238,0.12));
+        }
+        /* trust row responsive */
+        @media (max-width: 400px) {
+            .auth-trust-row { display: none; }
+        }
+        /* auth-remember style fix */
+        .auth-remember span {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        /* Dark toggle on auth fix */
+        #auth-dark-toggle {
+            border-color: rgba(255,255,255,0.28) !important;
+            color: rgba(255,255,255,0.7) !important;
+        }
+        #auth-dark-toggle:hover {
+            border-color: rgba(255,255,255,0.6) !important;
+            color: white !important;
+            background: rgba(255,255,255,0.1) !important;
+        }
     </style>
 </head>
 <body>
@@ -306,10 +317,10 @@
 
         <footer class="auth-footer">
             <p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p>
-            <p style="margin-top:0.35rem;">
-                <a href="privacy.html">Privacy</a> ·
-                <a href="terms.html">Terms</a> ·
-                <a href="contact.html">Contact</a>
+            <p style="font-size:0.78rem;margin-top:0.35rem;">
+                <a href="privacy.html" style="color:var(--primary);text-decoration:none;margin:0 0.4rem;">Privacy</a> · 
+                <a href="terms.html" style="color:var(--primary);text-decoration:none;margin:0 0.4rem;">Terms</a> · 
+                DPO: <a href="mailto:freshzone.alerts@gmail.com" style="color:var(--primary);">freshzone.alerts@gmail.com</a>
             </p>
         </footer>
     </div>
