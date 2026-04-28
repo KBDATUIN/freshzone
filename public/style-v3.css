@@ -619,3 +619,123 @@ button.filter-inline-clear svg {
         max-height: 11px !important;
     }
 }
+
+/* ================================================================
+   FreshZone — UI/UX Enhancement Layer
+   Animations, micro-interactions, polish — purely additive
+   ================================================================ */
+
+/* ── MOBILE TABLE SCROLL ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .log-container::-webkit-scrollbar { height: 5px !important; }
+    .log-container::-webkit-scrollbar-track { background: rgba(0,78,122,0.06) !important; border-radius: 99px !important; }
+    .log-container::-webkit-scrollbar-thumb { background: rgba(0,180,216,0.45) !important; border-radius: 99px !important; }
+    [data-theme="dark"] .log-container::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.35) !important; }
+    .log-container th, .log-container td { padding: 0.6rem 0.7rem !important; font-size: 0.8rem !important; }
+}
+
+/* ── CARD ENTRANCE ───────────────────────────────────────────────────────────────────── */
+@keyframes fzCardIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.glass-card, .hero, .location-card, .stat-box, .filter-bar, .log-container, .aq-guide, .page-hero {
+    animation: fzCardIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+}
+.stat-box:nth-child(1) { animation-delay: 0.05s; }
+.stat-box:nth-child(2) { animation-delay: 0.12s; }
+.stat-box:nth-child(3) { animation-delay: 0.19s; }
+
+@keyframes fzPageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.container { animation: fzPageIn 0.32s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* ── CARD HOVER LIFT ──────────────────────────────────────────────────────────────────── */
+.glass-card, .location-card, .stat-box {
+    transition: transform 0.22s cubic-bezier(0.22,1,0.36,1), box-shadow 0.22s ease !important;
+}
+.glass-card:hover, .location-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 16px 48px rgba(0,40,100,0.18), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8) !important;
+}
+[data-theme="dark"] .glass-card:hover, [data-theme="dark"] .location-card:hover {
+    box-shadow: 0 16px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(34,211,238,0.18) !important;
+}
+.stat-box:hover { transform: translateY(-3px) !important; }
+
+/* ── BUTTON PRESS ─────────────────────────────────────────────────────────────────────── */
+.btn-primary:active, .btn-success:active, .filter-action-btn:active,
+.confirm-btn:active, .cancel-btn:active { transform: scale(0.97) !important; transition: transform 0.1s ease !important; }
+
+/* ── NAV ACTIVE PULSE ─────────────────────────────────────────────────────────────────── */
+.nav-links a { transition: color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease !important; }
+.nav-links a.active { animation: navPulse 3s ease-in-out infinite !important; }
+@keyframes navPulse {
+    0%,100% { box-shadow: 0 3px 14px rgba(0,180,216,0.5); }
+    50%      { box-shadow: 0 3px 22px rgba(0,180,216,0.75), 0 0 28px rgba(0,180,216,0.25); }
+}
+
+/* ── MODAL BLUR + ENTRANCE ───────────────────────────────────────────────────────────── */
+.modal-overlay-custom { backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; background: rgba(0,15,35,0.65) !important; }
+.modal-content-custom { animation: fzModalIn 0.3s cubic-bezier(0.22,1,0.36,1) both !important; box-shadow: 0 28px 72px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.12) !important; }
+@keyframes fzModalIn {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── NOTIFICATION GLASS ─────────────────────────────────────────────────────────────── */
+.notification { backdrop-filter: blur(16px) saturate(180%) !important; -webkit-backdrop-filter: blur(16px) saturate(180%) !important; border: 1px solid rgba(255,255,255,0.18) !important; box-shadow: 0 8px 32px rgba(0,0,0,0.2) !important; }
+.notification.success { background: linear-gradient(135deg, rgba(22,163,74,0.93), rgba(21,128,61,0.93)) !important; }
+.notification.error   { background: linear-gradient(135deg, rgba(220,38,38,0.93), rgba(185,28,28,0.93)) !important; }
+.notification.info    { background: linear-gradient(135deg, rgba(0,130,200,0.93), rgba(0,100,160,0.93)) !important; }
+
+/* ── TABLE ROW HOVER ──────────────────────────────────────────────────────────────────── */
+tbody tr { transition: background 0.15s ease, transform 0.15s ease !important; }
+tbody tr:hover { transform: translateX(3px) !important; }
+
+/* ── FILTER BAR FOCUS GLOW ───────────────────────────────────────────────────────────── */
+.filter-bar { transition: box-shadow 0.2s ease !important; }
+.filter-bar:focus-within { box-shadow: 0 6px 28px rgba(0,50,100,0.14), 0 0 0 2px rgba(0,180,216,0.22) !important; }
+
+/* ── INPUT FOCUS LIFT ──────────────────────────────────────────────────────────────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+select:focus, textarea:focus { transform: translateY(-1px) !important; transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important; }
+
+/* ── TAG POLISH ─────────────────────────────────────────────────────────────────────────── */
+.tag { transition: transform 0.15s ease !important; display: inline-flex !important; align-items: center !important; }
+.tag-danger  { box-shadow: 0 2px 8px rgba(153,27,27,0.15) !important; }
+.tag-success { box-shadow: 0 2px 8px rgba(20,83,45,0.12) !important; }
+.tag-warning { box-shadow: 0 2px 8px rgba(120,53,15,0.12) !important; }
+
+/* ── MOBILE DRAWER POLISH ───────────────────────────────────────────────────────────── */
+.mobile-nav-drawer { box-shadow: -8px 0 40px rgba(0,0,0,0.38) !important; border-left: 1px solid rgba(0,200,230,0.14) !important; }
+.mobile-nav-drawer a { border-radius: 10px !important; margin: 2px 8px !important; transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease !important; }
+.mobile-nav-drawer a:hover { transform: translateX(4px) !important; }
+.mobile-nav-drawer a.active { background: linear-gradient(135deg, rgba(0,180,216,0.28), rgba(0,150,180,0.16)) !important; border-left: 3px solid #0ecfef !important; }
+
+/* ── AQI BAND HOVER ────────────────────────────────────────────────────────────────────── */
+.aqi-band { transition: transform 0.18s ease, box-shadow 0.18s ease !important; cursor: default; }
+.aqi-band:hover { transform: translateY(-2px) scale(1.04) !important; box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important; }
+
+/* ── GLOBAL SCROLLBAR ───────────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,78,122,0.04); border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: rgba(0,180,216,0.3); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,180,216,0.55); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.22); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.42); }
+
+/* ── FOCUS VISIBLE ───────────────────────────────────────────────────────────────────────── */
+:focus-visible { outline: 2px solid #00b4d8 !important; outline-offset: 3px !important; border-radius: 6px !important; }
+
+/* ── REDUCED MOTION ──────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .glass-card, .hero, .location-card, .stat-box, .filter-bar,
+    .log-container, .aq-guide, .page-hero, .container,
+    .modal-content-custom, .nav-links a.active {
+        animation: none !important;
+        transition: none !important;
+    }
+}
