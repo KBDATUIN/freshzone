@@ -21,7 +21,7 @@
     <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
     <link rel="stylesheet" href="/pwa.css">
     <link rel="stylesheet" href="style-fixes.css">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://freshzone.space/">
@@ -64,746 +64,312 @@
         "dateModified": "2026-04-26"
     }
     </script>
-    <style>
-        /* ── AUTH PAGE REDESIGN — inline overrides ─────────────── */
-
-        /* OTP centering */
-        #signup-otp-input, #reset-otp-input {
-            text-align: center;
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: 0.4em;
-            color: var(--primary);
-        }
-        [data-theme="dark"] #signup-otp-input,
-        [data-theme="dark"] #reset-otp-input { color: #22d3ee; }
-
-        /* Input group spacing */
-        .auth-form-content .input-group { margin-bottom: 0.7rem; }
-
-        /* Auth logo */
-        .auth-logo { filter: drop-shadow(0 4px 16px rgba(0,78,122,0.18)); }
-        [data-theme="dark"] .auth-logo { filter: drop-shadow(0 4px 16px rgba(34,211,238,0.12)); }
-
-        /* Remember me */
-        .auth-remember span { font-size: 0.8rem; color: var(--gray); font-weight: 500; cursor: pointer; }
-
-        /* Dark toggle */
-        #auth-dark-toggle {
-            border-color: rgba(255,255,255,0.28) !important;
-            color: rgba(255,255,255,0.7) !important;
-        }
-        #auth-dark-toggle:hover {
-            border-color: rgba(255,255,255,0.6) !important;
-            color: white !important;
-            background: rgba(255,255,255,0.1) !important;
-        }
-
-        /* ── SPLIT LAYOUT ──────────────────────────────────────── */
-        .auth-wrapper {
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            align-items: stretch;
-            justify-content: center;
-            padding: 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Left panel — branding */
-        .auth-left-panel {
-            flex: 0 0 42%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 3rem 3.5rem;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(155deg,
-                rgba(0,30,55,0.92) 0%,
-                rgba(0,60,100,0.88) 40%,
-                rgba(0,100,150,0.82) 100%
-            );
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-right: 1px solid rgba(255,255,255,0.08);
-        }
-
-        /* Animated orbs inside left panel */
-        .auth-left-panel::before {
-            content: '';
-            position: absolute;
-            width: 420px; height: 420px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0,180,216,0.22) 0%, transparent 70%);
-            top: -80px; left: -80px;
-            animation: authOrbFloat 12s ease-in-out infinite alternate;
-            pointer-events: none;
-        }
-        .auth-left-panel::after {
-            content: '';
-            position: absolute;
-            width: 320px; height: 320px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(14,207,239,0.18) 0%, transparent 70%);
-            bottom: -60px; right: -60px;
-            animation: authOrbFloat 16s ease-in-out infinite alternate-reverse;
-            pointer-events: none;
-        }
-        @keyframes authOrbFloat {
-            from { transform: translate(0, 0) scale(1); }
-            to   { transform: translate(30px, 20px) scale(1.08); }
-        }
-
-        /* Left panel content */
-        .auth-panel-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 2.5rem;
-            position: relative;
-            z-index: 2;
-        }
-        .auth-panel-logo img {
-            height: 52px;
-            filter: drop-shadow(0 4px 16px rgba(0,180,216,0.4));
-        }
-        .auth-panel-logo-text {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: -0.03em;
-        }
-
-        .auth-panel-headline {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(1.6rem, 2.2vw, 2.2rem);
-            font-weight: 800;
-            color: #fff;
-            line-height: 1.2;
-            letter-spacing: -0.035em;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 2;
-        }
-        .auth-panel-headline span {
-            background: linear-gradient(135deg, #7df9ff, #0ecfef);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .auth-panel-sub {
-            font-size: 0.92rem;
-            color: rgba(200,236,255,0.78);
-            line-height: 1.65;
-            margin-bottom: 2.5rem;
-            max-width: 320px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Feature list */
-        .auth-feature-list {
-            list-style: none;
-            padding: 0; margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            position: relative;
-            z-index: 2;
-            width: 100%;
-        }
-        .auth-feature-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-        .auth-feature-icon {
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            background: rgba(0,180,216,0.18);
-            border: 1px solid rgba(0,180,216,0.30);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            color: #7df9ff;
-            transition: all 0.25s ease;
-        }
-        .auth-feature-item:hover .auth-feature-icon {
-            background: rgba(0,180,216,0.30);
-            box-shadow: 0 0 16px rgba(0,180,216,0.35);
-            transform: scale(1.08);
-        }
-        .auth-feature-icon svg { width: 16px; height: 16px; }
-        .auth-feature-text strong {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 2px;
-        }
-        .auth-feature-text span {
-            font-size: 0.78rem;
-            color: rgba(200,236,255,0.65);
-            line-height: 1.4;
-        }
-
-        /* Trust badges row — inside left panel */
-        .auth-panel-badges {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 2.5rem;
-            position: relative;
-            z-index: 2;
-        }
-        .auth-panel-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 12px;
-            border-radius: 99px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.16);
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: rgba(200,236,255,0.85);
-            letter-spacing: 0.03em;
-            transition: all 0.22s ease;
-        }
-        .auth-panel-badge:hover {
-            background: rgba(0,180,216,0.18);
-            border-color: rgba(0,180,216,0.40);
-            color: #fff;
-            box-shadow: 0 0 12px rgba(0,180,216,0.25);
-        }
-        .auth-panel-badge svg { width: 11px; height: 11px; }
-
-        /* Right panel — form */
-        .auth-right-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 2.5rem 2rem;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            position: relative;
-            background: rgba(255,255,255,0.04);
-        }
-
-        /* The actual card inside right panel */
-        .auth-right-panel .auth-container {
-            width: 100%;
-            max-width: 440px;
-        }
-
-        /* Hide old header on desktop (left panel replaces it) */
-        .auth-right-panel .auth-header {
-            display: none;
-        }
-
-        /* Card redesign */
-        .auth-right-panel .auth-card {
-            background: rgba(245,252,255,0.97) !important;
-            border: 1px solid rgba(255,255,255,0.75) !important;
-            border-radius: 24px !important;
-            padding: 2.25rem 2rem 2rem !important;
-            box-shadow:
-                0 0 0 1px rgba(0,180,216,0.10),
-                0 24px 60px rgba(0,40,100,0.18),
-                inset 0 1px 0 rgba(255,255,255,0.95) !important;
-            animation: fzCardIn 0.55s cubic-bezier(0.34,1.56,0.64,1) both !important;
-        }
-        [data-theme="dark"] .auth-right-panel .auth-card {
-            background: rgba(10,20,36,0.98) !important;
-            border-color: rgba(34,211,238,0.14) !important;
-            box-shadow:
-                0 0 0 1px rgba(34,211,238,0.12),
-                0 24px 60px rgba(0,0,0,0.55) !important;
-        }
-
-        /* Brand section inside card — compact */
-        .auth-right-panel .brand-section {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 1.25rem;
-        }
-        .auth-right-panel .brand-section img {
-            height: 44px;
-            filter: drop-shadow(0 3px 10px rgba(0,78,122,0.20));
-        }
-
-        /* Card heading */
-        .auth-card-heading {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        .auth-card-heading h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.35rem;
-            font-weight: 800;
-            color: #002840;
-            letter-spacing: -0.03em;
-            margin-bottom: 4px;
-        }
-        [data-theme="dark"] .auth-card-heading h2 { color: #e2f0f8; }
-        .auth-card-heading p {
-            font-size: 0.82rem;
-            color: #5a7a8a;
-            margin: 0;
-        }
-        [data-theme="dark"] .auth-card-heading p { color: #64748b; }
-
-        /* Tabs — pill style */
-        .auth-tabs {
-            display: flex;
-            background: rgba(0,100,160,0.07) !important;
-            border-radius: 12px !important;
-            padding: 4px !important;
-            border: 1px solid rgba(0,100,160,0.12) !important;
-            margin-bottom: 1.5rem;
-            gap: 4px;
-        }
-        .auth-tab {
-            flex: 1;
-            padding: 0.55rem 0.75rem !important;
-            border-radius: 9px !important;
-            font-size: 0.84rem !important;
-            font-weight: 700 !important;
-            color: #5a7a8a !important;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            margin: 0 !important;
-            width: auto !important;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
-        }
-        .auth-tab.active {
-            background: #fff !important;
-            color: #003a5c !important;
-            box-shadow: 0 2px 10px rgba(0,78,122,0.14), inset 0 1px 0 rgba(255,255,255,0.9) !important;
-            transform: translateY(-1px) !important;
-        }
-        [data-theme="dark"] .auth-tab { color: #64748b !important; }
-        [data-theme="dark"] .auth-tab.active {
-            background: rgba(34,211,238,0.12) !important;
-            color: #7df9ff !important;
-            box-shadow: inset 0 0 0 1px rgba(34,211,238,0.22) !important;
-        }
-
-        /* AQ guide — below card, compact */
-        .auth-right-panel .aq-guide {
-            margin-top: 1rem !important;
-            border-radius: 16px !important;
-            padding: 1.1rem 1.25rem !important;
-            background: rgba(240,252,255,0.85) !important;
-            border: 1px solid rgba(0,120,180,0.12) !important;
-            backdrop-filter: blur(12px);
-        }
-        [data-theme="dark"] .auth-right-panel .aq-guide {
-            background: rgba(10,20,36,0.85) !important;
-            border-color: rgba(34,211,238,0.10) !important;
-        }
-
-        /* Dark toggle + footer row */
-        .auth-bottom-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 1.25rem;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .auth-dark-toggle-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .auth-dark-label {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
-            font-weight: 600;
-        }
-        .auth-footer {
-            text-align: right;
-            flex: 1;
-        }
-        .auth-footer p {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.55);
-            margin: 0;
-        }
-        .auth-footer a { color: rgba(125,249,255,0.75) !important; }
-        .auth-footer a:hover { color: #fff !important; }
-
-        /* ── MOBILE — stack vertically ────────────────────────── */
-        @media (max-width: 768px) {
-            .auth-wrapper {
-                flex-direction: column;
-                align-items: stretch;
-                padding: 0;
-            }
-            .auth-left-panel {
-                flex: none;
-                padding: 1.75rem 1.5rem 1.5rem;
-                border-right: none;
-                border-bottom: 1px solid rgba(255,255,255,0.08);
-                background: linear-gradient(160deg,
-                    rgba(0,30,55,0.95) 0%,
-                    rgba(0,70,110,0.90) 100%
-                );
-            }
-            .auth-panel-headline { font-size: 1.4rem; margin-bottom: 0.6rem; }
-            .auth-panel-sub { display: none; }
-            .auth-feature-list { display: none; }
-            .auth-panel-badges { margin-top: 1rem; }
-            .auth-panel-logo { margin-bottom: 1rem; }
-
-            .auth-right-panel {
-                padding: 1.5rem 1rem 2rem;
-            }
-            .auth-right-panel .auth-card {
-                padding: 1.75rem 1.35rem 1.5rem !important;
-                border-radius: 20px !important;
-            }
-            .auth-bottom-row {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .auth-footer { text-align: center; }
-        }
-
-        @media (max-width: 400px) {
-            .auth-panel-badges { display: none; }
-            .auth-right-panel { padding: 1.25rem 0.75rem 1.75rem; }
-            .auth-right-panel .auth-card {
-                padding: 1.5rem 1.1rem 1.35rem !important;
-            }
-        }
-
-        /* ── LARGE SCREENS — cap left panel width ──────────────── */
-        @media (min-width: 1200px) {
-            .auth-left-panel { flex: 0 0 38%; padding: 4rem; }
-        }
-    </style>
 </head>
-<body>
-<div class="auth-wrapper">
-    <div class="smoke-container" id="smoke-bg"></div>
+<body class="auth-page">
 
-    <!-- ── LEFT PANEL — branding ──────────────────────────────── -->
-    <aside class="auth-left-panel">
-        <div class="auth-panel-logo">
-            <img src="logo1.png" alt="FreshZone">
-            <span class="auth-panel-logo-text">FreshZone</span>
+<!-- ══════════════════════════════════════════════════════════
+     AUTH SPLIT LAYOUT
+     Left = branding panel (fixed, full height)
+     Right = scrollable form panel
+══════════════════════════════════════════════════════════ -->
+<div class="auth-split-wrapper">
+
+    <!-- ── LEFT PANEL ─────────────────────────────────────── -->
+    <aside class="auth-left-panel" aria-hidden="true">
+        <!-- Orb decorations -->
+        <div class="auth-orb auth-orb--1"></div>
+        <div class="auth-orb auth-orb--2"></div>
+        <div class="auth-orb auth-orb--3"></div>
+
+        <!-- Logo -->
+        <div class="auth-lp-logo">
+            <img src="logo1.png" alt="FreshZone logo">
+            <span>FreshZone</span>
         </div>
 
-        <h1 class="auth-panel-headline">
+        <!-- Headline -->
+        <h1 class="auth-lp-headline">
             Breathe smarter.<br>
-            <span>Monitor in real-time.</span>
+            <em>Monitor in real&#8209;time.</em>
         </h1>
-        <p class="auth-panel-sub">
+        <p class="auth-lp-sub">
             Campus-wide vape aerosol detection powered by IoT sensors — giving staff instant alerts and actionable air quality data.
         </p>
 
-        <ul class="auth-feature-list">
-            <li class="auth-feature-item">
-                <div class="auth-feature-icon">
+        <!-- Feature list -->
+        <ul class="auth-lp-features">
+            <li>
+                <span class="auth-lp-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <div class="auth-feature-text">
+                </span>
+                <span class="auth-lp-feat-text">
                     <strong>Real-time Detection</strong>
                     <span>PM1.0, PM2.5 &amp; PM10 tracked live across all zones</span>
-                </div>
+                </span>
             </li>
-            <li class="auth-feature-item">
-                <div class="auth-feature-icon">
+            <li>
+                <span class="auth-lp-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </div>
-                <div class="auth-feature-text">
+                </span>
+                <span class="auth-lp-feat-text">
                     <strong>Instant Alerts</strong>
                     <span>Push notifications the moment aerosol levels spike</span>
-                </div>
+                </span>
             </li>
-            <li class="auth-feature-item">
-                <div class="auth-feature-icon">
+            <li>
+                <span class="auth-lp-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                </div>
-                <div class="auth-feature-text">
+                </span>
+                <span class="auth-lp-feat-text">
                     <strong>Historical Logs</strong>
                     <span>Full detection history with AQI trends and export</span>
-                </div>
+                </span>
             </li>
-            <li class="auth-feature-item">
-                <div class="auth-feature-icon">
+            <li>
+                <span class="auth-lp-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </div>
-                <div class="auth-feature-text">
+                </span>
+                <span class="auth-lp-feat-text">
                     <strong>Secure Access</strong>
                     <span>Role-based login with OTP email verification</span>
-                </div>
+                </span>
             </li>
         </ul>
 
-        <div class="auth-panel-badges">
-            <span class="auth-panel-badge">
+        <!-- Trust badges -->
+        <div class="auth-lp-badges">
+            <span class="auth-lp-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 Verified
             </span>
-            <span class="auth-panel-badge">
+            <span class="auth-lp-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 Encrypted
             </span>
-            <span class="auth-panel-badge">
+            <span class="auth-lp-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
                 Live 24/7
             </span>
         </div>
     </aside>
 
-    <!-- ── RIGHT PANEL — form ──────────────────────────────────── -->
+    <!-- ── RIGHT PANEL ─────────────────────────────────────── -->
     <div class="auth-right-panel">
-        <div class="auth-container">
+        <div class="auth-rp-inner">
 
-        <!-- HEADER (hidden on desktop, shown on mobile) -->
-        <header class="auth-header">
-            <h1>FreshZone</h1>
-            <p>Real-time campus air quality monitoring — powered by IoT sensors</p>
-        </header>
+            <!-- Mobile-only top bar -->
+            <div class="auth-mobile-bar">
+                <img src="logo1.png" alt="FreshZone" class="auth-mobile-logo">
+                <span class="auth-mobile-title">FreshZone</span>
+            </div>
 
-        <!-- CARD -->
-        <main class="glass-card auth-card">
+            <!-- Card heading (updates via JS on tab switch) -->
             <div class="auth-card-heading">
-                <h2>Welcome back</h2>
-                <p>Sign in to your FreshZone account</p>
-            </div>
-            <!-- Tab Switcher -->
-            <div class="auth-tabs" id="auth-tabs" role="tablist" aria-label="Authentication mode">
-                <button class="auth-tab active" id="tab-login"   role="tab" aria-selected="true"  aria-controls="login-view">Sign In</button>
-                <button class="auth-tab"        id="tab-signup"  role="tab" aria-selected="false" aria-controls="signup-view">Create Account</button>
+                <h2 id="auth-heading-title">Welcome back</h2>
+                <p id="auth-heading-sub">Sign in to your FreshZone account</p>
             </div>
 
-            <!-- ═══ LOGIN VIEW ═══ -->
-            <div id="login-view" class="auth-form-content" role="tabpanel" aria-labelledby="tab-login">
-                <div class="input-group">
-                    <label for="login-email">Email or Phone Number</label>
-                    <input type="text" id="login-email" placeholder="name@gmail.com or 09XXXXXXXXX" autocomplete="username">
-                </div>
-                <div class="input-group">
-                    <label for="login-password">Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-                        <button type="button" class="eye-btn" aria-label="Toggle password visibility">
-                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="auth-meta-row">
-                    <label class="auth-remember">
-                        <input type="checkbox" id="remember-me" checked>
-                        <span>Stay logged in</span>
-                    </label>
-                    <span id="biometric-hint" style="display:none;font-size:0.78rem;color:var(--secondary);cursor:pointer;font-weight:600;">🔒 Use fingerprint</span>
-                    <span class="auth-forgot">Forgot password?</span>
-                </div>
-                <button class="btn-primary" style="margin-top:1.1rem;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                    Sign In
-                </button>
-                <div class="auth-extra-links">
-                    <p>New here? <span data-switch-tab="signup" class="text-link">Create account</span></p>
-                </div>
-            </div>
+            <!-- ── FORM CARD ──────────────────────────────── -->
+            <div class="auth-card glass-card">
 
-            <!-- ═══ SIGNUP VIEW ═══ -->
-            <div id="signup-view" class="auth-form-content hidden" role="tabpanel" aria-labelledby="tab-signup">
-                <div class="grid-inputs">
-                    <div class="input-group"><label for="signup-first-name">First Name</label><input type="text" id="signup-first-name" placeholder="John" autocomplete="given-name"></div>
-                    <div class="input-group"><label for="signup-last-name">Last Name</label><input type="text" id="signup-last-name" placeholder="Doe" autocomplete="family-name"></div>
+                <!-- Tab Switcher -->
+                <div class="auth-tabs" id="auth-tabs" role="tablist" aria-label="Authentication mode">
+                    <button class="auth-tab active" id="tab-login"  role="tab" aria-selected="true"  aria-controls="login-view">Sign In</button>
+                    <button class="auth-tab"        id="tab-signup" role="tab" aria-selected="false" aria-controls="signup-view">Create Account</button>
                 </div>
-                <div class="grid-inputs">
-                    <div class="input-group"><label for="signup-employeeid">Employee ID</label><input type="text" id="signup-employeeid" placeholder="02XXXXXX"></div>
-                </div>
-                <div class="input-group">
-                    <label for="signup-email">Email Address</label>
-                    <input type="email" id="signup-email" placeholder="email@gmail.com" autocomplete="email">
-                    <div id="signup-email-status" style="margin-top:0.35rem;font-size:0.88rem;color:#6b7280;">Enter your Gmail or school email address.</div>
-                </div>
-                <div class="input-group"><label for="signup-contact">Contact Number</label><input type="tel" id="signup-contact" placeholder="+63 9xx xxx xxxx" autocomplete="tel"></div>
-                <div class="input-group">
-                    <label for="signup-position">Position</label>
-                    <select id="signup-position"><option value="" disabled selected>Select your position</option><option value="Administrator">Administrator</option><option value="Staff / Teachers">Staff / Teachers</option></select>
-                </div>
-                <div class="input-group">
-                    <label for="signup-password">Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="signup-password" placeholder="Min. 8 characters" autocomplete="new-password">
-                        <button type="button" class="eye-btn" aria-label="Toggle password visibility">
-                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                        </button>
-                    </div>
-                    <div class="pw-strength-bar" id="signup-pw-bar"></div>
-                    <span class="pw-strength-label" id="signup-pw-label"></span>
-                </div>
-                <button id="signup-btn" class="btn-primary" style="margin-top:1.1rem;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-                    Send Verification OTP
-                </button>
-                <div id="signup-otp-section" class="otp-box hidden">
-                    <div class="email-sent-banner" id="signup-email-banner">
-                        <span class="email-sent-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-                        </span>
-                        <div class="email-sent-text"><strong>OTP sent to your email!</strong><span id="signup-email-display"></span></div>
-                    </div>
-                    <div class="input-group"><label for="signup-otp-input">Verification Code</label><input type="text" id="signup-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric"></div>
-                    <div class="otp-timer" id="signup-otp-timer"></div>
-                    <button class="btn-success">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Verify &amp; Register
-                    </button>
-                    <button id="signup-resend-btn" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
-                        Resend OTP
-                    </button>
-                </div>
-                <div class="auth-extra-links"><p>Already have an account? <span data-switch-tab="login" class="text-link">Sign In</span></p></div>
-            </div>
 
-            <!-- ═══ FORGOT PASSWORD VIEW ═══ -->
-            <div id="forgot-view" class="auth-form-content hidden">
-                <div class="info-alert">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <p style="margin:0;font-size:0.84rem;">Enter your registered email to receive a password reset code.</p>
-                </div>
-                <div class="input-group"><label for="reset-email">Registered Email</label><input type="email" id="reset-email" placeholder="name@gmail.com" autocomplete="email"></div>
-                <button id="reset-btn" class="btn-primary" style="margin-top:1rem;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-                    Send Reset Code
-                </button>
-                <div id="reset-otp-section" class="otp-box hidden">
-                    <div class="email-sent-banner" id="reset-email-banner">
-                        <span class="email-sent-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-                        </span>
-                        <div class="email-sent-text"><strong>Reset code sent to your email!</strong><span id="reset-email-display"></span></div>
-                    </div>
-                    <div class="input-group"><label for="reset-otp-input">OTP Code</label><input type="text" id="reset-otp-input" placeholder="6-digit code" maxlength="6" inputmode="numeric"></div>
-                    <div class="otp-timer" id="reset-otp-timer"></div>
-                    <button id="reset-resend-btn" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
-                        Resend OTP
-                    </button>
+                <!-- ═══ LOGIN VIEW ═══ -->
+                <div id="login-view" class="auth-form-content" role="tabpanel" aria-labelledby="tab-login">
                     <div class="input-group">
-                        <label for="reset-new-password">New Password</label>
+                        <label for="login-email">Email or Phone Number</label>
+                        <input type="text" id="login-email" placeholder="name@gmail.com or 09XXXXXXXXX" autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">Password</label>
                         <div class="input-password-wrap">
-                            <input type="password" id="reset-new-password" placeholder="Enter new password" autocomplete="new-password">
+                            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
                             <button type="button" class="eye-btn" aria-label="Toggle password visibility">
                                 <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                 <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                             </button>
                         </div>
-                        <div class="pw-strength-bar" id="reset-pw-bar"></div>
-                        <span class="pw-strength-label" id="reset-pw-label"></span>
                     </div>
-                    <button class="btn-primary" style="margin-top:1rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Update Password
+                    <div class="auth-meta-row">
+                        <label class="auth-remember">
+                            <input type="checkbox" id="remember-me" checked>
+                            <span>Stay logged in</span>
+                        </label>
+                        <span id="biometric-hint" style="display:none;font-size:0.78rem;color:var(--secondary);cursor:pointer;font-weight:600;">🔒 Use fingerprint</span>
+                        <span class="auth-forgot">Forgot password?</span>
+                    </div>
+                    <button class="btn-primary" style="margin-top:1.1rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        Sign In
+                    </button>
+                    <div class="auth-extra-links">
+                        <p>New here? <span data-switch-tab="signup" class="text-link">Create account</span></p>
+                    </div>
+                </div>
+
+                <!-- ═══ SIGNUP VIEW ═══ -->
+                <div id="signup-view" class="auth-form-content hidden" role="tabpanel" aria-labelledby="tab-signup">
+                    <div class="grid-inputs">
+                        <div class="input-group"><label for="signup-first-name">First Name</label><input type="text" id="signup-first-name" placeholder="John" autocomplete="given-name"></div>
+                        <div class="input-group"><label for="signup-last-name">Last Name</label><input type="text" id="signup-last-name" placeholder="Doe" autocomplete="family-name"></div>
+                    </div>
+                    <div class="input-group"><label for="signup-employeeid">Employee ID</label><input type="text" id="signup-employeeid" placeholder="02XXXXXX"></div>
+                    <div class="input-group">
+                        <label for="signup-email">Email Address</label>
+                        <input type="email" id="signup-email" placeholder="email@gmail.com" autocomplete="email">
+                        <div id="signup-email-status" style="margin-top:0.35rem;font-size:0.82rem;color:#6b7280;">Enter your Gmail or school email address.</div>
+                    </div>
+                    <div class="input-group"><label for="signup-contact">Contact Number</label><input type="tel" id="signup-contact" placeholder="+63 9xx xxx xxxx" autocomplete="tel"></div>
+                    <div class="input-group">
+                        <label for="signup-position">Position</label>
+                        <select id="signup-position"><option value="" disabled selected>Select your position</option><option value="Administrator">Administrator</option><option value="Staff / Teachers">Staff / Teachers</option></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-password">Password</label>
+                        <div class="input-password-wrap">
+                            <input type="password" id="signup-password" placeholder="Min. 8 characters" autocomplete="new-password">
+                            <button type="button" class="eye-btn" aria-label="Toggle password visibility">
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </button>
+                        </div>
+                        <div class="pw-strength-bar" id="signup-pw-bar"></div>
+                        <span class="pw-strength-label" id="signup-pw-label"></span>
+                    </div>
+                    <button id="signup-btn" class="btn-primary" style="margin-top:1.1rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                        Send Verification OTP
+                    </button>
+                    <div id="signup-otp-section" class="otp-box hidden">
+                        <div class="email-sent-banner" id="signup-email-banner">
+                            <span class="email-sent-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                            </span>
+                            <div class="email-sent-text"><strong>OTP sent to your email!</strong><span id="signup-email-display"></span></div>
+                        </div>
+                        <div class="input-group"><label for="signup-otp-input">Verification Code</label><input type="text" id="signup-otp-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric"></div>
+                        <div class="otp-timer" id="signup-otp-timer"></div>
+                        <button class="btn-success">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Verify &amp; Register
+                        </button>
+                        <button id="signup-resend-btn" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                            Resend OTP
+                        </button>
+                    </div>
+                    <div class="auth-extra-links"><p>Already have an account? <span data-switch-tab="login" class="text-link">Sign In</span></p></div>
+                </div>
+
+                <!-- ═══ FORGOT PASSWORD VIEW ═══ -->
+                <div id="forgot-view" class="auth-form-content hidden">
+                    <div class="info-alert">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <p style="margin:0;font-size:0.84rem;">Enter your registered email to receive a password reset code.</p>
+                    </div>
+                    <div class="input-group"><label for="reset-email">Registered Email</label><input type="email" id="reset-email" placeholder="name@gmail.com" autocomplete="email"></div>
+                    <button id="reset-btn" class="btn-primary" style="margin-top:1rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                        Send Reset Code
+                    </button>
+                    <div id="reset-otp-section" class="otp-box hidden">
+                        <div class="email-sent-banner" id="reset-email-banner">
+                            <span class="email-sent-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                            </span>
+                            <div class="email-sent-text"><strong>Reset code sent to your email!</strong><span id="reset-email-display"></span></div>
+                        </div>
+                        <div class="input-group"><label for="reset-otp-input">OTP Code</label><input type="text" id="reset-otp-input" placeholder="6-digit code" maxlength="6" inputmode="numeric"></div>
+                        <div class="otp-timer" id="reset-otp-timer"></div>
+                        <button id="reset-resend-btn" style="display:none;margin-top:0.5rem;background:transparent!important;color:var(--secondary);border:1.5px solid var(--secondary);padding:0.45rem 1rem;border-radius:var(--radius-md);font-size:0.82rem;cursor:pointer;width:100%;justify-content:center;box-shadow:none !important;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                            Resend OTP
+                        </button>
+                        <div class="input-group">
+                            <label for="reset-new-password">New Password</label>
+                            <div class="input-password-wrap">
+                                <input type="password" id="reset-new-password" placeholder="Enter new password" autocomplete="new-password">
+                                <button type="button" class="eye-btn" aria-label="Toggle password visibility">
+                                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                </button>
+                            </div>
+                            <div class="pw-strength-bar" id="reset-pw-bar"></div>
+                            <span class="pw-strength-label" id="reset-pw-label"></span>
+                        </div>
+                        <button class="btn-primary" style="margin-top:1rem;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Update Password
+                        </button>
+                    </div>
+                    <div class="auth-extra-links">
+                        <p><span data-switch-tab="login" class="text-link">&#8592; Back to Sign In</span></p>
+                    </div>
+                </div>
+
+            </div><!-- /.auth-card -->
+
+            <!-- Bottom row: dark toggle + footer -->
+            <div class="auth-rp-bottom">
+                <div class="auth-dark-toggle-wrap">
+                    <span class="auth-dark-label">Appearance</span>
+                    <button id="auth-dark-toggle" class="dark-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                     </button>
                 </div>
-                <div class="auth-extra-links">
-                    <p><span data-switch-tab="login" class="text-link">← Back to Sign In</span></p>
-                </div>
+                <footer class="auth-footer">
+                    <p>&#169; 2026 FreshZone</p>
+                    <p>
+                        <a href="privacy.html">Privacy</a> &#183;
+                        <a href="terms.html">Terms</a> &#183;
+                        <a href="mailto:freshzone.alerts@gmail.com">Contact</a>
+                    </p>
+                </footer>
             </div>
-        </main>
 
-        <section class="aq-guide" aria-labelledby="auth-aq-guide-title" style="margin-top:0.9rem;">
-            <div class="aq-guide-head">
-                <h3 id="auth-aq-guide-title">What FreshZone monitors</h3>
-                <span class="aq-guide-chip">Live Sensors</span>
-            </div>
-            <div class="aq-guide-grid">
-                <article class="aq-card">
-                    <h4>PM1.0, PM2.5, PM10</h4>
-                    <p>FreshZone reads multiple particle sizes to detect aerosol behavior and air quality changes in real time.</p>
-                </article>
-                <article class="aq-card">
-                    <h4>AQI</h4>
-                    <p>AQI translates PM2.5 into a health-based score so alerts are easier to interpret quickly.</p>
-                </article>
-                <article class="aq-card">
-                    <h4>Why it matters</h4>
-                    <p>Earlier detection helps staff respond faster, reduce exposure, and keep shared spaces safer.</p>
-                </article>
-            </div>
-        </section>
-
-        <div class="auth-bottom-row">
-            <div class="auth-dark-toggle-wrap">
-                <span class="auth-dark-label">Appearance</span>
-                <button id="auth-dark-toggle" class="dark-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </button>
-            </div>
-            <footer class="auth-footer">
-                <p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p>
-                <p style="font-size:0.72rem;margin-top:0.25rem;">
-                    <a href="privacy.html">Privacy</a> ·
-                    <a href="terms.html">Terms</a> ·
-                    <a href="mailto:freshzone.alerts@gmail.com">Contact</a>
-                </p>
-            </footer>
-        </div>
-
-        </div><!-- /.auth-container -->
+        </div><!-- /.auth-rp-inner -->
     </div><!-- /.auth-right-panel -->
-</div><!-- /.auth-wrapper -->
+
+</div><!-- /.auth-split-wrapper -->
+
+<!-- Smoke bg (kept for JS compat) -->
+<div class="smoke-container" id="smoke-bg"></div>
 
 <div id="notification" class="notification hidden" role="alert" aria-live="polite"></div>
 
 <script>
-// Tab switcher — works with the existing showView() in auth.js
+// ── TAB SWITCHER ─────────────────────────────────────────────
 function switchTab(mode) {
     const tabs = {
-        login:  { tab:'tab-login',  view:'login-view',  h2:'Welcome back',       sub:'Sign in to your FreshZone account'   },
-        signup: { tab:'tab-signup', view:'signup-view', h2:'Create account',     sub:'Join FreshZone — it only takes a minute' },
-        forgot: { tab:null,         view:'forgot-view', h2:'Reset password',     sub:'We\'ll send a code to your email'    },
+        login:  { tab:'tab-login',  view:'login-view',  h2:'Welcome back',    sub:'Sign in to your FreshZone account'      },
+        signup: { tab:'tab-signup', view:'signup-view', h2:'Create account',  sub:'Join FreshZone \u2014 it only takes a minute' },
+        forgot: { tab:null,         view:'forgot-view', h2:'Reset password',  sub:'We\u2019ll send a reset code to your email'  },
     };
-    // Hide all views
     ['login-view','signup-view','forgot-view'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.classList.add('hidden'); el.style.display = ''; }
     });
-    // Deactivate all tabs
     document.querySelectorAll('.auth-tab').forEach(t => {
         t.classList.remove('active'); t.setAttribute('aria-selected','false');
     });
-    // Show selected
     const target = tabs[mode];
-    if (target) {
-        const view = document.getElementById(target.view);
-        if (view) { view.classList.remove('hidden'); }
-        if (target.tab) {
-            const tab = document.getElementById(target.tab);
-            if (tab) { tab.classList.add('active'); tab.setAttribute('aria-selected','true'); }
-        }
-        // Update card heading
-        const h2 = document.querySelector('.auth-card-heading h2');
-        const sub = document.querySelector('.auth-card-heading p');
-        if (h2) h2.textContent = target.h2;
-        if (sub) sub.textContent = target.sub;
+    if (!target) return;
+    const view = document.getElementById(target.view);
+    if (view) view.classList.remove('hidden');
+    if (target.tab) {
+        const tab = document.getElementById(target.tab);
+        if (tab) { tab.classList.add('active'); tab.setAttribute('aria-selected','true'); }
     }
+    const h2  = document.getElementById('auth-heading-title');
+    const sub = document.getElementById('auth-heading-sub');
+    if (h2)  h2.textContent  = target.h2;
+    if (sub) sub.textContent = target.sub;
 }
-// Keep legacy showView working (called from auth.js)
+// Legacy compat — called from auth.js
 function showView(id) {
     const map = {'login-view':'login','signup-view':'signup','forgot-view':'forgot'};
     switchTab(map[id] || 'login');
@@ -814,6 +380,6 @@ function showView(id) {
 <script src="auth.js"></script>
 <script src="/pwa.js" defer></script>
 <script src="cookie-consent.js?v=3" defer></script>
-    <script defer src="enhance.js"></script>
+<script defer src="enhance.js"></script>
 </body>
 </html>
