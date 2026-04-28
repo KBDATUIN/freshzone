@@ -762,3 +762,9 @@ footer {
         font-size: 0.73rem !important;
     }
 }
+
+/* -- iOS SAFE AREA - mobile nav drawer ----------------------- */
+.mobile-nav-drawer {
+    padding-bottom: env(safe-area-inset-bottom, 16px) !important;
+}
+
