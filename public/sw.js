@@ -291,6 +291,11 @@ self.addEventListener('fetch', (event) => {
     if (url.origin !== location.origin && !url.origin.includes('fonts.googleapis.com') && !url.origin.includes('fontshare.com')) {
         return;
     }
+
+    // Skip fontshare CDN font files — let browser handle natively (avoids SW errors on CDN outages)
+    if (url.origin.includes('cdn.fontshare.com')) {
+        return;
+    }
     
     // ── API ROUTES: Network-first ──
     if (url.pathname.startsWith('/api/')) {
