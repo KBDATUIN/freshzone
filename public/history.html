@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <style>/* Anti-flash */html{background:white;}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
-    <script>(function(){var t=localStorage.getItem('fz-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | History</title>
@@ -22,7 +21,6 @@
     <meta name="apple-mobile-web-app-title" content="FreshZone">
     <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
     <link rel="stylesheet" href="/pwa.css">
-    <link rel="stylesheet" href="style-fixes.css">
     <style>
         /* ── KEYFRAMES ─────────────────────────────────────── */
         @keyframes rowSlideIn {
@@ -51,7 +49,7 @@
         .stats-grid .stat-box:nth-child(3) { animation-delay:0.34s; }
 
         /* ── TABLE ──────────────────────────────────────────── */
-        table { width:100%; border-collapse:collapse; }
+        table { width:100%; border-collapse:collapse; min-width:600px; }
         th,td { padding:1.1rem 1.2rem; text-align:left; border-bottom:1px solid #eee; font-size:0.95rem; }
         th { background:#f8f9fa; color:var(--gray); font-size:0.85rem; font-weight:600; }
         tbody tr { transition:background 0.22s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1); }
@@ -107,18 +105,9 @@
         }
 
         /* ── HISTORY PAGE READABILITY TWEAKS ───────────────────────── */
-        .page-hero {
-            background: rgba(240,252,255,0.98) !important;
-            border: 1px solid rgba(0,120,180,0.18) !important;
-            border-radius: 20px !important;
-            padding: 1.75rem 1.5rem !important;
-            box-shadow: 0 8px 32px rgba(0,60,110,0.14) !important;
-        }
-        .page-hero h1 { color: #002840 !important; font-weight: 800 !important; font-size: 1.55rem !important; letter-spacing: -0.025em !important; }
-        .page-hero p { color: #2e5a72 !important; font-size: 0.95rem !important; max-width: 620px !important; margin-top: 0.3rem !important; }
-        [data-theme="dark"] .page-hero { background: rgba(10,20,36,0.98) !important; border-color: rgba(34,211,238,0.12) !important; }
-        [data-theme="dark"] .page-hero h1 { color: #e2f0f8 !important; }
-        [data-theme="dark"] .page-hero p { color: #94a3b8 !important; }
+        .page-hero { background: rgba(255,255,255,0.92); border: 1px solid rgba(0,120,180,0.18); border-radius: 24px; padding: 1.8rem; box-shadow: 0 24px 60px rgba(0,72,112,0.12); }
+        .page-hero h1 { color: #043551; }
+        .page-hero p { color: #315b71; font-size: 1rem; max-width: 620px; }
         .stats-grid .stat-box { background: rgba(255,255,255,0.96); }
         .aq-guide-head h3 { color: #03314c; }
         .aq-guide-chip { background: rgba(0,180,216,0.14); color: #005c81; border-radius: 999px; padding: 0.55rem 0.95rem; font-weight: 700; letter-spacing: 0.02em; }
@@ -215,89 +204,35 @@
         .filter-input-wrap input,
         .filter-input-wrap select {
             width: 100%;
-            padding-right: 2.25rem;
+            padding-right: 2rem;
         }
-        /* ── X CLEAR BUTTON — perfect circle, all screen sizes ── */
         .filter-inline-clear {
-            /* Position */
             position: absolute !important;
-            right: 8px !important;
+            right: 6px !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            /* Force exact square — border-radius:50% then makes it a circle */
-            width: 22px !important;
-            height: 22px !important;
-            min-width: 22px !important;
-            max-width: 22px !important;
-            min-height: 22px !important;
-            max-height: 22px !important;
-            /* Appearance */
+            width: 20px !important;
+            height: 20px !important;
+            min-width: unset !important;
             padding: 0 !important;
             margin: 0 !important;
             border: none !important;
             border-radius: 50% !important;
-            background: rgba(92,110,128,0.78) !important;
+            background: #94a3b8 !important;
             color: white !important;
-            /* Layout inside */
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            flex-shrink: 0 !important;
-            flex-grow: 0 !important;
-            /* Misc */
+            font-size: 0.6rem !important;
             cursor: pointer !important;
             box-shadow: none !important;
             text-transform: none !important;
-            z-index: 10 !important;
-            overflow: hidden !important;
-            line-height: 22px !important;
-            font-size: 0 !important;
-            transition: background 0.15s ease !important;
-            /* Prevent any inherited styles from stretching it */
-            outline: none !important;
-            letter-spacing: 0 !important;
-            vertical-align: unset !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            z-index: 2 !important;
+            transition: background 0.2s !important;
         }
-        .filter-inline-clear:hover { background: rgba(51,65,85,0.95) !important; }
-        .filter-inline-clear:active { transform: translateY(-50%) scale(0.88) !important; }
-        .filter-inline-clear:focus { background: rgba(51,65,85,0.95) !important; }
+        .filter-inline-clear:hover { background: #64748b !important; }
         .filter-inline-clear::after { display: none !important; }
-        .filter-inline-clear::before { display: none !important; }
-        /* SVG X icon inside — locked to 11x11 */
-        .filter-inline-clear > svg,
-        .filter-inline-clear svg {
-            width: 11px !important;
-            height: 11px !important;
-            min-width: 11px !important;
-            max-width: 11px !important;
-            flex-shrink: 0 !important;
-            display: block !important;
-            stroke: white !important;
-            fill: none !important;
-            stroke-width: 2.5 !important;
-            pointer-events: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        /* Mobile — same exact rules, no changes */
-        @media (max-width: 600px) {
-            .filter-inline-clear {
-                width: 22px !important;
-                height: 22px !important;
-                min-width: 22px !important;
-                max-width: 22px !important;
-                min-height: 22px !important;
-                max-height: 22px !important;
-                right: 8px !important;
-                border-radius: 50% !important;
-            }
-            .filter-inline-clear > svg,
-            .filter-inline-clear svg {
-                width: 11px !important;
-                height: 11px !important;
-                max-width: 11px !important;
-            }
-        }
 
         /* Button label parts — always visible */
         .fab-icon { display: inline-flex; align-items: center; flex-shrink: 0; }
@@ -389,7 +324,7 @@
             <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
                 <img src="logo1.png" alt="FreshZone Logo">
             </a>
-            <div class="nav-links" id="desktop-nav">
+            <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <a href="history.html" class="active">History</a>
                 <a href="about.html">About</a>
@@ -422,7 +357,6 @@
             <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
             <a href="history.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
-            <a href="about.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> About</a>
             <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
             <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
             <div class="mobile-nav-divider"></div>
@@ -465,7 +399,7 @@
                     <label for="filter-search"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search</label>
                     <div class="filter-input-wrap">
                         <input type="text" id="filter-search" placeholder="Location or action…" maxlength="100" oninput="renderTable();updateClearBtns()">
-                        <button class="filter-inline-clear" id="clear-search" onclick="clearField('filter-search')" title="Clear search" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                        <button class="filter-inline-clear" id="clear-search" onclick="clearField('filter-search')" title="Clear search" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     </div>
                 </div>
 
@@ -478,7 +412,7 @@
                             <option value="Acknowledged">Acknowledged</option>
                             <option value="Cleared">Cleared</option>
                         </select>
-                        <button class="filter-inline-clear" id="clear-status" onclick="clearField('filter-status')" title="Clear status" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                        <button class="filter-inline-clear" id="clear-status" onclick="clearField('filter-status')" title="Clear status" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     </div>
                 </div>
 
@@ -486,7 +420,7 @@
                     <label for="filter-date"><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Date</label>
                     <div class="filter-input-wrap">
                         <input type="date" id="filter-date" onchange="renderTable();updateClearBtns()">
-                        <button class="filter-inline-clear" id="clear-date" onclick="clearField('filter-date')" title="Clear date" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                        <button class="filter-inline-clear" id="clear-date" onclick="clearField('filter-date')" title="Clear date" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                     </div>
                 </div>
 
@@ -598,30 +532,288 @@
                display:none;align-items:center;justify-content:center;z-index:900;
                box-shadow:0 4px 14px rgba(0,0,0,0.2);margin:0;padding:0;text-transform:none;">↑</button>
 
-    <footer class="site-footer">
-        <p>
-            © 2026 FreshZone – Campus Vape Aerosol Detection System<br>
-            <a href="terms.html">Terms of Service</a> |
-            <a href="privacy.html">Privacy Policy</a> |
-            DPO: <a href="mailto:dpo@freshzone.space">dpo@freshzone.space</a>
-        </p>
-    </footer>
-
-    <script src="cookie-consent.js?v=3" defer></script>
+    <footer><p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p></footer>
 
     <script src="utils.js"></script>
     <script>
         // Auth guard
-        let user = null;
-        (async function initUser() {
-            user = await hydrateSessionUser();
-            if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; return; }
-            window._fzCurrentUser = user;
-            if (user.position === 'Administrator') {
-                const ds = document.getElementById('danger-section');
-                if (ds) ds.style.display = '';
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; }
+
+        // Show danger section (Delete All History) only for Administrators
+        if (user && user.position === 'Administrator') {
+            const ds = document.getElementById('danger-section');
+            if (ds) ds.style.display = '';
+        }
+
+        let allRecords = [];
+
+        async function loadHistory() {
+            try {
+                const data = await apiFetch('/history');
+                if (data && data.success) {
+                    allRecords = data.data;
+                } else {
+                    allRecords = [];
+                }
+                renderTable();
+                loadStats();
+            } catch(err) {
+                showNotification('Failed to load history.', 'error');
             }
+        }
+
+        async function loadStats() {
+            try {
+                const data = await apiFetch('/history/stats');
+                if (data && data.success && data.stats) {
+                    setHistoryStats(data.stats);
+                    return;
+                }
+            } catch(err) {
+                // silently fall back to derived stats from the loaded history records
+            }
+            setHistoryStats();
+        }
+
+        function setHistoryStats(stats = {}) {
+            const fallback = computeHistoryStats();
+            let today    = Number.isFinite(stats.today)    ? stats.today    : fallback.today;
+            let total    = Number.isFinite(stats.total)    ? stats.total    : fallback.total;
+            let resolved = Number.isFinite(stats.resolved) ? stats.resolved : fallback.resolved;
+            if (fallback.total > 0 && total === 0) total = fallback.total;
+            if (fallback.resolved > 0 && resolved === 0) resolved = fallback.resolved;
+            if (fallback.today > 0 && today === 0) today = fallback.today;
+            setStatAnimated('stat-today', today);
+            setStatAnimated('stat-total', total);
+            setStatAnimated('stat-resolved', resolved);
+        }
+
+        function computeHistoryStats() {
+            const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+            let todayCount = 0;
+            let resolvedCount = 0;
+            allRecords.forEach(r => {
+                if (r.detected_at) {
+                    const detectedDate = new Date(r.detected_at).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+                    if (detectedDate === today) todayCount += 1;
+                }
+                if (r.status === 'Cleared' || r.resolved_at) resolvedCount += 1;
+            });
+            return {
+                today: todayCount,
+                total: allRecords.length,
+                resolved: resolvedCount,
+            };
+        }
+
+        function renderTable() {
+            const search  = document.getElementById('filter-search').value.toLowerCase();
+            const status  = document.getElementById('filter-status').value;
+            const dateVal = document.getElementById('filter-date').value;
+            const tbody   = document.getElementById('history-tbody');
+
+            let records = allRecords.filter(r => {
+                const matchSearch = !search ||
+                    (r.location    || '').toLowerCase().includes(search) ||
+                    (r.status      || '').toLowerCase().includes(search) ||
+                    (r.handled_by  || '').toLowerCase().includes(search) ||
+                    (r.notes       || '').toLowerCase().includes(search);
+                const matchStatus = !status || r.status === status;
+                const matchDate = !dateVal || (() => {
+                    if (!r.detected_at) return false;
+                    const d = new Date(r.detected_at);
+                    const manila = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }); // YYYY-MM-DD
+                    return manila === dateVal;
+                })();
+                return matchSearch && matchStatus && matchDate;
+            });
+
+            tbody.style.transition = 'opacity 0.18s ease';
+            tbody.style.opacity = '0';
+            setTimeout(() => {
+                tbody.innerHTML = '';
+                if (records.length === 0) {
+                    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No records found matching your filters.</td></tr>';
+                } else {
+                    records.forEach((r, i) => {
+                        const isDetected = r.status === 'Detected';
+                        const tr = document.createElement('tr');
+                        tr.className = 'row-animate';
+                        tr.style.animationDelay = (i * 0.055) + 's';
+                        // Format times in Manila timezone
+                        const phLocale = 'en-PH';
+                        const phOpts   = { timeZone: 'Asia/Manila', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+                        const timeOnly = { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+                        const dateOnly = { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' };
+
+                        const detectedStr     = r.detected_at     ? new Date(r.detected_at).toLocaleString(phLocale, phOpts)     : '—';
+                        const acknowledgedStr = r.acknowledged_at  ? new Date(r.acknowledged_at).toLocaleString(phLocale, phOpts)  : '—';
+                        const resolvedStr     = r.resolved_at      ? new Date(r.resolved_at).toLocaleString(phLocale, phOpts)      : '—';
+
+                        // Response time — duration + acknowledged timestamp
+                        let responseDuration = '—';
+                        let responseTimestamp = '';
+                        if (r.response_seconds !== null && r.response_seconds !== undefined) {
+                            const totalSec = r.response_seconds;
+                            const hrs  = Math.floor(totalSec / 3600);
+                            const mins = Math.floor((totalSec % 3600) / 60);
+                            const secs = totalSec % 60;
+                            if (totalSec < 60)        responseDuration = secs + 's';
+                            else if (totalSec < 3600) responseDuration = mins + 'm ' + secs + 's';
+                            else                      responseDuration = hrs + 'h ' + mins + 'm';
+                        }
+                        if (r.acknowledged_at) {
+                            responseTimestamp = new Date(r.acknowledged_at).toLocaleString(phLocale, phOpts);
+                        }
+
+                        const responseCell = responseDuration !== '—'
+                            ? `<span style="font-weight:600;color:var(--primary);">${responseDuration}</span>${responseTimestamp ? `<br><span style="font-size:0.78rem;color:var(--gray);font-weight:400;">${responseTimestamp}</span>` : ''}`
+                            : '—';
+
+                        // Status tag
+                        let statusTag = 'tag-info';
+                        if (r.status === 'Detected')     statusTag = 'tag-danger';
+                        else if (r.status === 'Cleared') statusTag = 'tag-success';
+                        else if (r.status === 'Acknowledged') statusTag = 'tag-warning';
+
+                        tr.innerHTML = `
+                            <td data-label="Detected">${detectedStr}</td>
+                            <td data-label="Location">${r.location || '—'}</td>
+                            <td data-label="Status"><span class="tag ${statusTag}">${r.status}</span></td>
+                            <td data-label="Acknowledged">${acknowledgedStr}</td>
+                            <td data-label="Resolved">${resolvedStr}</td>
+                            <td data-label="Response">${responseCell}</td>
+                            <td data-label="By">${r.handled_by || '—'}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+                tbody.style.opacity = '1';
+            }, 180);
+        }
+
+        function setStatAnimated(id, val) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = val;
+            el.classList.remove('pop');
+            void el.offsetWidth;
+            el.classList.add('pop');
+        }
+
+        // ── FILTER CLEAR BUTTONS ──────────────────────────────
+        // Shows/hides the inline ✕ button inside each filter input
+        function updateClearBtns() {
+            const fields = [
+                { inputId: 'filter-search', btnId: 'clear-search' },
+                { inputId: 'filter-status', btnId: 'clear-status' },
+                { inputId: 'filter-date',   btnId: 'clear-date'   },
+            ];
+            fields.forEach(({ inputId, btnId }) => {
+                const input = document.getElementById(inputId);
+                const btn   = document.getElementById(btnId);
+                if (!input || !btn) return;
+                btn.style.display = input.value ? 'flex' : 'none';
+            });
+        }
+
+        function clearField(fieldId) {
+            const el = document.getElementById(fieldId);
+            if (!el) return;
+            el.value = '';
+            renderTable();
+            updateClearBtns();
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-search').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-date').value = '';
+            updateClearBtns();
+            renderTable();
+        }
+
+        function exportCSV() {
+            const ph = { timeZone: 'Asia/Manila', year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true };
+            const fmt = dt => dt ? new Date(dt).toLocaleString('en-PH', ph) : '—';
+            const fmtSec = (s) => {
+                if (s === null || s === undefined) return '';
+                const hrs = Math.floor(s / 3600), mins = Math.floor((s % 3600) / 60), secs = s % 60;
+                if (s < 60) return secs + 's';
+                if (s < 3600) return mins + 'm ' + secs + 's';
+                return hrs + 'h ' + mins + 'm';
+            };
+            const header = 'Detected,Location,Status,Acknowledged,Resolved,Response Time,By,Notes\n';
+            const rows = allRecords.map(r =>
+                `"${fmt(r.detected_at)}","${r.location}","${r.status}","${fmt(r.acknowledged_at)}","${fmt(r.resolved_at)}","${fmtSec(r.response_seconds)}","${r.handled_by||''}","${r.notes||''}"`
+            ).join('\n');
+            const blob = new Blob([header + rows], { type: 'text/csv' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'freshzone-history.csv'; a.click();
+            showNotification('CSV exported successfully.', 'success');
+        }
+
+
+        function clearAllHistory() {
+            document.getElementById('clearAllModal').style.display = 'flex';
+        }
+
+        async function confirmClearAll() {
+            document.getElementById('clearAllModal').style.display = 'none';
+            try {
+                const data = await apiFetch('/history/clear-all', { method: 'DELETE' });
+                if (data && data.success) {
+                    allRecords = [];
+                    renderTable();
+                    loadStats();
+                    showNotification('All history cleared successfully.', 'success');
+                } else {
+                    showNotification(data?.message || 'Failed to clear history.', 'error');
+                }
+            } catch(err) {
+                showNotification('Connection error.', 'error');
+            }
+        }
+
+        loadHistory();
+        
+        // ── SORT TABLE ─────────────────────────────────────
+        let sortCol = 0; let sortAsc = false;
+        const COLS = ['detected_at','location','status','acknowledged_at','resolved_at','response_seconds','handled_by'];
+
+        function sortTable(colIdx) {
+            const key = COLS[colIdx];
+            if (sortCol === colIdx) { sortAsc = !sortAsc; } else { sortCol = colIdx; sortAsc = true; }
+            allRecords = [...allRecords].sort((a, b) => {
+                const va = (a[key] || '').toString().toLowerCase();
+                const vb = (b[key] || '').toString().toLowerCase();
+                return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+            });
+            // Update header indicators
+            document.querySelectorAll('th').forEach((th, i) => {
+                th.classList.remove('sort-asc','sort-desc');
+                if (i === colIdx) th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+            });
+            renderTable();
+        }
+
+        // ── BACK TO TOP ────────────────────────────────────
+        const btt = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (btt) btt.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        }, { passive: true });
+
+
+        // Show logged-in user name in nav
+        (function() {
+            const u = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const el = document.getElementById('nav-user-name');
-            if (el) el.textContent = user.full_name || user.name || '';
-            loadHistory();
+            if (el && (u.full_name || u.name)) el.textContent = u.full_name || u.name;
         })();
+        initHotkeys('history');
+    </script>
+    <script src="/pwa.js" defer></script>
+    <script defer src="enhance.js"></script>
+</body>
+</html>
