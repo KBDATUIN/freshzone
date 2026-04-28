@@ -70,6 +70,11 @@ body::before{
   z-index: 0; pointer-events: none;
   animation: fzAurora 28s var(--fz-ease) infinite alternate;
 }
+@media (prefers-reduced-motion: reduce) {
+    body::before {
+        animation: none;
+    }
+}
 @keyframes fzAurora{
   0%   { transform: rotate(0deg) scale(1); }
   50%  { transform: rotate(8deg) scale(1.08); }
