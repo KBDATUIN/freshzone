@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style-v2.css">
     <link rel="stylesheet" href="style-v3.css">
+    <link rel="stylesheet" href="style-fixes.css">
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#004e7a">
@@ -306,6 +307,14 @@
             .nav-links { display: none !important; }
             .nav-controls .hamburger { display: flex !important; }
             .nav-user { display: none !important; }
+        }
+    </style>
+    <style>
+        /* CRITICAL: override style-v3.css which sets overflow:hidden on .log-container */
+        .log-container {
+            overflow-x: auto !important;
+            overflow-y: visible !important;
+            -webkit-overflow-scrolling: touch !important;
         }
     </style>
 </head>
