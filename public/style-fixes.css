@@ -858,3 +858,13 @@ footer {
     }
 }
 
+/* ── CRITICAL: override style-v3.css .log-container{overflow:hidden} ── */
+/* style-v3.css sets overflow:hidden on .log-container which blocks scroll.
+   style-fixes.css loads last so this wins. */
+.log-container {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: contain !important;
+}
+
