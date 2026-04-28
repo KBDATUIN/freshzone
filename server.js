@@ -177,7 +177,7 @@ app.get('/api/auth/csrf-token', csrfTokenHandler);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── API ROUTES ────────────────────────────────────────────────
-app.use('/api/auth',     authLimiter,  csrfProtection, require('./api/auth'));
+app.use('/api/auth',     authLimiter,  require('./api/auth'));
 app.use('/api/readings', esp32Limiter, csrfProtection, require('./api/readings'));
 app.use('/api/history',               csrfProtection, require('./api/history'));
 app.use('/api/profile',               csrfProtection, require('./api/profile'));
