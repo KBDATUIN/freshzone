@@ -324,7 +324,7 @@
             <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
                 <img src="logo1.png" alt="FreshZone Logo">
             </a>
-            <div class="nav-links">
+            <div class="nav-links" id="desktop-nav">
                 <a href="dashboard.html">Dashboard</a>
                 <a href="history.html" class="active">History</a>
                 <a href="about.html">About</a>
@@ -537,14 +537,19 @@
     <script src="utils.js"></script>
     <script>
         // Auth guard
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; }
-
-        // Show danger section (Delete All History) only for Administrators
-        if (user && user.position === 'Administrator') {
-            const ds = document.getElementById('danger-section');
-            if (ds) ds.style.display = '';
-        }
+        let user = null;
+        (async function initUser() {
+            user = await hydrateSessionUser();
+            if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; return; }
+            window._fzCurrentUser = user;
+            if (user.position === 'Administrator') {
+                const ds = document.getElementById('danger-section');
+                if (ds) ds.style.display = '';
+            }
+            const el = document.getElementById('nav-user-name');
+            if (el) el.textContent = user.full_name || user.name || '';
+            loadHistory();
+        })();
 
         let allRecords = [];
 
@@ -776,8 +781,6 @@
             }
         }
 
-        loadHistory();
-        
         // ── SORT TABLE ─────────────────────────────────────
         let sortCol = 0; let sortAsc = false;
         const COLS = ['detected_at','location','status','acknowledged_at','resolved_at','response_seconds','handled_by'];
@@ -805,12 +808,6 @@
         }, { passive: true });
 
 
-        // Show logged-in user name in nav
-        (function() {
-            const u = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            const el = document.getElementById('nav-user-name');
-            if (el && (u.full_name || u.name)) el.textContent = u.full_name || u.name;
-        })();
         initHotkeys('history');
     </script>
     <script src="/pwa.js" defer></script>
