@@ -11,6 +11,8 @@ html {
     max-width: 100vw !important;
 }
 body {
+    /* Override style.css body{overflow-x:hidden} — it blocks .log-container scroll */
+    overflow-x: visible !important;
     width: 100% !important;
     max-width: 100vw !important;
 }
