@@ -1,9 +1,13 @@
-// Push toggle drag handler — draggable + click-to-toggle
-// Loads after togglePushNotifications() exists
-// No conflicts with existing onclick/JS
+/* Push Toggle — Draggable + Click-to-toggle
+ * Compatible with existing onclick="togglePushNotifications()"
+ * Drag knob or click switch → toggle
+ * Touch/mobile friendly
+ * No conflicts */
 
 (function() {
   'use strict';
 
   const switchBtn = document.getElementById('push-btn');
-  const knob = switchBtn ? switchBtn.querySelector('.push-toggle
+  if (!switchBtn) return;
+
+  const knob = switchBtn.querySelector('.
