@@ -351,7 +351,15 @@
         0 0 28px rgba(34,211,238,0.3) !important;
 }
 
-/* Password eye button — glassy orb */
+/* Password eye button — glassy orb (FIXED hover overflow) */
+.auth-form-content .input-password-wrap {
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+}
+.auth-form-content .input-group {
+    overflow: hidden !important;
+}
 .eye-btn {
     background: rgba(255,255,255,0.25) !important;
     backdrop-filter: blur(10px) !important;
@@ -361,11 +369,13 @@
     width: 36px !important;
     height: 36px !important;
     right: 0.85rem !important;
+    transform: translateZ(0);
+    will-change: transform;
 }
 .eye-btn:hover {
     background: rgba(255,255,255,0.35) !important;
-    transform: scale(1.1) !important;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25) !important;
+    transform: scale(1.05) translateZ(0) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.20), 0 2px 4px rgba(0,0,0,0.15) !important;
 }
 [data-theme="dark"] .eye-btn {
     background: rgba(34,211,238,0.15) !important;
