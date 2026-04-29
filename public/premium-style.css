@@ -50,10 +50,10 @@
 }
 .push-toggle-knob {
     position: absolute !important;
-    top: 2px !important;     /* UP from 3px — PERFECT center */
-    left: 2px !important;    /* UP from 3px — PERFECT center */
-    width: 20px !important;  /* UP from 18px — matches switch */
-    height: 20px !important; /* UP from 18px — matches switch */
+top: 1.5px !important;  /* Pixel-perfect center in 24px switch */
+    left: 1.5px !important; /* Pixel-perfect center in 44px switch */
+    width: 21px !important; /* Precise for green background flush */
+    height: 21px !important;
     background: rgba(255,255,255,0.95) !important;
     border-radius: 50% !important;
     box-shadow: 
@@ -62,7 +62,7 @@
     transition: transform 0.32s cubic-bezier(0.4,0,0.2,1.2) !important;
 }
 .push-toggle-switch.active .push-toggle-knob {
-    transform: translateX(20px) !important; /* EXACT switch width */
+transform: translateX(21.5px) !important; /* EXACT center in active state */
 }
 .push-toggle-switch.active {
     background: linear-gradient(135deg, rgba(22,163,74,0.95), rgba(34,197,94,0.92)) !important;
