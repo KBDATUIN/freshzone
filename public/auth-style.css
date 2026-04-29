@@ -373,6 +373,7 @@
 .eye-btn:hover {
     background: rgba(255,255,255,0.35) !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important;
+    transition: background 0.2s ease, box-shadow 0.2s ease !important;
 }
 [data-theme="dark"] .eye-btn {
     background: rgba(34,211,238,0.15) !important;
