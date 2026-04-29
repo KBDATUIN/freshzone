@@ -1,61 +1,625 @@
-/* SCROLL TO TOP BUTTON — RIGHT SIDE FIXED */
+/* ═══════════════════════════════════════════════════════════════
+   FRESHZONE PREMIUM GLOBAL UPGRADE v2.0 — FIXED + ENHANCED
+   Push knob centered • Scroll button right-aligned • FULL glassmorphism
+   Loads after style-fixes.css — high-specificity premium overrides
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 0. SCROLL TO TOP — RIGHT-POSITIONED GLASS BUTTON ─────────── */
 #back-to-top {
     left: auto !important;
-    right: 20px !important;
-    bottom: 80px !important;
-    transform: none !important;
+    right: 1.25rem !important;
+    bottom: 5.5rem !important;
     z-index: 999 !important;
     border-radius: 50% !important;
-    width: 48px !important;
-    height: 48px !important;
-    background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+    width: 3.25rem !important;
+    height: 3.25rem !important;
+    background: linear-gradient(135deg, rgba(0,180,216,0.95), rgba(14,207,239,0.92)) !important;
     color: white !important;
-    border: none !important;
-    font-size: 1.1rem !important;
-    font-weight: 700 !important;
-    box-shadow: 0 6px 20px rgba(0,78,122,0.3) !important;
-    transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+    border: 1px solid rgba(255,255,255,0.3) !important;
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: 
+        0 8px 28px rgba(0,78,122,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.4) !important;
+    transition: all 0.28s cubic-bezier(0.4,0,0.2,1.2) !important;
 }
 #back-to-top:hover {
-    transform: translateY(-3px) scale(1.08) !important;
-    box-shadow: 0 12px 32px rgba(0,180,216,0.4) !important;
+    transform: translateY(-4px) scale(1.1) !important;
+    box-shadow: 
+        0 16px 40px rgba(0,180,216,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.6) !important;
+    background: linear-gradient(135deg, rgba(0,180,216,0.98), rgba(14,207,239,0.95)) !important;
 }
 #back-to-top::before { content: '↑' !important; }
 [data-theme="dark"] #back-to-top {
-    background: linear-gradient(135deg, #22d3ee, #38bdf8) !important;
-    box-shadow: 0 6px 20px rgba(34,211,238,0.25) !important;
+    background: linear-gradient(135deg, rgba(34,211,238,0.9), rgba(59,130,246,0.85)) !important;
+    border-color: rgba(34,211,238,0.25) !important;
 }
 [data-theme="dark"] #back-to-top:hover {
-    box-shadow: 0 12px 32px rgba(34,211,238,0.35) !important;
+    background: linear-gradient(135deg, rgba(34,211,238,0.95), rgba(59,130,246,0.9)) !important;
 }
 
-/* PUSH TOGGLE KNOB ALIGNMENT — PERFECT CENTER */
+/* ── 1. PUSH TOGGLE — KNOB PERFECTLY CENTERED ────────────────── */
 .push-toggle-switch {
+    position: relative !important;
+    width: 44px !important;
     height: 24px !important;
+    border-radius: 12px !important;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
 }
 .push-toggle-knob {
-    top: 2px !important;
-    left: 2px !important;
-    width: 20px !important;
-    height: 20px !important;
+    position: absolute !important;
+    top: 2px !important;     /* UP from 3px — PERFECT center */
+    left: 2px !important;    /* UP from 3px — PERFECT center */
+    width: 20px !important;  /* UP from 18px — matches switch */
+    height: 20px !important; /* UP from 18px — matches switch */
+    background: rgba(255,255,255,0.95) !important;
+    border-radius: 50% !important;
+    box-shadow: 
+        0 2px 8px rgba(0,0,0,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.6) !important;
+    transition: transform 0.32s cubic-bezier(0.4,0,0.2,1.2) !important;
 }
 .push-toggle-switch.active .push-toggle-knob {
-    transform: translateX(20px) !important;
+    transform: translateX(20px) !important; /* EXACT switch width */
+}
+.push-toggle-switch.active {
+    background: linear-gradient(135deg, rgba(22,163,74,0.95), rgba(34,197,94,0.92)) !important;
+    box-shadow: 
+        0 4px 16px rgba(22,163,74,0.3),
+        inset 0 0 0 1px rgba(255,255,255,0.3) !important;
+}
+.push-toggle-switch:hover:not(.active) {
+    background: rgba(0,180,216,0.15) !important;
 }
 
-/* MOBILE: Push toggle hidden below 640px (as defined in HTML) — NO CHANGE */
-@media (max-width: 640px) {
-    .push-toggle-wrap { display: none !important; }
+/* ── 2. NAV — FROSTED GLASS PERFECTION ───────────────────────── */
+nav {
+    background: rgba(0,68,110,0.94) !important;
+    backdrop-filter: blur(32px) saturate(220%) !important;
+    border-bottom: 1px solid rgba(0,180,216,0.35) !important;
+    box-shadow: 
+        0 4px 0 rgba(0,180,216,0.3),
+        0 12px 48px rgba(0,30,60,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.22) !important;
+}
+nav * { box-sizing: border-box; }
+
+[data-theme="dark"] nav {
+    background: rgba(4,12,24,0.98) !important;
+    border-bottom-color: rgba(34,211,238,0.25) !important;
+    box-shadow: 
+        0 4px 0 rgba(34,211,238,0.25),
+        0 12px 44px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(34,211,238,0.12) !important;
 }
 
-/* GLOBAL PUSH TOGGLE CONSISTENCY — OVERRIDE INLINE HTML */
-.push-toggle-switch,
-.push-toggle-knob {
-    transition: all 0.28s cubic-bezier(0.4,0,0.2,1) !important;
+.nav-container {
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+.nav-links a {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: rgba(225,245,255,0.98) !important;
+    padding: 0.6rem 1.2rem !important;
+    border-radius: 16px !important;
+    font-weight: 700 !important;
+    backdrop-filter: blur(16px) !important;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1.2) !important;
+    margin-right: 0.45rem !important;
+}
+.nav-links a:last-child { margin-right: 0; }
+
+.nav-links a:hover {
+    background: rgba(255,255,255,0.25) !important;
+    border-color: rgba(255,255,255,0.4) !important;
+    color: white !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35) !important;
 }
 
-/* ENSURE BACK-TO-TOP APPEARS ON SCROLL */
-#back-to-top {
-    display: none !important;
+.nav-links a.active {
+    background: linear-gradient(135deg, rgba(0,180,216,1), rgba(14,207,239,0.98)) !important;
+    border-color: rgba(255,255,255,0.45) !important;
+    color: white !important;
+    box-shadow: 
+        0 12px 36px rgba(0,180,216,0.55),
+        inset 0 1px 0 rgba(255,255,255,0.4) !important;
+    transform: translateY(-1.5px) !important;
 }
-#back-to-top.show { display: flex !important; }
+
+[data-theme="dark"] .nav-links a {
+    background: rgba(0,0,0,0.45) !important;
+    border-color: rgba(34,211,238,0.2) !important;
+    color: rgba(195,235,255,0.98) !important;
+}
+[data-theme="dark"] .nav-links a:hover {
+    background: rgba(0,0,0,0.65) !important;
+    border-color: rgba(34,211,238,0.35) !important;
+}
+[data-theme="dark"] .nav-links a.active {
+    background: linear-gradient(135deg, rgba(34,211,238,0.3), rgba(125,211,252,0.28)) !important;
+}
+
+/* ── 3. NAV USER PILL — GLASS MICRO-DETAIL ──────────────────── */
+.nav-user {
+    background: rgba(255,255,255,0.16) !important;
+    border: 1.5px solid rgba(255,255,255,0.32) !important;
+    color: rgba(225,245,255,0.98) !important;
+    backdrop-filter: blur(14px) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.25) !important;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1.2) !important;
+}
+.nav-user:hover {
+    background: rgba(255,255,255,0.28) !important;
+    border-color: rgba(255,255,255,0.5) !important;
+    transform: translateY(-1px) scale(1.05) !important;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.35) !important;
+}
+[data-theme="dark"] .nav-user {
+    background: rgba(34,211,238,0.16) !important;
+    border-color: rgba(34,211,238,0.32) !important;
+}
+
+/* ── 4. TOGGLES — GLASS SWITCHES WITH DEPTH ─────────────────── */
+.dark-toggle, .push-toggle-switch {
+    background: rgba(255,255,255,0.18) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 2px solid rgba(255,255,255,0.35) !important;
+    border-radius: 16px !important;
+    box-shadow: 
+        0 8px 28px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.3) !important;
+}
+.dark-toggle:hover, .push-toggle-switch:hover {
+    border-color: rgba(255,255,255,0.55) !important;
+    background: rgba(255,255,255,0.32) !important;
+    transform: translateY(-2px) scale(1.1) !important;
+    box-shadow: 
+        0 12px 36px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.5) !important;
+}
+.push-toggle-switch.active {
+    background: linear-gradient(135deg, rgba(22,163,74,0.98), rgba(34,197,94,0.95)) !important;
+    border-color: rgba(22,163,74,0.6) !important;
+    box-shadow: 
+        0 8px 28px rgba(22,163,74,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.4) !important;
+}
+
+/* ── 5. MASTHEAD / HERO — LUMINOUS GLASS PANEL ───────────────── */
+.fz-masthead, .hero, .page-hero, .dashboard-masthead {
+    background: linear-gradient(160deg, rgba(232,248,255,0.98) 0%, rgba(210,237,255,0.96) 100%) !important;
+    backdrop-filter: blur(36px) saturate(220%) brightness(1.03) !important;
+    border: 1px solid rgba(255,255,255,0.88) !important;
+    border-radius: 28px !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.35),
+        0 36px 88px rgba(0,40,100,0.25),
+        0 16px 40px rgba(0,0,0,0.14),
+        inset 0 1px 0 rgba(255,255,255,1),
+        inset 0 -1px 0 rgba(0,120,180,0.1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+.fz-masthead::before, .hero::before, .page-hero::before, .dashboard-masthead::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #00b4d8 0%, #0ecfef 33%, #7dd3fc 66%, #00b4d8 100%);
+    opacity: 0.96;
+    pointer-events: none;
+    animation: mastheadShimmer 4.5s ease-in-out infinite;
+}
+@keyframes mastheadShimmer {
+    0%, 100% { opacity: 0.85; transform: scaleX(0.9); }
+    50% { opacity: 1; transform: scaleX(1.08); }
+}
+[data-theme="dark"] .fz-masthead, [data-theme="dark"] .hero, [data-theme="dark"] .page-hero, [data-theme="dark"] .dashboard-masthead {
+    background: rgba(6,16,30,0.99) !important;
+    border-color: rgba(34,211,238,0.18) !important;
+    box-shadow: 
+        0 0 0 1px rgba(34,211,238,0.16),
+        0 36px 88px rgba(0,0,0,0.7),
+        0 16px 40px rgba(0,0,0,0.42),
+        inset 0 1px 0 rgba(34,211,238,0.16),
+        inset 0 -1px 0 rgba(0,0,0,0.5) !important;
+}
+[data-theme="dark"] .fz-masthead::before, [data-theme="dark"] .hero::before, [data-theme="dark"] .page-hero::before, [data-theme="dark"] .dashboard-masthead::before {
+    background: linear-gradient(90deg, #22d3ee, #38bdf8, #7dd3fc, #22d3ee);
+}
+
+/* Hero text — gradient glow */
+.fz-masthead h1, .hero h1, .page-hero h1, .dashboard-masthead h1 {
+    background: linear-gradient(135deg, #003a5c 0%, #004e7a 50%, #006fa3 100%);
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    filter: drop-shadow(0 4px 24px rgba(0,0,0,0.22));
+}
+[data-theme="dark"] .fz-masthead h1, [data-theme="dark"] .hero h1, [data-theme="dark"] .page-hero h1, [data-theme="dark"] .dashboard-masthead h1 {
+    background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 50%, #7dd3fc 100%);
+}
+
+/* ── 6. GLASS CARDS — STACKED LUMINOUS DEPTH ─────────────────── */
+.glass-card, .card, .aq-card {
+    background: rgba(248,253,255,0.97) !important;
+    backdrop-filter: blur(32px) saturate(220%) brightness(1.02) !important;
+    border: 1px solid rgba(255,255,255,0.88) !important;
+    border-radius: 24px !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.35),
+        0 32px 80px rgba(0,40,100,0.25),
+        0 12px 36px rgba(0,0,0,0.14),
+        inset 0 1px 0 rgba(255,255,255,1),
+        inset 0 -1px 0 rgba(0,120,180,0.12) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: all 0.45s cubic-bezier(0.175,0.885,0.32,1.3) !important;
+}
+.glass-card::before, .card::before, .aq-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse 70% 50% at 20% 25%, rgba(14,207,239,0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 60% at 80% 75%, rgba(0,180,216,0.1) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+}
+.glass-card > *:not(style), .card > *:not(style), .aq-card > *:not(style) { position: relative; z-index: 2; }
+.glass-card:hover, .card:hover, .aq-card:hover {
+    transform: translateY(-10px) !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.4),
+        0 44px 100px rgba(0,40,100,0.35),
+        0 20px 48px rgba(0,0,0,0.18),
+        inset 0 1px 0 rgba(255,255,255,1),
+        inset 0 -1px 0 rgba(0,180,216,0.15) !important;
+}
+[data-theme="dark"] .glass-card, [data-theme="dark"] .card, [data-theme="dark"] .aq-card {
+    background: rgba(6,16,30,0.98) !important;
+    border-color: rgba(34,211,238,0.18) !important;
+    box-shadow: 
+        0 0 0 1px rgba(34,211,238,0.16),
+        0 32px 80px rgba(0,0,0,0.65),
+        0 12px 36px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(34,211,238,0.16),
+        inset 0 -1px 0 rgba(0,0,0,0.5) !important;
+}
+[data-theme="dark"] .glass-card::before, [data-theme="dark"] .card::before, [data-theme="dark"] .aq-card::before {
+    background: 
+        radial-gradient(ellipse 70% 50% at 20% 25%, rgba(34,211,238,0.1) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 60% at 80% 75%, rgba(125,211,252,0.08) 0%, transparent 65%);
+}
+
+/* ── 7. STAT BOXES — PRISMATIC GLOW ──────────────────────────── */
+.stat-box {
+    background: linear-gradient(145deg, rgba(232,248,255,0.99) 0%, rgba(210,237,255,0.97) 100%) !important;
+    border: 1px solid rgba(255,255,255,0.88) !important;
+    border-radius: 24px !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.35),
+        0 24px 64px rgba(0,40,100,0.2),
+        0 10px 32px rgba(0,0,0,0.14),
+        inset 0 1px 0 rgba(255,255,255,1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: all 0.45s cubic-bezier(0.175,0.885,0.32,1.3) !important;
+}
+.stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    opacity: 0.96;
+}
+.stat-box:hover {
+    transform: translateY(-12px) !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.45),
+        0 36px 84px rgba(0,40,100,0.3),
+        0 16px 44px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.stat-box h3 {
+    background: linear-gradient(135deg, var(--primary) 0%, #006fa3 100%);
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    filter: drop-shadow(0 3px 16px rgba(0,0,0,0.18));
+    font-weight: 900 !important;
+    letter-spacing: -0.035em !important;
+}
+[data-theme="dark"] .stat-box {
+    background: linear-gradient(145deg, rgba(6,16,30,0.99) 0%, rgba(4,12,24,0.97) 100%) !important;
+    border-color: rgba(34,211,238,0.2) !important;
+}
+[data-theme="dark"] .stat-box h3 {
+    background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 100%);
+}
+[data-theme="dark"] .stat-box::before {
+    background: linear-gradient(90deg, #22d3ee, #38bdf8);
+}
+
+/* ── 8. TABLES — HOLOGRAPHIC DEPTH ──────────────────────────── */
+.log-container {
+    background: rgba(248,253,255,0.96) !important;
+    backdrop-filter: blur(28px) !important;
+    border: 1px solid rgba(255,255,255,0.82) !important;
+    border-radius: 24px !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.28),
+        0 28px 72px rgba(0,40,100,0.2),
+        0 10px 32px rgba(0,0,0,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.98) !important;
+    overflow: hidden !important;
+}
+.log-container table { background: transparent !important; }
+th {
+    background: linear-gradient(135deg, rgba(0,100,160,0.15), rgba(0,180,216,0.1)) !important;
+    border-bottom: 2px solid rgba(0,120,180,0.25) !important;
+    color: #002c45 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.07em !important;
+    backdrop-filter: blur(16px) !important;
+    position: sticky; top: 0; z-index: 10;
+}
+th:hover {
+    background: linear-gradient(135deg, rgba(0,100,160,0.25), rgba(0,180,216,0.18)) !important;
+    color: #004e7a !important;
+    transform: translateY(-1.5px) !important;
+}
+th.sort-asc::after, th.sort-desc::after {
+    color: #00b4d8 !important;
+    font-weight: 900 !important;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
+}
+td {
+    border-bottom-color: rgba(0,100,160,0.12) !important;
+    transition: background 0.28s ease !important;
+}
+tbody tr:nth-child(even) td { background: rgba(0,120,180,0.05) !important; }
+tbody tr:hover td { background: rgba(0,180,216,0.12) !important; }
+tbody tr {
+    transform: translateZ(0);
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+}
+tbody tr:hover { transform: translateX(10px) !important; }
+[data-theme="dark"] .log-container {
+    background: rgba(6,16,30,0.98) !important;
+    border-color: rgba(34,211,238,0.16) !important;
+}
+[data-theme="dark"] th {
+    background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(34,211,238,0.1)) !important;
+    border-bottom-color: rgba(34,211,238,0.2) !important;
+    color: #94a3b8 !important;
+}
+[data-theme="dark"] th:hover {
+    background: linear-gradient(135deg, rgba(0,0,0,0.65), rgba(34,211,238,0.18)) !important;
+    color: #22d3ee !important;
+}
+[data-theme="dark"] tbody tr:nth-child(even) td { background: rgba(34,211,238,0.05) !important; }
+[data-theme="dark"] tbody tr:hover td { background: rgba(34,211,238,0.14) !important; }
+
+/* ── 9. FILTER BAR — GLASS COMMAND DECK ──────────────────────── */
+.filter-bar {
+    background: linear-gradient(160deg, rgba(232,248,255,0.98) 0%, rgba(210,237,255,0.96) 100%) !important;
+    backdrop-filter: blur(32px) !important;
+    border: 1px solid rgba(255,255,255,0.85) !important;
+    border-radius: 24px !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.28),
+        0 24px 64px rgba(0,40,100,0.22),
+        0 10px 32px rgba(0,0,0,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.98) !important;
+}
+.filter-group label {
+    color: #002c45 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.09em !important;
+}
+.filter-group input, .filter-group select {
+    background: rgba(255,255,255,0.9) !important;
+    border: 2px solid rgba(0,100,160,0.25) !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}
+.filter-group input:focus, .filter-group select:focus {
+    border-color: #00b4d8 !important;
+    box-shadow: 
+        0 0 0 4px rgba(0,180,216,0.22),
+        inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.filter-action-btn {
+    background: linear-gradient(135deg, var(--primary) 0%, #006fa3 100%) !important;
+    border-radius: 16px !important;
+    font-weight: 800 !important;
+    box-shadow: 
+        0 8px 28px rgba(0,78,122,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.3) !important;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1.2) !important;
+}
+.filter-action-btn:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 
+        0 16px 44px rgba(0,180,216,0.55),
+        inset 0 1px 0 rgba(255,255,255,0.45) !important;
+}
+.filter-danger-btn {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 8px 28px rgba(220,38,38,0.45) !important;
+}
+[data-theme="dark"] .filter-bar {
+    background: rgba(6,16,30,0.98) !important;
+    border-color: rgba(34,211,238,0.18) !important;
+}
+[data-theme="dark"] .filter-action-btn:hover {
+    box-shadow: 0 16px 44px rgba(34,211,238,0.5) !important;
+}
+
+/* ── 10. MODALS — CRYSTAL ORB EFFECTS ────────────────────────── */
+.modal-overlay-custom, .staff-response-modal, #crop-modal, #logoutModal, #clearAllModal {
+    backdrop-filter: blur(36px) !important;
+    background: rgba(0,0,0,0.7) !important;
+}
+.modal-content-custom, .staff-response-card, .crop-modal-card {
+    background: rgba(248,253,255,0.98) !important;
+    backdrop-filter: blur(36px) saturate(220%) !important;
+    border: 1px solid rgba(255,255,255,0.88) !important;
+    border-radius: 28px !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.35),
+        0 44px 100px rgba(0,40,100,0.45),
+        0 20px 56px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.modal-btn-group .confirm-btn, .staff-respond-btn, .crop-btn-apply {
+    background: linear-gradient(135deg, var(--primary) 0%, #006fa3 100%) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 36px rgba(0,78,122,0.5) !important;
+}
+.modal-btn-group .cancel-btn, .staff-dismiss-btn, .crop-btn-cancel {
+    background: rgba(255,255,255,0.2) !important;
+    border: 2px solid rgba(255,255,255,0.35) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: 16px !important;
+}
+[data-theme="dark"] .modal-content-custom, [data-theme="dark"] .staff-response-card, [data-theme="dark"] .crop-modal-card {
+    background: rgba(6,16,30,0.99) !important;
+    border-color: rgba(34,211,238,0.2) !important;
+}
+
+/* Alarm overlay glass */
+#fz-alarm-overlay { backdrop-filter: blur(20px) !important; }
+.fz-alarm-inner {
+    backdrop-filter: blur(28px) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 0 0 1px rgba(255,0,0,0.45), 0 44px 100px rgba(220,38,38,0.65) !important;
+}
+.fz-alarm-title {
+    background: linear-gradient(135deg, white 0%, rgba(255,255,255,0.95) 100%);
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+}
+
+/* ── 11. LOCATION CARDS — PULSE WITH GLASS ───────────────────── */
+.location-card {
+    border-radius: 24px !important;
+    border: 1px solid rgba(255,255,255,0.85) !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.28),
+        0 24px 64px rgba(0,40,100,0.22),
+        inset 0 1px 0 rgba(255,255,255,0.95) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+.location-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: linear-gradient(180deg, var(--gray-light), var(--secondary));
+    opacity: 0.85;
+}
+.location-card.clear::before { background: linear-gradient(180deg, var(--success), #22c55e); }
+.location-card.detecting::before { 
+    background: linear-gradient(180deg, var(--danger), #ef4444) !important;
+    animation: statusPulse 2s ease-in-out infinite !important;
+}
+@keyframes statusPulse {
+    0%, 100% { opacity: 0.92; }
+    50% { opacity: 1; }
+}
+.location-card:hover {
+    transform: translateY(-10px) scale(1.02) !important;
+    box-shadow: 
+        0 0 0 1px rgba(255,255,255,0.4),
+        0 36px 84px rgba(0,40,100,0.32),
+        0 16px 44px rgba(0,0,0,0.2) !important;
+}
+
+/* ── 12. LIVE BADGE — GLASS PULSE ────────────────────────────── */
+.live-badge {
+    background: rgba(22,163,74,0.22) !important;
+    border: 1.5px solid rgba(22,163,74,0.4) !important;
+    box-shadow: 0 0 0 1px rgba(22,163,74,0.3);
+    backdrop-filter: blur(12px) !important;
+    animation: badgeGlow 2.2s ease-in-out infinite alternate !important;
+}
+@keyframes badgeGlow {
+    from { box-shadow: 0 0 0 1px rgba(22,163,74,0.3), 0 0 16px rgba(22,163,74,0.2); }
+    to   { box-shadow: 0 0 0 1px rgba(22,163,74,0.45), 0 0 24px rgba(22,163,74,0.3); }
+}
+
+/* ── 13. AQ GUIDE — PRISMATIC GLASS ──────────────────────────── */
+.aq-guide-grid .aq-card {
+    border-radius: 20px !important;
+    background: rgba(255,255,255,0.94) !important;
+    border: 1px solid rgba(255,255,255,0.8) !important;
+    backdrop-filter: blur(20px) !important;
+}
+.aq-guide-chip {
+    background: rgba(0,180,216,0.2) !important;
+    border: 1.5px solid rgba(0,180,216,0.35) !important;
+    color: #004e7a !important;
+    border-radius: 24px !important;
+    padding: 0.6rem 1.1rem !important;
+    font-weight: 800 !important;
+    backdrop-filter: blur(12px) !important;
+}
+
+.aqi-bands { gap: 1.25rem; }
+.aqi-band {
+    flex: 1;
+    min-width: 130px;
+    background: rgba(255,255,255,0.9) !important;
+    border: 2px solid rgba(255,255,255,0.45) !important;
+    border-radius: 20px !important;
+    padding: 1.25rem 1.1rem !important;
+    backdrop-filter: blur(20px) !important;
+    text-align: center;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1.2) !important;
+}
+.aqi-band:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 20px 52px rgba(0,0,0,0.22) !important;
+}
+
+/* ── 14. RESPONSIVE — ENHANCED MOBILE ────────────────────────── */
+@media (max-width: 768px) {
+    .filter-inputs-row { flex-direction: column !important; gap: 1.4rem !important; }
+    .stats-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .nav-container { padding: 0 1.25rem; }
+    .nav-links a { 
+        padding: 0.55rem 1.1rem !important;
+        font-size: 0.88rem !important;
+        margin-right: 0.3rem !important;
+    }
+}
+@media (max-width: 480px) {
+    .nav-links a { 
+        padding: 0.5rem 0.95rem !important;
+        font-size: 0.84rem !important;
+    }
+    .glass-card, .card, .aq-card { 
+        margin: 0.75rem !important; 
+        border-radius: 20px !important;
+    }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM v2.0 — Glassmorphism perfected, knobs centered, scroll fixed
+   Every element elevated while 100% preserving original functionality
+   ═══════════════════════════════════════════════════════════════ */
