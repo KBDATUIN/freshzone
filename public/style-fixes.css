@@ -1668,3 +1668,291 @@ footer a:hover {
 .input-password-wrap button.eye-btn::after {
     display: none !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   EYE BUTTON — FINAL FIX v3
+   Root cause: global button rule adds overflow:hidden (clips SVG)
+   and the hover translateY(-3px) conflicts with translateY(-50%).
+   Fix: lock the eye-btn completely out of all global rules.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1. Prevent shimmer/overflow rule from touching eye-btn */
+.input-password-wrap,
+.input-password-wrap .eye-btn,
+.input-password-wrap button.eye-btn {
+    overflow: visible !important;
+}
+
+/* 2. Hard-lock position & size — beats any specificity battle */
+.input-password-wrap {
+    position: relative !important;
+    display: block !important;
+    margin-top: 0.35rem !important;
+}
+
+.input-password-wrap input[type="password"],
+.input-password-wrap input[type="text"] {
+    padding-right: 3rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 0 !important;
+}
+
+.input-password-wrap .eye-btn,
+.input-password-wrap button.eye-btn {
+    position: absolute !important;
+    right: 0.6rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    color: var(--gray, #6b7280) !important;
+    z-index: 10 !important;
+    overflow: visible !important;
+    filter: none !important;
+    flex-shrink: 0 !important;
+    transition: color 0.25s ease, background 0.25s ease !important;
+}
+
+/* 3. Neutralise shimmer ::before/::after on eye-btn */
+.input-password-wrap .eye-btn::before,
+.input-password-wrap .eye-btn::after,
+.input-password-wrap button.eye-btn::before,
+.input-password-wrap button.eye-btn::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* 4. Hover — colour change only, NO vertical translate shift */
+.input-password-wrap .eye-btn:hover,
+.input-password-wrap button.eye-btn:hover {
+    transform: translateY(-50%) !important;
+    background: rgba(0,180,216,0.10) !important;
+    color: var(--secondary, #00b4d8) !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+/* 5. Active */
+.input-password-wrap .eye-btn:active,
+.input-password-wrap button.eye-btn:active {
+    transform: translateY(-50%) scale(0.88) !important;
+    background: rgba(0,180,216,0.15) !important;
+}
+
+/* 6. SVG icons inside eye-btn */
+.input-password-wrap .eye-btn svg,
+.input-password-wrap button.eye-btn svg,
+.eye-icon,
+.eye-off-icon {
+    width: 20px !important;
+    height: 20px !important;
+    pointer-events: none !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+}
+
+.eye-icon.hidden,
+.eye-off-icon.hidden {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SMOOTH HOVER ANIMATIONS — AUTH PAGE ELEMENTS
+   translateY(-2px) = subtle "lift" on all interactive elements
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Auth trust badges */
+.auth-trust-badge {
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.25s ease,
+                background 0.2s ease !important;
+    cursor: default;
+}
+.auth-trust-badge:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0,180,216,0.28) !important;
+}
+
+/* Auth tab buttons */
+.auth-tab {
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1),
+                background 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease !important;
+}
+.auth-tab:hover:not(.active) {
+    transform: translateY(-1px) !important;
+    background: rgba(0,180,216,0.08) !important;
+}
+
+/* Input fields */
+.auth-form-content .input-group input,
+.auth-form-content .input-group select {
+    transition: border-color 0.22s ease,
+                box-shadow 0.22s ease,
+                transform 0.22s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+.auth-form-content .input-group input:focus,
+.auth-form-content .input-group select:focus {
+    transform: translateY(-1px) !important;
+}
+.auth-form-content .input-group input:hover:not(:focus),
+.auth-form-content .input-group select:hover:not(:focus) {
+    transform: translateY(-1px) !important;
+}
+
+/* Primary / success buttons (sign in, send OTP, etc.) */
+.auth-form-content .btn-primary,
+.auth-form-content .btn-success {
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.25s ease,
+                filter 0.2s ease !important;
+}
+.auth-form-content .btn-primary:hover,
+.auth-form-content .btn-success:hover {
+    transform: translateY(-3px) !important;
+}
+.auth-form-content .btn-primary:active,
+.auth-form-content .btn-success:active {
+    transform: translateY(-1px) scale(0.97) !important;
+}
+
+/* Forgot password / text links */
+.auth-forgot,
+.text-link,
+.auth-extra-links .text-link {
+    display: inline-block;
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1),
+                color 0.18s ease !important;
+}
+.auth-forgot:hover,
+.text-link:hover {
+    transform: translateY(-1px) !important;
+    color: var(--secondary, #00b4d8) !important;
+}
+
+/* Remember me / checkbox row */
+.auth-remember {
+    transition: transform 0.2s ease !important;
+    display: inline-flex;
+    align-items: center;
+}
+.auth-remember:hover {
+    transform: translateY(-1px) !important;
+}
+
+/* AQ guide cards */
+.aq-card {
+    transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.28s ease !important;
+}
+.aq-card:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 24px rgba(0,180,216,0.18) !important;
+}
+
+/* Brand logo hover */
+.auth-logo {
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1),
+                filter 0.3s ease !important;
+}
+.brand-section:hover .auth-logo {
+    transform: translateY(-3px) scale(1.04) !important;
+    filter: drop-shadow(0 8px 24px rgba(0,78,122,0.28)) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE OPTIMISATION — auth page ≤ 480 px
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    /* Make the input-password-wrap robust on narrow screens */
+    .input-password-wrap {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .input-password-wrap input[type="password"],
+    .input-password-wrap input[type="text"] {
+        /* Extra-safe right padding so text never slides under the eye */
+        padding-right: 3.2rem !important;
+        font-size: 1rem !important; /* Prevent iOS auto-zoom (must be ≥16px) */
+    }
+
+    /* Slightly larger tap target on mobile */
+    .input-password-wrap .eye-btn,
+    .input-password-wrap button.eye-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        right: 0.4rem !important;
+    }
+
+    /* All form inputs ≥16px to stop iOS zoom */
+    .auth-form-content input,
+    .auth-form-content select {
+        font-size: 1rem !important;
+    }
+
+    /* Stack grid-inputs to single column */
+    .grid-inputs {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+    }
+
+    /* Comfortable card padding on small phones */
+    .auth-card {
+        padding: 1.4rem 1rem 1.6rem !important;
+        border-radius: 18px !important;
+    }
+
+    /* Trust badges: allow wrapping */
+    .auth-trust-row {
+        flex-wrap: wrap !important;
+        gap: 0.4rem !important;
+        justify-content: center !important;
+    }
+
+    .auth-trust-badge {
+        font-size: 0.72rem !important;
+        padding: 0.3rem 0.7rem !important;
+    }
+
+    /* AQ guide grid single column */
+    .aq-guide-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Extra-small phones */
+@media (max-width: 360px) {
+    .auth-card {
+        padding: 1.1rem 0.8rem 1.3rem !important;
+    }
+    .input-password-wrap input[type="password"],
+    .input-password-wrap input[type="text"] {
+        padding-right: 3.4rem !important;
+    }
+    .input-password-wrap .eye-btn,
+    .input-password-wrap button.eye-btn {
+        right: 0.3rem !important;
+        width: 38px !important;
+        min-width: 38px !important;
+    }
+}
