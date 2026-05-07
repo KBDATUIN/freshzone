@@ -209,6 +209,22 @@
             width: 100%;
             padding-right: 2rem;
         }
+        /* Remove native dropdown arrow; inject custom arrow via bg positioned left of the X zone */
+        .filter-input-wrap select {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            /* custom chevron sits at right:32px (left of the 26px X-button zone) */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 32px center !important;
+            background-size: 14px 14px !important;
+            padding-right: 3.4rem !important;
+            cursor: pointer !important;
+        }
+        [data-theme="dark"] .filter-input-wrap select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+        }
         .filter-inline-clear {
             position: absolute !important;
             right: 6px !important;
