@@ -915,10 +915,10 @@ footer {
     line-height: 1.2 !important;
 }
 
-/* ── How-it-works: 4-col grid (one card per column) ──────────── */
+/* ── How-it-works: 3-col grid (matches history page) ─────────── */
 .aq-guide-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 0.65rem !important;
     margin-top: 0 !important;
     align-items: stretch !important;
@@ -956,10 +956,19 @@ footer {
 /* ── Responsive: collapse gracefully ────────────────────────── */
 @media (max-width: 900px) {
     .aq-guide-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
     .live-sensor-strip {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .aq-guide-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .live-sensor-strip {
+        grid-template-columns: 1fr !important;
     }
 }
 
@@ -969,9 +978,6 @@ footer {
     }
     .aq-guide-grid {
         grid-template-columns: 1fr 1fr !important;
-    }
-    .live-sensor-strip {
-        grid-template-columns: 1fr !important;
     }
     .aqi-bands {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
