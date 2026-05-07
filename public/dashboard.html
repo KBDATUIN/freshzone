@@ -121,19 +121,18 @@
 
         /* ── PM1.0 DISPLAY (replaces AQI badge) ──────────────── */
         .pm1-display {
-            display: flex; align-items: baseline; gap: 5px;
-            margin: 10px 0 6px; padding: 10px 14px;
-            border-radius: 12px; font-family: 'Space Grotesk', monospace;
+            display: inline-flex; align-items: baseline; gap: 4px;
+            margin: 6px 0 4px; padding: 3px 10px;
+            border-radius: 20px; font-family: 'Space Grotesk', monospace;
             background: rgba(0,180,216,0.08); border: 1px solid rgba(0,180,216,0.2);
-            transition: all 0.4s ease;
+            transition: all 0.4s ease; max-width: fit-content;
         }
         .pm1-value {
-            font-size: 2rem; font-weight: 800; line-height: 1;
-            color: var(--primary, #004e7a); letter-spacing: -0.02em;
+            font-size: 0.95rem; font-weight: 700; line-height: 1.5;
+            color: var(--primary, #004e7a);
         }
         .pm1-unit {
-            font-size: 0.72rem; font-weight: 600; color: var(--gray);
-            text-transform: uppercase; letter-spacing: 0.06em;
+            font-size: 0.75rem; font-weight: 500; color: var(--gray);
         }
         .pm1-clear  { background: rgba(34,197,94,0.08);  border-color: rgba(34,197,94,0.25); }
         .pm1-clear  .pm1-value { color: #15803d; }
