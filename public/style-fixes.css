@@ -868,3 +868,121 @@ footer {
     overscroll-behavior-x: contain !important;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   PM1.0 DETECTION GUIDE — ALIGNMENT FIX
+   Fixes: 4-card grid misalignment, 5-col band gap, conflicting
+   overrides from style-merged / style-v2. Loads last → wins.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Guide container: full-width, no clipping ────────────────── */
+.aq-guide {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+/* ── Header row: title + chip always on same line ────────────── */
+.aq-guide-head {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+/* ── Top strip: 3-col equal-height cards ─────────────────────── */
+.live-sensor-strip {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+    align-items: stretch !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.65rem !important;
+}
+.live-sensor-item {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    height: auto !important;
+    min-height: unset !important;
+    align-self: stretch !important;
+    box-sizing: border-box !important;
+}
+.live-sensor-item strong {
+    margin-bottom: 0.25rem !important;
+    line-height: 1.2 !important;
+}
+
+/* ── How-it-works: 4-col grid (one card per column) ──────────── */
+.aq-guide-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+    margin-top: 0 !important;
+    align-items: stretch !important;
+}
+.aq-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    box-sizing: border-box !important;
+}
+.aq-card p {
+    flex: 1 !important;
+    margin: 0 !important;
+}
+
+/* ── Severity bands: 4-col (matches the 4 actual bands) ─────── */
+.aqi-bands {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.45rem !important;
+    margin-top: 0.65rem !important;
+}
+.aqi-band {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 0.5rem 0.3rem !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+    min-height: unset !important;
+}
+
+/* ── Responsive: collapse gracefully ────────────────────────── */
+@media (max-width: 900px) {
+    .aq-guide-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    .live-sensor-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .aq-guide-head {
+        flex-wrap: wrap !important;
+    }
+    .aq-guide-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .live-sensor-strip {
+        grid-template-columns: 1fr !important;
+    }
+    .aqi-bands {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .aq-guide-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .aqi-bands {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
