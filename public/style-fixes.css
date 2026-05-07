@@ -1,436 +1,1051 @@
-/* ═══════════════════════════════════════════════════════════════════
-   FRESHZONE · style-fixes.css
-   Mobile-first layout fixes & optimizations
-   Loads LAST in smoke.html — safe targeted overrides only.
-   Does NOT affect auth.html, history.html, or any other page.
-   ═══════════════════════════════════════════════════════════════════ */
+/* ================================================================
+   FreshZone — Responsive Fix Layer
+   Fixes: horizontal scroll, mobile table, overflow issues
+   Applies to: all pages — loaded LAST after style-v3.css
+   ================================================================ */
 
-/* ── 0. BASE RESET — viewport & box model ─────────────────────── */
-*, *::before, *::after {
-    box-sizing: border-box;
+/* ── GLOBAL OVERFLOW PREVENTION ─────────────────────────────── */
+html {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+}
+body {
+    /* Override style.css body{overflow-x:hidden} — it blocks .log-container scroll */
+    overflow-x: visible !important;
+    width: 100% !important;
+    max-width: 100vw !important;
 }
 
-html, body {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
+* { box-sizing: border-box; }
+
+/* ── CONTAINER CLAMP ─────────────────────────────────────────── */
+.container {
+    width: 100% !important;
+    max-width: 1100px !important;
+    margin: 0 auto !important;
+    padding: 2rem 1.5rem !important;
 }
 
-/* ── 1. PAGE WRAPPER — proper centering on all viewports ───────── */
-.page-wrapper,
-.main-wrapper,
-.content-wrapper,
-main,
-.smoke-main {
-    width: 100%;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: clamp(0.75rem, 4vw, 1.5rem);
-    padding-right: clamp(0.75rem, 4vw, 1.5rem);
+/* ── NAV — prevent overflow but allow drawer to escape ──────── */
+nav {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow: visible !important;   /* must NOT be hidden — clips mobile drawer */
+    box-sizing: border-box !important;
 }
-
-/* ── 2. NAVBAR / TOPBAR — prevent overflow, fix alignment ────────
-   Targets the top navigation bar with logo + dark toggle + hamburger */
-nav,
-.navbar,
-.topbar,
-.nav-bar,
-header.main-nav {
-    width: 100%;
-    max-width: 100%;
+.nav-container {
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 1.25rem !important;
     display: flex !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    padding-left: clamp(0.75rem, 4vw, 1.5rem) !important;
-    padding-right: clamp(0.75rem, 4vw, 1.5rem) !important;
+    gap: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
     box-sizing: border-box !important;
 }
 
-nav img.logo,
-nav .nav-logo,
-.navbar .brand img {
-    max-height: 40px;
-    width: auto;
-    flex-shrink: 0;
+/* ── LOG CONTAINER (HISTORY TABLE WRAPPER) ───────────────────── */
+/* THIS IS THE KEY FIX: The table inside needs overflow-x:auto
+   but the body must NOT have overflow-x:hidden that fights it */
+.log-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: contain !important;
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid rgba(0,78,122,0.08) !important;
+    box-shadow: var(--shadow-sm) !important;
+    position: relative !important;
 }
 
-.nav-actions,
-.nav-right,
-.topbar-actions {
-    display: flex;
+/* Table itself — allow natural scrolling inside container */
+.log-container table {
+    width: 100% !important;
+    min-width: 620px; /* allow horizontal scroll on mobile */
+    border-collapse: collapse !important;
+}
+
+/* ── TH CELL LAYOUT FIX ──────────────────────────────────────── */
+.th-cell {
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
+    gap: 5px;
+    white-space: nowrap;
 }
 
-/* ── 3. HERO / DASHBOARD HEADER CARD ────────────────────────────
-   The main glass card at top: title, LIVE badge, description, user badge, CTA */
-.dashboard-hero,
-.hero-card,
-.main-card,
-.smoke-hero,
-.glass-hero {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    box-sizing: border-box !important;
-    text-align: center !important;
-}
-
-/* The eyebrow label (PM1.0 · REAL-TIME · CAMPUS SAFETY) */
-.hero-eyebrow,
-.card-eyebrow,
-.sensor-label,
-.dashboard-hero .eyebrow,
-[class*="eyebrow"] {
-    display: block;
-    width: 100%;
-    text-align: center !important;
-    word-break: break-word;
-}
-
-/* Main heading */
-.dashboard-hero h1,
-.hero-card h1,
-.smoke-hero h1,
-.main-card h1 {
-    text-align: center !important;
-    width: 100%;
-    word-break: break-word;
-    hyphens: auto;
-}
-
-/* LIVE badge row */
-.live-badge-row,
-.status-row,
-.hero-status {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100%;
-}
-
-/* Description text */
-.dashboard-hero p,
-.hero-card p,
-.smoke-hero p,
-.main-card > p {
-    text-align: center !important;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    word-break: break-word;
-}
-
-/* User / role badge (Logged in as Earl James Perez — Administrator) */
-.user-badge,
-.logged-in-badge,
-.admin-badge,
-[class*="user-pill"],
-[class*="role-badge"] {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    text-align: center !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-}
-
-/* CTA button — View detection history */
-.btn-primary,
-.cta-btn,
-[class*="btn-primary"],
-.view-history-btn {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* ── 4. TIMESTAMP / AUTO-REFRESH ROW ─────────────────────────────
-   "Last updated: May 7, 2026, 09:15:16 PM (0s ago) — Auto-refreshes every 5 seconds" */
-.last-updated,
-.auto-refresh-row,
-.timestamp-row,
-[class*="last-updated"],
-[class*="refresh-row"] {
-    display: block !important;
-    width: 100% !important;
-    text-align: center !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-    overflow: hidden !important;
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-    box-sizing: border-box !important;
-    font-size: clamp(0.7rem, 2.5vw, 0.82rem) !important;
-    line-height: 1.5 !important;
-}
-
-/* ── 5. SENSOR CARDS GRID ─────────────────────────────────────────
-   4th Floor Male CR, 4th Floor Female CR, etc. */
-.sensor-grid,
-.cards-grid,
-.sensors-list,
-.sensor-list,
-.rooms-grid {
+/* ── STATS GRID — responsive ─────────────────────────────────── */
+.stats-grid {
     display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 0.85rem !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    width: 100% !important;
+}
+
+/* ── FILTER BAR — always vertical on mobile ──────────────────── */
+.filter-bar {
     width: 100% !important;
     box-sizing: border-box !important;
 }
 
-.sensor-card,
-.room-card,
-.zone-card,
-[class*="sensor-card"],
-[class*="room-card"] {
+/* ── PAGE HERO — no overflow ─────────────────────────────────── */
+.page-hero {
     width: 100% !important;
-    max-width: 100% !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
 }
 
-/* Sensor card inner rows */
-.sensor-card-header,
-.card-header-row,
-.room-name-row {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
+/* ── SENSOR GRID (DASHBOARD) ─────────────────────────────────── */
+.grid#sensor-grid {
     width: 100% !important;
-    flex-wrap: wrap !important;
-    gap: 0.25rem !important;
-}
-
-.sensor-status-row,
-.status-indicator-row {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.4rem !important;
-    flex-wrap: wrap !important;
-}
-
-/* PM value pill */
-.pm-badge,
-.pm-chip,
-.pm-value,
-[class*="pm-badge"],
-[class*="pm-chip"] {
-    display: inline-flex !important;
-    align-items: center !important;
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
-}
-
-/* Last seen text */
-.last-seen,
-.card-timestamp,
-[class*="last-seen"] {
-    font-size: clamp(0.7rem, 2.5vw, 0.78rem) !important;
-    color: var(--gray, #6b7280) !important;
-    word-break: break-word !important;
-}
-
-/* ── 6. GLASS CARDS — global fix for padding on mobile ──────────── */
-.glass-card,
-[class*="glass-card"],
-.card,
-.dashboard-card {
-    padding: clamp(1rem, 4vw, 1.75rem) !important;
     box-sizing: border-box !important;
+}
+
+/* ── LOCATION CARDS ──────────────────────────────────────────── */
+.location-card {
     width: 100% !important;
-    max-width: 100% !important;
+    box-sizing: border-box !important;
     overflow: hidden !important;
 }
 
-/* ── 7. HAMBURGER MENU / SIDEBAR — don't overflow ─────────────── */
-.sidebar,
-.menu-drawer,
-[class*="sidebar"],
-[class*="menu-drawer"] {
-    max-width: min(85vw, 320px) !important;
+/* ── PM VALUES WRAPPING FIX ──────────────────────────────────── */
+.pm-values {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+}
+
+/* ── DASHBOARD MASTHEAD ──────────────────────────────────────── */
+.dashboard-masthead {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.dashboard-masthead__grid {
+    width: 100% !important;
     box-sizing: border-box !important;
 }
 
-/* ── 8. RESPONSIVE BREAKPOINTS ───────────────────────────────── */
+/* ── MODAL — prevent overflow ────────────────────────────────── */
+.modal-content-custom {
+    width: 90% !important;
+    max-width: 420px !important;
+    box-sizing: border-box !important;
+}
 
-/* — Mobile: ≤ 480px — */
-@media (max-width: 480px) {
+/* ── SECTION / AQ GUIDE ──────────────────────────────────────── */
+.aq-guide {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+.aq-guide-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 1rem !important;
+    width: 100% !important;
+}
+.aqi-bands {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+}
+.aqi-band {
+    flex: 1 1 80px !important;
+    min-width: 80px !important;
+}
 
-    /* Tighter page padding */
-    .page-wrapper,
-    .main-wrapper,
-    .content-wrapper,
-    main,
-    .smoke-main {
-        padding-left: 0.875rem !important;
-        padding-right: 0.875rem !important;
+/* ── FOOTER ──────────────────────────────────────────────────── */
+footer {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE — max-width: 768px
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem !important;
     }
 
-    /* Smaller hero heading */
-    .dashboard-hero h1,
-    .hero-card h1,
-    .smoke-hero h1 {
-        font-size: clamp(1.45rem, 6.5vw, 1.75rem) !important;
-        line-height: 1.25 !important;
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.6rem !important;
     }
 
-    /* Eyebrow label */
-    .hero-eyebrow,
-    .card-eyebrow {
-        font-size: clamp(0.62rem, 2.8vw, 0.72rem) !important;
-        letter-spacing: 0.06em !important;
+    .stat-box {
+        padding: 0.85rem 0.65rem !important;
+    }
+    .stat-box h3 { font-size: 1.35rem !important; }
+    .stat-box p  { font-size: 0.65rem !important; }
+
+    .page-hero {
+        flex-direction: column !important;
+        text-align: center !important;
+        padding: 1.25rem !important;
     }
 
-    /* Sensor card headings */
-    .sensor-card h2,
-    .sensor-card h3,
-    .room-card h2,
-    .zone-card h2 {
-        font-size: clamp(0.95rem, 4vw, 1.05rem) !important;
+    .dashboard-masthead {
+        text-align: center !important;
+    }
+    .dashboard-masthead__grid {
+        grid-template-columns: 1fr !important;
+    }
+    .dashboard-masthead__viz {
+        display: none !important; /* Hide rings on mobile to save space */
     }
 
-    /* Force single column sensor grid */
-    .sensor-grid,
-    .cards-grid,
-    .sensors-list {
+    /* Filter bar stacks vertically */
+    .filter-inputs-row {
+        flex-direction: column !important;
+        gap: 0.6rem !important;
+    }
+    .filter-inputs-row .filter-group {
+        min-width: auto !important;
+        width: 100% !important;
+    }
+
+    /* Sensor cards full-width */
+    .grid#sensor-grid {
         grid-template-columns: 1fr !important;
     }
 
-    /* CTA button comfortable tap target */
-    .btn-primary,
-    .cta-btn,
-    .view-history-btn {
-        min-height: 48px !important;
-        padding: 0.85rem 1.25rem !important;
-        font-size: 0.9rem !important;
+    /* Buttons in dashboard */
+    .btn-hero-history {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .aq-guide-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* On tablet/mobile — sensor strip goes to 1 column */
+    .live-sensor-strip {
+        grid-template-columns: 1fr !important;
+    }
+    .live-sensor-item {
+        /* Compact, content-height only — no empty white space */
+        padding: 0.55rem 0.7rem !important;
+        min-height: unset !important;
+        height: auto !important;
+    }
+
+    /* AQI bands: 2-col on mobile for compact look */
+    .aqi-bands {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    /* Guide head: stack title + chip vertically */
+    .aq-guide-head {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.4rem !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SMALL MOBILE — max-width: 600px
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.4rem !important;
+    }
+    .stat-box {
+        padding: 0.7rem 0.5rem !important;
+        border-radius: 10px !important;
+    }
+    .stat-box h3 { font-size: 1.2rem !important; }
+    .stat-box p  { font-size: 0.6rem !important; letter-spacing: 0.02em !important; }
+
+    /* Table: keep horizontal scroll on small phones — card layout at 480 */
+    .log-container {
+        border-radius: 12px !important;
+    }
+    .log-container table {
+        min-width: 560px !important;
+    }
+
+    /* Filter actions — 2-col grid */
+    .filter-actions-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem !important;
+    }
+    .filter-danger-btn {
+        grid-column: 1 / -1 !important;
+    }
+
+    /* Session pill — one line, scales down on mobile, never overflows */
+    .dashboard-hero-session {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.85rem 0.4rem 0.65rem !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+    .dashboard-hero-session svg {
+        width: 13px !important;
+        height: 13px !important;
+    }
+    .dashboard-hero-session #hero-session-text {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* Live sensor strip — already 1-col grid from 768px query; just tighten gap */
+    .live-sensor-strip {
+        gap: 0.4rem !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CARD MODE TABLE — max-width: 480px
+   Transforms table into readable stacked cards
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    /* Override min-width so the card layout takes over */
+    .log-container table {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+
+    .log-container,
+    .log-container table,
+    .log-container thead,
+    .log-container tbody,
+    .log-container th,
+    .log-container td,
+    .log-container tr {
+        display: block !important;
+    }
+
+    /* Hide header row visually (data-label pseudo-elements replace it) */
+    .log-container thead tr {
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+    }
+
+    /* Each row becomes a card */
+    .log-container tbody tr {
+        background: var(--table-bg, rgba(240,252,255,0.98)) !important;
+        margin-bottom: 12px !important;
+        border-radius: 14px !important;
+        box-shadow: 0 2px 12px rgba(0,50,100,0.10) !important;
+        padding: 12px !important;
+        border: 1px solid rgba(0,100,160,0.10) !important;
+        transform: none !important; /* disable hover translateX on mobile */
+        animation: none !important;
+        opacity: 1 !important;
+    }
+    .log-container tbody tr.row-animate {
+        animation: none !important;
+        opacity: 1 !important;
+    }
+
+    [data-theme="dark"] .log-container tbody tr {
+        background: rgba(10, 22, 38, 0.98) !important;
+        border-color: rgba(34,211,238,0.10) !important;
+    }
+
+    .log-container td {
+        border: none !important;
+        position: relative !important;
+        padding: 7px 10px 7px 45% !important;
+        text-align: right !important;
+        border-bottom: 1px solid rgba(0,80,120,0.07) !important;
+        font-size: 0.82rem !important;
+        min-height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+    }
+    .log-container td:last-child {
+        border-bottom: none !important;
+    }
+
+    /* Label from data-label attribute */
+    .log-container td::before {
+        content: attr(data-label) !important;
+        position: absolute !important;
+        left: 10px !important;
+        width: 42% !important;
+        font-weight: 700 !important;
+        font-size: 0.65rem !important;
+        text-align: left !important;
+        color: var(--gray) !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        line-height: 1.3 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* Empty state spans full width */
+    .empty-row td {
+        padding: 2rem 1rem !important;
+        text-align: center !important;
+        justify-content: center !important;
+    }
+    .empty-row td::before { display: none !important; }
+
+    /* Stats still 3-col */
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    /* Filter bar */
+    .filter-inputs-row { flex-direction: column !important; }
+    .filter-actions-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   VERY SMALL — max-width: 360px
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 360px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.3rem !important;
+    }
+    .stat-box h3 { font-size: 1rem !important; }
+    .stat-box p  { font-size: 0.55rem !important; }
+
+    .container { padding: 0.75rem !important; }
+
+    .log-container td {
+        padding: 7px 8px 7px 48% !important;
+        font-size: 0.78rem !important;
+    }
+}
+
+/* ── DARK MODE TABLE CARDS ───────────────────────────────────── */
+[data-theme="dark"] .log-container td { border-bottom-color: rgba(34,211,238,0.07) !important; }
+[data-theme="dark"] .log-container td::before { color: #64748b !important; }
+
+/* ── SAFE AREA INSETS (iPhone notch/home bar) ────────────────── */
+@supports (padding: env(safe-area-inset-bottom)) {
+    footer {
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+    }
+    #fz-bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom) !important;
+    }
+}
+
+/* ── BOTTOM NAV — proper safe area + z-index ─────────────────── */
+#fz-bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 9000 !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    box-sizing: border-box !important;
+}
+
+/* Prevent bottom nav from overlapping content */
+@media (max-width: 768px) {
+    body:has(#fz-bottom-nav) footer {
+        padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    body:has(#fz-bottom-nav) .container {
+        padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
+/* ── HERO / MASTHEAD — correct padding on mobile ─────────────── */
+.fz-masthead {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* ── GLASS CARDS — full width, no overflow ───────────────────── */
+.glass-card, .hero, .card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* ── FIX: h1 long words break instead of overflowing ────────── */
+.hero h1, .fz-masthead h1, .dashboard-masthead h1 {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    max-width: 100% !important;
+}
+
+/* ── FIX: tagline and eyebrow stay inside card ───────────────── */
+.dashboard-hero-eyebrow,
+.dashboard-hero-tagline {
+    max-width: 100% !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* ── FIX: session pill never wider than its parent ───────────── */
+.dashboard-hero-session {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+}
+.dashboard-hero-session #hero-session-text {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+}
+
+/* ── FILTER BAR CONTAINER ────────────────────────────────────── */
+.filter-bar {
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+/* ── INPUT FIXES — prevent zoom on iOS ──────────────────────── */
+@media (max-width: 600px) {
+    input, select, textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+}
+
+/* ── NOTIFICATION TOAST — always centered on mobile ─────────── */
+@media (max-width: 600px) {
+    .notification {
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) translateY(-12px) scale(0.98) !important;
+        width: calc(100vw - 1.5rem) !important;
+        max-width: calc(100vw - 1.5rem) !important;
+        min-width: 0 !important;
+        top: calc(env(safe-area-inset-top, 0px) + 0.75rem) !important;
+    }
+    .notification.show {
+        transform: translateX(-50%) translateY(0) scale(1) !important;
+    }
+}
+
+/* ── AQI GUIDE SECTION — layout fix ─────────────────────────── */
+.aq-guide {
+    overflow: visible !important;    /* was hidden — caused clipping */
+    box-sizing: border-box !important;
+}
+
+/* Desktop: 3-col grid (matches style-v2 design) */
+.live-sensor-strip {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    align-items: start !important;   /* prevents cards stretching tall */
+}
+.live-sensor-item {
+    box-sizing: border-box !important;
+    align-self: start !important;    /* each card only as tall as its content */
+    height: auto !important;
+    min-height: unset !important;
+}
+
+/* ── HISTORY PAGE: STAT BOXES WITH ICONS ────────────────────── */
+.stat--alerts h3 { color: var(--danger) !important; }
+.stat--records h3 { color: var(--secondary) !important; }
+.stat--resolved h3 { color: var(--success) !important; }
+
+/* ── FIX: Row hover transform breaks mobile card layout ──────── */
+@media (max-width: 480px) {
+    tbody tr:hover { transform: none !important; }
+    tbody tr:hover td { background: transparent !important; }
+}
+
+/* ── SCROLLBAR STYLE ON LOG CONTAINER ───────────────────────── */
+.log-container::-webkit-scrollbar {
+    height: 4px !important;
+}
+.log-container::-webkit-scrollbar-track {
+    background: rgba(0,78,122,0.05) !important;
+    border-radius: 99px !important;
+}
+.log-container::-webkit-scrollbar-thumb {
+    background: rgba(0,78,122,0.25) !important;
+    border-radius: 99px !important;
+}
+[data-theme="dark"] .log-container::-webkit-scrollbar-thumb {
+    background: rgba(34,211,238,0.25) !important;
+}
+
+/* ── SWIPE HINT on table (mobile) ────────────────────────────── */
+@media (min-width: 481px) and (max-width: 700px) {
+    .log-container::after {
+        content: "\2190 Swipe to see more \2192";
+        display: block !important;
+        text-align: center !important;
+        font-size: 0.7rem !important;
+        color: var(--gray) !important;
+        padding: 0.4rem !important;
+        opacity: 0.7 !important;
+        letter-spacing: 0.04em !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HAMBURGER MENU — SMOOTH TRANSITION FIX
+   Fixes: double X button overlap, drawer animation, backdrop
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Hide hamburger icon when mobile nav is open ───────────
+   Prevents the double-X problem: drawer has its own close btn,
+   so the hamburger morphed into X is redundant and overlapping */
+.mobile-nav.open ~ nav .hamburger,
+.hamburger.open {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.18s ease !important;
+}
+/* Keep it visible when closed */
+.hamburger:not(.open) {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: opacity 0.22s ease !important;
+}
+
+/* ── 2. Smooth backdrop fade ──────────────────────────────────
+   Backdrop fades in slightly before drawer slides, feels polished */
+.mobile-nav {
+    transition: opacity 0.28s ease, visibility 0.28s ease !important;
+    will-change: opacity;
+}
+
+/* ── 3. Smooth drawer slide ───────────────────────────────────
+   Single authoritative transition — overrides duplicates above */
+.mobile-nav-drawer {
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    will-change: transform;
+}
+
+/* ── 4. Stagger: links fade in after drawer arrives ──────────── */
+.mobile-nav-drawer a,
+.mobile-nav-close,
+.mobile-nav-divider {
+    opacity: 0;
+    transform: translateX(10px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.mobile-nav.open .mobile-nav-drawer a,
+.mobile-nav.open .mobile-nav-close,
+.mobile-nav.open .mobile-nav-divider {
+    opacity: 1;
+    transform: translateX(0);
+}
+/* Stagger each link by index */
+.mobile-nav.open .mobile-nav-close       { transition-delay: 0.08s; }
+.mobile-nav.open .mobile-nav-drawer a:nth-child(2) { transition-delay: 0.10s; }
+.mobile-nav.open .mobile-nav-drawer a:nth-child(3) { transition-delay: 0.14s; }
+.mobile-nav.open .mobile-nav-drawer a:nth-child(4) { transition-delay: 0.18s; }
+.mobile-nav.open .mobile-nav-drawer a:nth-child(5) { transition-delay: 0.22s; }
+.mobile-nav.open .mobile-nav-drawer a:nth-child(6) { transition-delay: 0.26s; }
+.mobile-nav.open .mobile-nav-drawer a:nth-child(7) { transition-delay: 0.30s; }
+.mobile-nav.open .mobile-nav-drawer a:nth-child(8) { transition-delay: 0.34s; }
+.mobile-nav.open .mobile-nav-divider     { transition-delay: 0.28s; }
+
+/* ── 5. Mobile nav close button — larger tap target ──────────── */
+.mobile-nav-close {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    transition: background 0.18s, opacity 0.22s ease, transform 0.22s ease !important;
+}
+
+/* ── 6. Hamburger spans — smooth morph ───────────────────────── */
+.hamburger span {
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.22s ease,
+                background 0.2s ease !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AIR QUALITY GUIDE — MOBILE POLISH
+   Fixes: huge empty card space, ugly stacking, inconsistent sizing
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Ensure the aq-guide section fits cleanly on all viewports */
+.aq-guide {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* live-sensor-item: content-fit height, never stretch */
+.live-sensor-item {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    height: auto !important;
+    min-height: unset !important;
+    align-self: start !important;
+}
+
+/* PM label (strong tag) — consistent spacing */
+.live-sensor-item strong {
+    margin-bottom: 0.2rem !important;
+    line-height: 1.2 !important;
+}
+
+/* AQI bands — consistent pill height, readable on small screens */
+.aqi-band {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.45rem 0.25rem !important;
+    height: auto !important;
+    min-height: unset !important;
+}
+
+@media (max-width: 480px) {
+    /* Section padding tighter on small phones */
+    .aq-guide {
+        padding: 0.85rem 0.75rem 0.9rem !important;
         border-radius: 14px !important;
     }
 
-    /* User badge text truncation */
-    .user-badge,
-    .logged-in-badge,
-    .admin-badge {
-        font-size: 0.78rem !important;
-        max-width: 100% !important;
+    /* Guide title smaller */
+    .aq-guide h3 {
+        font-size: 0.92rem !important;
     }
 
-    /* Glass card padding */
-    .glass-card,
-    [class*="glass-card"] {
-        padding: 1.1rem 1rem !important;
-        border-radius: 18px !important;
+    /* AQI bands: wrap to 3 on tiny phones */
+    .aqi-bands {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 0.35rem !important;
+    }
+    .aqi-band {
+        font-size: 0.6rem !important;
+        border-radius: 8px !important;
+        padding: 0.4rem 0.2rem !important;
+    }
+    .aqi-band span {
+        font-size: 0.56rem !important;
     }
 
-    /* Nav logo size on very small screens */
-    nav img.logo,
-    nav .nav-logo {
-        max-height: 32px !important;
+    /* Sensor strip tighter */
+    .live-sensor-strip {
+        gap: 0.35rem !important;
+        margin-top: 0.65rem !important;
+    }
+    .live-sensor-item {
+        padding: 0.5rem 0.65rem !important;
+        font-size: 0.73rem !important;
+        border-radius: 10px !important;
+    }
+    .live-sensor-item strong {
+        font-size: 0.68rem !important;
+    }
+
+    /* Aq cards — tighter */
+    .aq-card {
+        padding: 0.65rem 0.7rem !important;
+        border-radius: 10px !important;
+    }
+    .aq-card h4 {
+        font-size: 0.82rem !important;
+    }
+    .aq-card p {
+        font-size: 0.73rem !important;
     }
 }
 
-/* — Small: 481px – 640px — */
-@media (min-width: 481px) and (max-width: 640px) {
-    .sensor-grid,
-    .cards-grid {
+/* ── iOS SAFE AREA — mobile nav drawer ────────────────────── */
+.mobile-nav-drawer {
+    padding-bottom: env(safe-area-inset-bottom, 16px) !important;
+}
+
+/* ── HISTORY PAGE — mobile overrides ────────────────────────── */
+/* Force 3-col stats grid on all mobile sizes (inline style uses auto-fit
+   which collapses to 1-col when minmax(200px) can't fit 3 columns)     */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.6rem !important;
+    }
+    /* Tighter table cells on mobile */
+    .log-container th,
+    .log-container td {
+        padding: 0.65rem 0.75rem !important;
+        font-size: 0.82rem !important;
+    }
+    /* Page hero compact */
+    .page-hero {
+        padding: 1.1rem 1rem !important;
+    }
+    .page-hero h1 {
+        font-size: 1.25rem !important;
+    }
+    .page-hero p {
+        font-size: 0.82rem !important;
+    }
+    /* Filter bar full-width inputs */
+    .filter-inputs-row {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    .filter-inputs-row .filter-group,
+    .filter-bar input,
+    .filter-bar select {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    /* Export/filter action buttons full-width */
+    .filter-actions-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem !important;
+    }
+    .filter-danger-btn {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        gap: 0.4rem !important;
+    }
+    .stat-box {
+        padding: 0.65rem 0.45rem !important;
+    }
+    .stat-box h3 {
+        font-size: 1.1rem !important;
+    }
+    .stat-box p {
+        font-size: 0.58rem !important;
+    }
+    .page-hero h1 {
+        font-size: 1.1rem !important;
+    }
+    .filter-actions-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ── SCROLL AFFORDANCE — history table on mobile (481–768px) ── */
+/* Only applies in the horizontal-scroll range, not card-mode (≤480px)
+   Uses box-shadow inset instead of ::after to avoid conflicts      */
+@media (min-width: 481px) and (max-width: 768px) {
+    .log-container {
+        box-shadow:
+            inset -40px 0 24px -16px rgba(255,255,255,0.85),
+            var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.06)) !important;
+    }
+    [data-theme="dark"] .log-container {
+        box-shadow:
+            inset -40px 0 24px -16px rgba(10,20,32,0.90),
+            var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.06)) !important;
+    }
+}
+
+/* ── CRITICAL: override style-v3.css .log-container{overflow:hidden} ── */
+/* style-v3.css sets overflow:hidden on .log-container which blocks scroll.
+   style-fixes.css loads last so this wins. */
+.log-container {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: contain !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PM1.0 DETECTION GUIDE — COMPACT FIX (matches history page)
+   ═══════════════════════════════════════════════════════════════ */
+
+.aq-guide {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    padding: 0.75rem 0.9rem 0.8rem !important;
+    margin-top: 1rem !important;
+}
+
+.aq-guide-head {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.aq-guide h3 {
+    font-size: 0.95rem !important;
+    margin: 0 !important;
+}
+
+.live-sensor-strip {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.5rem !important;
+    margin: 0 0 0.5rem !important;
+}
+
+.live-sensor-item {
+    display: block !important;
+    padding: 0.45rem 0.55rem !important;
+    font-size: 0.72rem !important;
+    line-height: 1.4 !important;
+    height: auto !important;
+    min-height: unset !important;
+    box-sizing: border-box !important;
+}
+
+.live-sensor-item strong {
+    display: block !important;
+    font-size: 0.68rem !important;
+    margin-bottom: 0.15rem !important;
+    line-height: 1.2 !important;
+}
+
+.aq-guide-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.5rem !important;
+    margin: 0 0 0.5rem !important;
+}
+
+.aq-card {
+    padding: 0.5rem 0.6rem !important;
+    box-sizing: border-box !important;
+}
+
+.aq-card h4 {
+    font-size: 0.78rem !important;
+    margin: 0 0 0.15rem !important;
+}
+
+.aq-card p {
+    font-size: 0.71rem !important;
+    line-height: 1.42 !important;
+    margin: 0 !important;
+}
+
+.aqi-bands {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.4rem !important;
+    margin-top: 0.5rem !important;
+}
+
+.aqi-band {
+    padding: 0.38rem 0.25rem !important;
+    font-size: 0.63rem !important;
+    text-align: center !important;
+    height: auto !important;
+    min-height: unset !important;
+    box-sizing: border-box !important;
+}
+
+.aqi-band span {
+    font-size: 0.58rem !important;
+    margin-top: 0.08rem !important;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 700px) {
+    .aq-guide-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .live-sensor-strip {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .aq-guide-head { flex-wrap: wrap !important; }
+    .aqi-bands { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
+@media (max-width: 380px) {
+    .aq-guide-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HISTORY PAGE — GUIDE SECTION MOBILE OPTIMISATION
+   Target: phones < 540px. Desktop layout is untouched.
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 540px) {
+
+    /* Guide cards: single straight column */
+    .aq-guide-grid {
         grid-template-columns: 1fr !important;
     }
 
-    .dashboard-hero h1,
-    .hero-card h1 {
-        font-size: clamp(1.6rem, 5vw, 1.9rem) !important;
+    /* Info strip (Filtering / Exporting / Status meanings): single column */
+    .live-sensor-strip {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
     }
 
-    .glass-card,
-    [class*="glass-card"] {
-        padding: 1.25rem !important;
-    }
-}
-
-/* — Tablet: 641px – 1023px — */
-@media (min-width: 641px) and (max-width: 1023px) {
-    .sensor-grid,
-    .cards-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-}
-
-/* — Desktop: ≥ 1024px — */
-@media (min-width: 1024px) {
-    .sensor-grid,
-    .cards-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-    }
-}
-
-/* ── 9. SAFE AREA INSETS (notch/home bar on iOS) ──────────────── */
-@supports (padding: env(safe-area-inset-left)) {
-    nav,
-    .navbar,
-    .topbar {
-        padding-left: max(clamp(0.75rem, 4vw, 1.5rem), env(safe-area-inset-left)) !important;
-        padding-right: max(clamp(0.75rem, 4vw, 1.5rem), env(safe-area-inset-right)) !important;
+    /* AQI bands: all 4 in one straight row — they're short labels so they fit */
+    .aqi-bands {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 0.35rem !important;
     }
 
-    .page-wrapper,
-    main,
-    .smoke-main {
-        padding-left: max(clamp(0.75rem, 4vw, 1.5rem), env(safe-area-inset-left)) !important;
-        padding-right: max(clamp(0.75rem, 4vw, 1.5rem), env(safe-area-inset-right)) !important;
-        padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+    /* Slightly reduce band padding so 4 fit comfortably */
+    .aqi-band {
+        padding: 0.42rem 0.2rem !important;
+        font-size: 0.62rem !important;
+    }
+
+    /* Guide head: keep title + chip on same line but allow wrap only if truly needed */
+    .aq-guide-head {
+        flex-wrap: nowrap !important;
+        gap: 0.4rem !important;
+        align-items: center !important;
+    }
+
+    /* Chip: slightly smaller so it doesn't push to new line */
+    .aq-guide-chip {
+        font-size: 0.65rem !important;
+        padding: 0.25rem 0.55rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Guide title: prevent overflow */
+    .aq-guide h3 {
+        font-size: 0.88rem !important;
+        white-space: normal !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
     }
 }
 
-/* ── 10. PERFORMANCE — reduce overdraw on mobile ──────────────── */
-@media (max-width: 640px) {
-    /* Simplify blur on mobile GPU */
-    .glass-card,
-    [class*="glass-card"] {
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
+/* Extra-small phones: let chip wrap below title rather than overflow */
+@media (max-width: 380px) {
+    .aq-guide-head {
+        flex-wrap: wrap !important;
     }
-
-    /* Disable heavy animations on low-power mobile */
-    @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-        }
+    .aq-guide-chip {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+    /* 4 bands still fits at 380px but shrink more */
+    .aqi-band {
+        font-size: 0.58rem !important;
+        padding: 0.38rem 0.1rem !important;
     }
 }
-
-/* ── 11. TEXT OVERFLOW SAFETY — global ────────────────────────── */
-h1, h2, h3, h4, h5, h6,
-p, span, label, small {
-    max-width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-
-/* ── 12. IMG / SVG — prevent overflow ─────────────────────────── */
-img, svg {
-    max-width: 100%;
-    height: auto;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   END style-fixes.css
-   ═══════════════════════════════════════════════════════════════════ */
