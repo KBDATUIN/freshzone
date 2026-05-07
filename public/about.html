@@ -385,6 +385,7 @@
                 <a href="about.html" class="active">About</a>
                 <a href="profile.html">Profile</a>
                 <a href="contact.html">Contact</a>
+                <a href="admin.html" id="admin-nav-link-desktop" style="display:none;">Admin</a>
                 <a href="#" onclick="openLogoutModal();return false;">Logout</a>
             </div>
             <div class="nav-controls">
@@ -417,6 +418,7 @@
             <a href="about.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> About</a>
             <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
             <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
+            <a href="admin.html" id="admin-nav-link-mobile" style="display:none;"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Admin</a>
             <div class="mobile-nav-divider"></div>
             <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
         </div>
@@ -703,6 +705,12 @@
         (function() {
             const el = document.getElementById('nav-user-name');
             if (el && (user.full_name || user.name)) el.textContent = user.full_name || user.name;
+            if (user.position === 'Administrator') {
+                const da = document.getElementById('admin-nav-link-desktop');
+                const ma = document.getElementById('admin-nav-link-mobile');
+                if (da) da.style.display = '';
+                if (ma) ma.style.display = '';
+            }
         })();
         initHotkeys('about');
     </script>
