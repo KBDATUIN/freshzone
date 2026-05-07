@@ -176,18 +176,29 @@
 <script src="utils.js"></script>
 <script>
     // Auth guard — admin only
-    const user = JSON.parse(localStorage.getItem('currentUser'));
-    if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; }
+    let currentUser = null;
 
-    if (user?.position !== 'Administrator') {
-        document.getElementById('access-denied-msg').style.display = 'block';
-    } else {
-        document.getElementById('admin-content').style.display = 'block';
-        loadUsers();
-    }
+    (async function initAdmin() {
+        const user = await hydrateSessionUser();
+        if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; return; }
+        currentUser = user;
 
-    const nameEl = document.getElementById('nav-user-name');
-    if (nameEl) nameEl.textContent = user?.full_name || user?.name || 'User';
+        const nameEl = document.getElementById('nav-user-name');
+        if (nameEl) nameEl.textContent = user.full_name || user.name || 'User';
+
+        // Show admin nav link (in case arriving directly)
+        const da = document.getElementById('admin-nav-link-desktop');
+        const ma = document.getElementById('admin-nav-link-mobile');
+        if (da) da.style.display = '';
+        if (ma) ma.style.display = '';
+
+        if (user.position !== 'Administrator') {
+            document.getElementById('access-denied-msg').style.display = 'block';
+        } else {
+            document.getElementById('admin-content').style.display = 'block';
+            loadUsers();
+        }
+    })();
 
     async function loadUsers() {
         try {

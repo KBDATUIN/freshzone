@@ -25,14 +25,10 @@ function isValidPassword(pw) {
 // ── GET /api/profile/all-users ────────────────────────────────
 // Administrator only — returns list of all user accounts
 router.get('/all-users', authMiddleware, async (req, res) => {
-    try {
-        const [self] = await db.query(
-            'SELECT position FROM accounts WHERE id = ?',
-            [req.user.id]
-        );
-        if (!self.length || self[0].position !== 'Administrator')
-            return res.status(403).json({ success: false, message: 'Access denied: Administrator only.' });
+    if (req.user.position !== 'Administrator')
+        return res.status(403).json({ success: false, message: 'Access denied: Administrator only.' });
 
+    try {
         const [rows] = await db.query(
             `SELECT id, employee_id, full_name, email, contact_number,
                     position, is_active, date_joined, last_login
@@ -48,22 +44,17 @@ router.get('/all-users', authMiddleware, async (req, res) => {
 // ── PATCH /api/profile/toggle-active/:id ──────────────────────
 // Administrator only — enable or disable a user account
 router.patch('/toggle-active/:id', authMiddleware, async (req, res) => {
+    if (req.user.position !== 'Administrator')
+        return res.status(403).json({ success: false, message: 'Access denied: Administrator only.' });
+
+    const targetId = parseInt(req.params.id, 10);
+    if (!targetId || isNaN(targetId))
+        return res.status(400).json({ success: false, message: 'Invalid user ID.' });
+
+    if (targetId === req.user.id)
+        return res.status(400).json({ success: false, message: 'You cannot deactivate your own account.' });
+
     try {
-        const [self] = await db.query(
-            'SELECT position FROM accounts WHERE id = ?',
-            [req.user.id]
-        );
-        if (!self.length || self[0].position !== 'Administrator')
-            return res.status(403).json({ success: false, message: 'Access denied: Administrator only.' });
-
-        const targetId = parseInt(req.params.id, 10);
-        if (!targetId || isNaN(targetId))
-            return res.status(400).json({ success: false, message: 'Invalid user ID.' });
-
-        // Prevent admin from deactivating their own account
-        if (targetId === req.user.id)
-            return res.status(400).json({ success: false, message: 'You cannot deactivate your own account.' });
-
         const [target] = await db.query('SELECT id, is_active FROM accounts WHERE id = ?', [targetId]);
         if (!target.length)
             return res.status(404).json({ success: false, message: 'User not found.' });
