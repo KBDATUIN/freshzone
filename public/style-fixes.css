@@ -1049,3 +1049,114 @@ footer {
         padding: 0.38rem 0.1rem !important;
     }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   UNIVERSAL SMOOTH HOVER ANIMATIONS
+   Applied to all interactive elements that were missing
+   consistent transition + shadow-lift effects.
+   Only adds missing styles — does not override existing ones.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Base transition for glass-card / card / hero ────────────
+   These already have transition in style.css but lack :hover
+   in the main style.css (style-merged.css has it; this covers
+   pages that don't load style-merged).                        */
+.glass-card:hover,
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,50,110,0.16), 0 4px 12px rgba(0,0,0,0.07) !important;
+}
+
+/* ── aq-card (info cards on dashboard / history / about) ─── */
+.aq-card {
+    transition: transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                box-shadow 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+}
+.aq-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0,50,110,0.15), 0 3px 8px rgba(0,0,0,0.06) !important;
+}
+
+/* ── aqi-band (colour legend chips) ─────────────────────── */
+.aqi-band {
+    transition: transform 0.2s cubic-bezier(0.4,0,0.2,1),
+                box-shadow 0.2s cubic-bezier(0.4,0,0.2,1),
+                filter 0.2s !important;
+    cursor: default;
+}
+.aqi-band:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 16px rgba(0,40,90,0.15) !important;
+    filter: brightness(1.06);
+}
+
+/* ── ticket-item (contact inbox) ────────────────────────── */
+.ticket-item {
+    transition: transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                box-shadow 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+}
+.ticket-item:not(.resolved):hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0,50,110,0.14), 0 3px 8px rgba(0,0,0,0.06) !important;
+}
+
+/* ── filter-action-btn (history page buttons) ───────────── */
+.filter-action-btn {
+    transition: transform 0.2s cubic-bezier(0.4,0,0.2,1),
+                box-shadow 0.2s cubic-bezier(0.4,0,0.2,1),
+                filter 0.2s !important;
+}
+.filter-action-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 22px rgba(0,50,110,0.28) !important;
+    filter: brightness(1.08) !important;
+}
+.filter-action-btn:active {
+    transform: translateY(0) scale(0.99) !important;
+}
+
+/* ── nav-links a — add missing shadow on hover ──────────── */
+.nav-links a:hover {
+    box-shadow: 0 2px 10px rgba(0,78,122,0.10) !important;
+}
+.nav-links a {
+    transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+}
+
+/* ── live-sensor-item (info strip items) ────────────────── */
+.live-sensor-item {
+    transition: transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                box-shadow 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+}
+.live-sensor-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,50,110,0.10) !important;
+}
+
+/* ── confirm-btn / cancel-btn (modal buttons) ───────────── */
+.confirm-btn,
+.cancel-btn {
+    transition: transform 0.2s cubic-bezier(0.4,0,0.2,1),
+                box-shadow 0.2s cubic-bezier(0.4,0,0.2,1),
+                filter 0.2s !important;
+}
+.confirm-btn:hover,
+.cancel-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 22px rgba(0,50,110,0.28) !important;
+    filter: brightness(1.08) !important;
+}
+.confirm-btn:active,
+.cancel-btn:active {
+    transform: translateY(0) scale(0.99) !important;
+}
+
+/* ── Mobile: disable translateY lifts that break card layout  */
+@media (max-width: 600px) {
+    .aq-card:hover,
+    .aqi-band:hover,
+    .live-sensor-item:hover,
+    .ticket-item:not(.resolved):hover {
+        transform: none !important;
+    }
+}
