@@ -198,7 +198,86 @@
     });
   }
 
+  // ───── Page fade transition ─────
+  // Intercepts same-origin internal nav links and performs a
+  // CSS opacity fade-out before the browser navigates away.
+  // Auth redirects (auth.html), logout, external links, and
+  // modifier-key clicks (Cmd+click, middle-click) are all
+  // intentionally skipped so they keep their native behaviour.
+  // The CSS is injected once into <head> — no extra files needed.
+  function setupPageTransition() {
+    if (prefersReduced) return;
+
+    // Inject transition CSS once
+    if (!document.getElementById('fz-pt-style')) {
+      var s = document.createElement('style');
+      s.id = 'fz-pt-style';
+      s.textContent =
+        'body{opacity:1;transition:opacity 0.22s cubic-bezier(0.4,0,0.2,1)!important;}' +
+        'body.fz-fade-out{opacity:0!important;}' +
+        '@media(prefers-reduced-motion:reduce){body,body.fz-fade-out{transition:none!important;opacity:1!important;}}';
+      document.head.appendChild(s);
+    }
+
+    // Pages treated as internal app navigation
+    var NAV_PAGES = ['dashboard.html','history.html','profile.html','contact.html','about.html','admin.html'];
+
+    function isNavLink(href) {
+      if (!href) return false;
+      // strip query/hash, get the bare filename
+      var clean = href.replace(/[?#].*$/, '').split('/').pop();
+      return NAV_PAGES.indexOf(clean) !== -1;
+    }
+
+    document.addEventListener('click', function(ev) {
+      // Ignore modifier-key clicks (new tab / new window)
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+      if (ev.button !== 0) return;
+
+      var a = ev.target.closest('a[href]');
+      if (!a) return;
+
+      var href = a.getAttribute('href');
+      if (!href || href === '#' || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+      if (a.getAttribute('target') === '_blank') return;
+      if (!isNavLink(href)) return;
+
+      // Don't intercept if onclick already handles it (e.g. logout)
+      if (a.getAttribute('onclick') && a.getAttribute('onclick').indexOf('openLogoutModal') !== -1) return;
+
+      ev.preventDefault();
+      var dest = href;
+
+      document.body.classList.add('fz-fade-out');
+      setTimeout(function() {
+        window.location.href = dest;
+      }, 230);
+    }, { capture: false });
+
+    // Fade in on arrival — body starts transparent until JS runs
+    document.body.style.opacity = '0';
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        document.body.style.opacity = '';
+      });
+    });
+
+    // Handle browser back/forward (bfcache restore)
+    window.addEventListener('pageshow', function(ev) {
+      if (ev.persisted) {
+        document.body.classList.remove('fz-fade-out');
+        document.body.style.opacity = '0';
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            document.body.style.opacity = '';
+          });
+        });
+      }
+    });
+  }
+
   ready(function(){
+    try { setupPageTransition(); } catch(e){}
     try { setupReveal(); } catch(e){}
     try { setupRipple(); } catch(e){}
     try { setupMagnetic(); } catch(e){}
