@@ -658,6 +658,254 @@
             </div>
         </div>
 
+        <!-- ── DATA FLOW DIAGRAM ──────────────────────────────
+             Self-contained section. All styles are scoped to
+             .fz-flow-* classes — zero overlap with existing CSS.
+        ──────────────────────────────────────────────────────── -->
+        <div class="glass-card animate-in" style="animation-delay:0.35s; margin-bottom:1.5rem; padding:2rem 2rem 1.75rem;">
+            <span class="section-eyebrow">System Architecture</span>
+            <h2 style="font-size:1.3rem; margin-bottom:0.35rem; color:#003855;">How FreshZone Works</h2>
+            <p style="color:#4a7a90; font-size:0.85rem; margin-bottom:1.5rem; line-height:1.6;">Real-time air quality data travels from the prototype hardware through the cloud and back to your browser in under 5 seconds.</p>
+
+            <style>
+                /* ── scoped only to .fz-flow-* ── */
+                .fz-flow-wrap { display:flex; flex-direction:column; gap:0; }
+                .fz-flow-row  { display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap; }
+                .fz-flow-node {
+                    display:flex; flex-direction:column; align-items:center; justify-content:center;
+                    gap:4px; padding:0.75rem 0.9rem; border-radius:12px; min-width:108px;
+                    text-align:center; border:1px solid; transition:transform 0.22s ease, box-shadow 0.22s ease;
+                    cursor:default; position:relative;
+                }
+                .fz-flow-node:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,50,100,0.15); }
+                .fz-flow-icon  { font-size:1.5rem; line-height:1; }
+                .fz-flow-label { font-size:0.78rem; font-weight:700; line-height:1.2; }
+                .fz-flow-sub   { font-size:0.68rem; font-weight:400; line-height:1.3; opacity:0.75; }
+                /* arrow connector */
+                .fz-flow-arrow {
+                    display:flex; align-items:center; justify-content:center;
+                    flex-direction:column; gap:2px; padding:0 4px; flex-shrink:0;
+                }
+                .fz-flow-arrow-line {
+                    width:36px; height:2px; background:linear-gradient(90deg,rgba(0,150,200,0.35),rgba(0,150,200,0.7));
+                    border-radius:2px; position:relative; flex-shrink:0;
+                }
+                .fz-flow-arrow-line::after {
+                    content:''; position:absolute; right:-6px; top:-4px;
+                    border-left:8px solid rgba(0,150,200,0.7);
+                    border-top:5px solid transparent; border-bottom:5px solid transparent;
+                }
+                .fz-flow-arrow-label { font-size:0.6rem; color:#5a8a9f; white-space:nowrap; font-weight:500; }
+                /* vertical connector between rows */
+                .fz-flow-vconn {
+                    display:flex; flex-direction:column; align-items:center; gap:0;
+                    margin:0 auto; padding:0;
+                }
+                .fz-flow-vline {
+                    width:2px; height:28px;
+                    background:linear-gradient(180deg,rgba(0,150,200,0.4),rgba(0,150,200,0.7));
+                }
+                .fz-flow-vchev {
+                    width:0; height:0;
+                    border-left:5px solid transparent; border-right:5px solid transparent;
+                    border-top:7px solid rgba(0,150,200,0.7);
+                }
+                .fz-flow-vlabel { font-size:0.6rem; color:#5a8a9f; font-weight:500; margin:-2px 0 2px; white-space:nowrap; }
+                /* node colour variants */
+                .fz-n-hw   { background:#e8f5f0; border-color:#0ea266; }
+                .fz-n-hw   .fz-flow-label { color:#065f46; }
+                .fz-n-net  { background:#e6f4fb; border-color:#0099c8; }
+                .fz-n-net  .fz-flow-label { color:#004e7a; }
+                .fz-n-srv  { background:#eef2ff; border-color:#6366f1; }
+                .fz-n-srv  .fz-flow-label { color:#3730a3; }
+                .fz-n-db   { background:#fff7e6; border-color:#d97706; }
+                .fz-n-db   .fz-flow-label { color:#92400e; }
+                .fz-n-ci   { background:#fdf4ff; border-color:#a855f7; }
+                .fz-n-ci   .fz-flow-label { color:#6b21a8; }
+                .fz-n-out  { background:#e6f9f5; border-color:#0d9488; }
+                .fz-n-out  .fz-flow-label { color:#115e59; }
+                /* row labels */
+                .fz-flow-row-label {
+                    font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+                    color:#8dafc0; margin:0 0 6px; text-align:left; padding-left:4px;
+                }
+                /* legend */
+                .fz-flow-legend { display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:1.25rem; padding-top:1rem; border-top:1px solid rgba(0,100,160,0.1); }
+                .fz-flow-leg-item { display:flex; align-items:center; gap:5px; font-size:0.7rem; color:#4a7a90; }
+                .fz-flow-leg-dot  { width:10px; height:10px; border-radius:50%; border:1.5px solid; flex-shrink:0; }
+                /* dark-mode overrides */
+                [data-theme="dark"] .fz-n-hw  { background:rgba(6,95,70,0.18); border-color:#0ea266; }
+                [data-theme="dark"] .fz-n-hw  .fz-flow-label { color:#6ee7b7; }
+                [data-theme="dark"] .fz-n-net { background:rgba(0,100,160,0.18); border-color:#38bdf8; }
+                [data-theme="dark"] .fz-n-net .fz-flow-label { color:#7dd3fc; }
+                [data-theme="dark"] .fz-n-srv { background:rgba(79,70,229,0.18); border-color:#818cf8; }
+                [data-theme="dark"] .fz-n-srv .fz-flow-label { color:#c7d2fe; }
+                [data-theme="dark"] .fz-n-db  { background:rgba(146,64,14,0.18); border-color:#fbbf24; }
+                [data-theme="dark"] .fz-n-db  .fz-flow-label { color:#fde68a; }
+                [data-theme="dark"] .fz-n-ci  { background:rgba(107,33,168,0.18); border-color:#d8b4fe; }
+                [data-theme="dark"] .fz-n-ci  .fz-flow-label { color:#e9d5ff; }
+                [data-theme="dark"] .fz-n-out { background:rgba(13,94,88,0.18); border-color:#2dd4bf; }
+                [data-theme="dark"] .fz-n-out .fz-flow-label { color:#99f6e4; }
+                [data-theme="dark"] .fz-flow-row-label { color:#4a7a90; }
+                [data-theme="dark"] .fz-flow-sub { opacity:0.6; }
+                [data-theme="dark"] .fz-flow-arrow-label,
+                [data-theme="dark"] .fz-flow-vlabel { color:#4a7a90; }
+                [data-theme="dark"] .fz-flow-legend { border-top-color:rgba(0,180,216,0.12); }
+                [data-theme="dark"] .fz-flow-leg-item { color:#4a7a90; }
+                @media (max-width:620px) {
+                    .fz-flow-row { flex-direction:column; }
+                    .fz-flow-arrow { flex-direction:column; }
+                    .fz-flow-arrow-line { width:2px; height:28px; background:linear-gradient(180deg,rgba(0,150,200,0.35),rgba(0,150,200,0.7)); }
+                    .fz-flow-arrow-line::after {
+                        right:auto; top:auto; left:-4px; bottom:-6px;
+                        border-left:5px solid transparent; border-right:5px solid transparent;
+                        border-top:7px solid rgba(0,150,200,0.7);
+                        border-left:none;
+                    }
+                    .fz-flow-node { min-width:160px; }
+                }
+            </style>
+
+            <div class="fz-flow-wrap">
+
+                <!-- ROW 1 : Hardware prototype -->
+                <p class="fz-flow-row-label">① Prototype hardware</p>
+                <div class="fz-flow-row">
+                    <div class="fz-flow-node fz-n-hw">
+                        <span class="fz-flow-icon">🔌</span>
+                        <span class="fz-flow-label">ESP32</span>
+                        <span class="fz-flow-sub">Microcontroller</span>
+                    </div>
+                    <div class="fz-flow-arrow">
+                        <span class="fz-flow-arrow-label">UART</span>
+                        <div class="fz-flow-arrow-line"></div>
+                    </div>
+                    <div class="fz-flow-node fz-n-hw">
+                        <span class="fz-flow-icon">🌫️</span>
+                        <span class="fz-flow-label">PMS7003</span>
+                        <span class="fz-flow-sub">PM1.0 · PM2.5 sensor</span>
+                    </div>
+                    <div class="fz-flow-arrow">
+                        <span class="fz-flow-arrow-label">GPIO</span>
+                        <div class="fz-flow-arrow-line"></div>
+                    </div>
+                    <div class="fz-flow-node fz-n-hw" style="min-width:96px;">
+                        <span class="fz-flow-icon">💡</span>
+                        <span class="fz-flow-label">RGB LED</span>
+                        <span class="fz-flow-sub">Local alert</span>
+                    </div>
+                </div>
+
+                <!-- vertical connector 1 → 2 -->
+                <div class="fz-flow-vconn">
+                    <div class="fz-flow-vline"></div>
+                    <span class="fz-flow-vlabel">HTTP POST · every 5 s</span>
+                    <div class="fz-flow-vchev"></div>
+                </div>
+
+                <!-- ROW 2 : Network -->
+                <p class="fz-flow-row-label">② Network transport</p>
+                <div class="fz-flow-row">
+                    <div class="fz-flow-node fz-n-net">
+                        <span class="fz-flow-icon">📶</span>
+                        <span class="fz-flow-label">Campus WiFi</span>
+                        <span class="fz-flow-sub">WPA2 · DHCP</span>
+                    </div>
+                    <div class="fz-flow-arrow">
+                        <span class="fz-flow-arrow-label">HTTPS</span>
+                        <div class="fz-flow-arrow-line"></div>
+                    </div>
+                    <div class="fz-flow-node fz-n-net">
+                        <span class="fz-flow-icon">🌐</span>
+                        <span class="fz-flow-label">Railway</span>
+                        <span class="fz-flow-sub">Cloud hosting</span>
+                    </div>
+                </div>
+
+                <!-- vertical connector 2 → 3 -->
+                <div class="fz-flow-vconn">
+                    <div class="fz-flow-vline"></div>
+                    <span class="fz-flow-vlabel">HMAC-signed request</span>
+                    <div class="fz-flow-vchev"></div>
+                </div>
+
+                <!-- ROW 3 : Server + CI/CD -->
+                <p class="fz-flow-row-label">③ Backend & deployment</p>
+                <div class="fz-flow-row">
+                    <div class="fz-flow-node fz-n-srv">
+                        <span class="fz-flow-icon">⚙️</span>
+                        <span class="fz-flow-label">Node.js · Express</span>
+                        <span class="fz-flow-sub">REST API · SSE · Auth</span>
+                    </div>
+                    <div class="fz-flow-arrow">
+                        <span class="fz-flow-arrow-label">SQL query</span>
+                        <div class="fz-flow-arrow-line"></div>
+                    </div>
+                    <div class="fz-flow-node fz-n-db">
+                        <span class="fz-flow-icon">🗄️</span>
+                        <span class="fz-flow-label">MySQL</span>
+                        <span class="fz-flow-sub">Readings · events · users</span>
+                    </div>
+                    <div class="fz-flow-arrow">
+                        <span class="fz-flow-arrow-label">git push</span>
+                        <div class="fz-flow-arrow-line"></div>
+                    </div>
+                    <div class="fz-flow-node fz-n-ci">
+                        <span class="fz-flow-icon">🐙</span>
+                        <span class="fz-flow-label">GitHub · Railway CI</span>
+                        <span class="fz-flow-sub">Auto-deploy on push</span>
+                    </div>
+                </div>
+
+                <!-- vertical connector 3 → 4 -->
+                <div class="fz-flow-vconn">
+                    <div class="fz-flow-vline"></div>
+                    <span class="fz-flow-vlabel">Server-Sent Events · push email</span>
+                    <div class="fz-flow-vchev"></div>
+                </div>
+
+                <!-- ROW 4 : Client output -->
+                <p class="fz-flow-row-label">④ Client output</p>
+                <div class="fz-flow-row">
+                    <div class="fz-flow-node fz-n-out">
+                        <span class="fz-flow-icon">📊</span>
+                        <span class="fz-flow-label">Web Dashboard</span>
+                        <span class="fz-flow-sub">Live PM cards · history</span>
+                    </div>
+                    <div class="fz-flow-arrow">
+                        <span class="fz-flow-arrow-label"></span>
+                        <div class="fz-flow-arrow-line"></div>
+                    </div>
+                    <div class="fz-flow-node fz-n-out">
+                        <span class="fz-flow-icon">🔔</span>
+                        <span class="fz-flow-label">Push Alert</span>
+                        <span class="fz-flow-sub">Email · Web Push</span>
+                    </div>
+                    <div class="fz-flow-arrow">
+                        <span class="fz-flow-arrow-label"></span>
+                        <div class="fz-flow-arrow-line"></div>
+                    </div>
+                    <div class="fz-flow-node fz-n-out">
+                        <span class="fz-flow-icon">📋</span>
+                        <span class="fz-flow-label">Admin Panel</span>
+                        <span class="fz-flow-sub">Incidents · CSV export</span>
+                    </div>
+                </div>
+
+            </div><!-- /.fz-flow-wrap -->
+
+            <!-- Legend -->
+            <div class="fz-flow-legend">
+                <div class="fz-flow-leg-item"><span class="fz-flow-leg-dot" style="background:#e8f5f0;border-color:#0ea266;"></span>Hardware (prototype)</div>
+                <div class="fz-flow-leg-item"><span class="fz-flow-leg-dot" style="background:#e6f4fb;border-color:#0099c8;"></span>Network / Railway</div>
+                <div class="fz-flow-leg-item"><span class="fz-flow-leg-dot" style="background:#eef2ff;border-color:#6366f1;"></span>Node.js backend</div>
+                <div class="fz-flow-leg-item"><span class="fz-flow-leg-dot" style="background:#fff7e6;border-color:#d97706;"></span>MySQL database</div>
+                <div class="fz-flow-leg-item"><span class="fz-flow-leg-dot" style="background:#fdf4ff;border-color:#a855f7;"></span>GitHub · CI/CD</div>
+                <div class="fz-flow-leg-item"><span class="fz-flow-leg-dot" style="background:#e6f9f5;border-color:#0d9488;"></span>Client output</div>
+            </div>
+        </div>
+        <!-- ── END DATA FLOW DIAGRAM ─────────────────────────── -->
+
         <!-- ── ACKNOWLEDGEMENTS ────────────────────────────── -->
         <div class="glass-card animate-in" style="animation-delay:0.4s; margin-bottom:1.5rem; text-align:center; padding:2rem 2rem;">
             <span class="section-eyebrow">Acknowledgements</span>
