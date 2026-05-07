@@ -301,16 +301,13 @@
         [data-theme="dark"] .about-stat-label { color: #64748b; }
         /* Tech grid */
         .about-tech-grid {
-            display: flex;
-            flex-wrap: nowrap;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 0.85rem;
-            overflow-x: auto;
         }
-        .about-tech-grid::-webkit-scrollbar { display: none; }
-        .about-tech-grid { scrollbar-width: none; -ms-overflow-style: none; }
-        @media (max-width: 768px) {
+        @media (max-width: 480px) {
             .about-tech-grid {
-                flex-wrap: wrap;
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         .about-tech-pill {
@@ -322,9 +319,6 @@
             border-radius: 12px;
             padding: 0.85rem 1rem;
             transition: all 0.22s ease;
-            flex: 1 1 0;
-            min-width: max-content;
-            white-space: nowrap;
         }
         .about-tech-pill:hover { background: rgba(0,100,160,0.1); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,50,100,0.12); }
         [data-theme="dark"] .about-tech-pill { background: rgba(34,211,238,0.05); border-color: rgba(34,211,238,0.12); }
