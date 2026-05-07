@@ -198,39 +198,87 @@
     });
   }
 
-  // ───── Page fade transition ─────
-  // Intercepts same-origin internal nav links and performs a
-  // CSS opacity fade-out before the browser navigates away.
-  // Auth redirects (auth.html), logout, external links, and
-  // modifier-key clicks (Cmd+click, middle-click) are all
-  // intentionally skipped so they keep their native behaviour.
-  // The CSS is injected once into <head> — no extra files needed.
+  // ───── Page transition — fade-out + content slide-up on entry ─────
+  //
+  // HOW IT WORKS
+  // Exit : fade the <html> element to opacity 0 (200ms), then navigate.
+  //        Fading <html> keeps the body background visible the whole time
+  //        — no white flash between pages.
+  // Entry: <html> starts at opacity 0 (set by the injected <style> below,
+  //        which runs before any paint). JS fades it back in (300ms) and
+  //        simultaneously slide-ups key content containers (nav, cards, hero).
+  //
+  // WHAT IS SKIPPED (kept at native browser behaviour)
+  //   • Logout link (onclick contains openLogoutModal)
+  //   • auth.html  — not in the nav-page list
+  //   • External links, mailto:, tel:
+  //   • Modifier-key clicks (Cmd+click, Ctrl+click, middle-click → new tab)
+  //   • prefers-reduced-motion users — no animation at all
   function setupPageTransition() {
-    if (prefersReduced) return;
 
-    // Inject transition CSS once
+    // ── CSS injected into <head> before first paint ──────────────────
+    // html starts invisible; the transition class fades it in/out.
+    // Content containers get a slide-up keyframe on entry.
+    // Everything is no-op under prefers-reduced-motion.
     if (!document.getElementById('fz-pt-style')) {
       var s = document.createElement('style');
       s.id = 'fz-pt-style';
-      s.textContent =
-        'body{opacity:1;transition:opacity 0.22s cubic-bezier(0.4,0,0.2,1)!important;}' +
-        'body.fz-fade-out{opacity:0!important;}' +
-        '@media(prefers-reduced-motion:reduce){body,body.fz-fade-out{transition:none!important;opacity:1!important;}}';
+      s.textContent = [
+        // Keep <html> background visible at all times; fade only opacity
+        'html{opacity:1;transition:opacity 0.2s cubic-bezier(0.4,0,0.2,1);}',
+        'html.fz-out{opacity:0!important;transition:opacity 0.18s cubic-bezier(0.4,0,0.2,1)!important;}',
+
+        // Entry slide-up for main content blocks
+        '@keyframes fzSlideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}',
+
+        // Apply slide-up to nav, hero/header, cards, tables, filter bars
+        // Uses .fz-entering class added on load, removed after animation
+        'html.fz-entering nav,',
+        'html.fz-entering .page-hero,',
+        'html.fz-entering .dashboard-masthead,',
+        'html.fz-entering .glass-card:not(.animate-in),',
+        'html.fz-entering .stat-box:not(.animate-in),',
+        'html.fz-entering .location-card,',
+        'html.fz-entering .log-container:not(.animate-in),',
+        'html.fz-entering .filter-bar,',
+        'html.fz-entering .profile-card,',
+        'html.fz-entering .contact-page-header,',
+        'html.fz-entering .about-stat-strip,',
+        'html.fz-entering .about-team-grid,',
+        'html.fz-entering .inbox-section{',
+        '  animation:fzSlideUp 0.38s cubic-bezier(0.22,1,0.36,1) both;',
+        '}',
+
+        // Stagger siblings so they cascade in, not all at once
+        'html.fz-entering nav{animation-delay:0ms;}',
+        'html.fz-entering .page-hero,html.fz-entering .dashboard-masthead{animation-delay:40ms;}',
+        'html.fz-entering .filter-bar,html.fz-entering .contact-page-header,html.fz-entering .about-stat-strip{animation-delay:60ms;}',
+        'html.fz-entering .glass-card:not(.animate-in):nth-child(1),html.fz-entering .stat-box:not(.animate-in):nth-child(1),html.fz-entering .location-card:nth-child(1){animation-delay:80ms;}',
+        'html.fz-entering .glass-card:not(.animate-in):nth-child(2),html.fz-entering .stat-box:not(.animate-in):nth-child(2),html.fz-entering .location-card:nth-child(2){animation-delay:120ms;}',
+        'html.fz-entering .glass-card:not(.animate-in):nth-child(3),html.fz-entering .stat-box:not(.animate-in):nth-child(3),html.fz-entering .location-card:nth-child(3){animation-delay:160ms;}',
+        'html.fz-entering .glass-card:not(.animate-in):nth-child(n+4),html.fz-entering .stat-box:not(.animate-in):nth-child(n+4),html.fz-entering .location-card:nth-child(n+4){animation-delay:200ms;}',
+        'html.fz-entering .log-container:not(.animate-in),html.fz-entering .inbox-section,html.fz-entering .about-team-grid{animation-delay:140ms;}',
+        'html.fz-entering .profile-card{animation-delay:80ms;}',
+
+        // Disable everything for reduced-motion users
+        '@media(prefers-reduced-motion:reduce){',
+        '  html,html.fz-out,html.fz-entering *{transition:none!important;animation:none!important;opacity:1!important;transform:none!important;}',
+        '}',
+      ].join('');
       document.head.appendChild(s);
     }
 
-    // Pages treated as internal app navigation
+    // Pages in the internal nav — everything else uses native navigation
     var NAV_PAGES = ['dashboard.html','history.html','profile.html','contact.html','about.html','admin.html'];
 
-    function isNavLink(href) {
+    function isNavHref(href) {
       if (!href) return false;
-      // strip query/hash, get the bare filename
       var clean = href.replace(/[?#].*$/, '').split('/').pop();
       return NAV_PAGES.indexOf(clean) !== -1;
     }
 
+    // ── EXIT: intercept clicks on internal nav links ──────────────────
     document.addEventListener('click', function(ev) {
-      // Ignore modifier-key clicks (new tab / new window)
       if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
       if (ev.button !== 0) return;
 
@@ -240,38 +288,52 @@
       var href = a.getAttribute('href');
       if (!href || href === '#' || href.startsWith('mailto:') || href.startsWith('tel:')) return;
       if (a.getAttribute('target') === '_blank') return;
-      if (!isNavLink(href)) return;
+      if (!isNavHref(href)) return;
 
-      // Don't intercept if onclick already handles it (e.g. logout)
-      if (a.getAttribute('onclick') && a.getAttribute('onclick').indexOf('openLogoutModal') !== -1) return;
+      // Skip logout anchor
+      var oc = a.getAttribute('onclick') || '';
+      if (oc.indexOf('openLogoutModal') !== -1) return;
 
       ev.preventDefault();
       var dest = href;
 
-      document.body.classList.add('fz-fade-out');
-      setTimeout(function() {
-        window.location.href = dest;
-      }, 230);
-    }, { capture: false });
-
-    // Fade in on arrival — body starts transparent until JS runs
-    document.body.style.opacity = '0';
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        document.body.style.opacity = '';
-      });
+      document.documentElement.classList.add('fz-out');
+      setTimeout(function() { window.location.href = dest; }, 200);
     });
 
-    // Handle browser back/forward (bfcache restore)
+    // ── ENTRY: fade <html> back in + trigger slide-up ─────────────────
+    // <html> is already at opacity:0 from the previous page's fz-out.
+    // We add fz-entering (enables slide-up keyframes), then fade in.
+    function enterPage() {
+      var html = document.documentElement;
+      html.classList.remove('fz-out');
+      html.classList.add('fz-entering');
+      // Force a reflow so the opacity:0 state is painted before we remove it
+      void html.offsetHeight;
+      // Fade in
+      html.style.opacity = '0';
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          html.style.opacity = '';
+        });
+      });
+      // Remove entering class after all slide-ups are done (longest = 200+380ms)
+      setTimeout(function() { html.classList.remove('fz-entering'); }, 640);
+    }
+
+    if (prefersReduced) return; // skip all animation for reduced-motion
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', enterPage);
+    } else {
+      enterPage();
+    }
+
+    // Handle browser back/forward (bfcache restores the old page instantly)
     window.addEventListener('pageshow', function(ev) {
       if (ev.persisted) {
-        document.body.classList.remove('fz-fade-out');
-        document.body.style.opacity = '0';
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            document.body.style.opacity = '';
-          });
-        });
+        document.documentElement.classList.remove('fz-out');
+        enterPage();
       }
     });
   }
