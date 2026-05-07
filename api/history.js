@@ -1,10 +1,11 @@
 // ============================================================
-//  api/history.js — Detection history log
+//  api/history.js — Detection history log (PM1.0 only)
 // ============================================================
 const express = require('express');
 const router  = express.Router();
 const db      = require('../db');
 const { authMiddleware, adminOnly } = require('../middleware/auth');
+const logger  = require('../logger');
 
 // ── GET /api/history ──────────────────────────────────────────
 // Returns full detection event history with all timestamps
@@ -15,14 +16,14 @@ router.get('/', authMiddleware, async (req, res) => {
     const safeLimit = Math.min(Math.max(parseInt(req.query.limit) || 200, 1), 500);
 
     try {
-        // Pull directly from detection_events + accounts — no view dependency
-        // All times converted to Asia/Manila (UTC+8)
+        // pm2_5_value column stores the PM1.0 value at time of detection
+        // (legacy column name — the value recorded is always PM1.0)
         let query = `
             SELECT
                 de.id,
                 de.location_name                                          AS location,
                 de.event_status                                           AS status,
-                de.pm2_5_value,
+                de.pm2_5_value                                            AS pm1_0_value,
                 de.aqi_value,
                 de.aqi_category,
                 de.notes,
@@ -65,8 +66,7 @@ router.get('/', authMiddleware, async (req, res) => {
             params.push(status);
         }
         if (date) {
-            // Filter by Manila date
-            query += ' AND DATE(CONVERT_TZ(de.detected_at, \'+00:00\', \'+08:00\')) = ?';
+            query += " AND DATE(CONVERT_TZ(de.detected_at, '+00:00', '+08:00')) = ?";
             params.push(date);
         }
 
@@ -74,21 +74,16 @@ router.get('/', authMiddleware, async (req, res) => {
 
         const [rows] = await db.query(query, params);
 
-        // Format for frontend
         const formatted = rows.map(r => {
-            // mysql2 with timezone:'+00:00' returns DATETIME as Date objects (UTC).
-            // Convert to ISO string so the frontend receives a proper UTC timestamp.
             const toISO = (v) => {
                 if (!v) return null;
                 if (v instanceof Date) return v.toISOString();
-                // Fallback: bare string from MySQL — treat as UTC
                 return new Date(String(v).replace(' ', 'T') + 'Z').toISOString();
             };
             const detectedAt     = toISO(r.detected_at);
             const acknowledgedAt = toISO(r.acknowledged_at);
             const resolvedAt     = toISO(r.resolved_at);
 
-            // Build response notes
             let response = '—';
             if (r.notes) {
                 response = r.notes;
@@ -104,7 +99,7 @@ router.get('/', authMiddleware, async (req, res) => {
                 id:               r.id,
                 location:         r.location || '—',
                 status:           r.status,
-                pm2_5:            r.pm2_5_value,
+                pm1_0:            r.pm1_0_value,   // PM1.0 only — renamed from pm2_5
                 aqi:              r.aqi_value,
                 aqi_category:     r.aqi_category,
                 notes:            r.notes,
@@ -128,7 +123,7 @@ router.get('/', authMiddleware, async (req, res) => {
         res.json({ success: true, data: formatted });
 
     } catch (err) {
-        console.error('[history] Error:', err.message);
+        logger.error({ err }, '[history] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
@@ -136,7 +131,6 @@ router.get('/', authMiddleware, async (req, res) => {
 // ── GET /api/history/stats ────────────────────────────────────
 router.get('/stats', authMiddleware, async (req, res) => {
     try {
-        // Use Manila timezone for "today"
         const [[todayRow]] = await db.query(
             `SELECT COUNT(*) AS count FROM detection_events
              WHERE DATE(CONVERT_TZ(detected_at, '+00:00', '+08:00')) = DATE(CONVERT_TZ(NOW(), '+00:00', '+08:00'))`
@@ -157,6 +151,7 @@ router.get('/stats', authMiddleware, async (req, res) => {
             }
         });
     } catch (err) {
+        logger.error({ err }, '[history/stats] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
@@ -171,7 +166,7 @@ router.delete('/clear-all', authMiddleware, adminOnly, async (req, res) => {
         await db.query('DELETE FROM login_attempts');
         res.json({ success: true, message: 'All history cleared successfully.' });
     } catch (err) {
-        console.error('[clear-all] Error:', err.message);
+        logger.error({ err }, '[clear-all] Error');
         res.status(500).json({ success: false, message: 'Server error: ' + err.message });
     }
 });

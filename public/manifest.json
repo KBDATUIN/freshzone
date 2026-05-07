@@ -1,7 +1,7 @@
 {
     "name": "FreshZone — Vape & Smoke Detector",
     "short_name": "FreshZone",
-    "description": "Real-time campus vape and smoke detection monitoring system with live PM1.0, PM2.5 & PM10 readings from sensors.",
+    "description": "Real-time campus vape and smoke detection monitoring system with live PM1.0 readings from sensors.",
     "start_url": "/auth.html",
     "scope": "/",
     "display": "standalone",

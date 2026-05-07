@@ -18,7 +18,7 @@ function formatPm1(pm1) {
     return n.toFixed(1);
 }
 
-/** Alert emails show PM1.0 only (dashboard still shows PM1 / PM2.5 / PM10). */
+/** Alert emails show PM1.0 only. FreshZone detects vape/smoke using PM1.0 exclusively. */
 async function sendAlertEmail(to, name, location, pm1, category) {
     if (!resend) {
         console.log('[mailer] Cannot send alert email - Resend not configured');

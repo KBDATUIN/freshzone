@@ -1,52 +1,40 @@
-// Run this with: node test-email.js your@gmail.com
+// ============================================================
+//  test-email.js — Test Resend email delivery
+//  Run with: node test-email.js your@email.com
+// ============================================================
 require('dotenv').config();
-const nodemailer = require('nodemailer');
+const { sendOTPEmail, sendAlertEmail } = require('./mailer');
 
 const recipient = process.argv[2];
+const type      = process.argv[3] || 'otp'; // 'otp' or 'alert'
+
 if (!recipient) {
-    console.error('Usage: node test-email.js your@gmail.com');
+    console.error('Usage: node test-email.js your@email.com [otp|alert]');
     process.exit(1);
 }
 
-console.log('--- FreshZone Email Test ---');
-console.log('GMAIL_USER:', process.env.GMAIL_USER);
-console.log('GMAIL_APP_PASSWORD:', process.env.GMAIL_APP_PASSWORD ? `"${process.env.GMAIL_APP_PASSWORD}" (${process.env.GMAIL_APP_PASSWORD.length} chars)` : 'NOT SET');
+if (!process.env.RESEND_API_KEY) {
+    console.error('❌ RESEND_API_KEY is not set in .env');
+    process.exit(1);
+}
+
+console.log('--- FreshZone Email Test (Resend) ---');
+console.log('RESEND_API_KEY:', process.env.RESEND_API_KEY ? '✅ Set' : '❌ Not set');
 console.log('Sending to:', recipient);
+console.log('Type:', type);
 console.log('---');
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-    },
-    logger: true,   // prints every SMTP command
-    debug: true,    // full debug output
-});
-
-transporter.verify((err) => {
-    if (err) {
-        console.error('\n❌ VERIFY FAILED:', err.message);
-        console.error('Full error:', JSON.stringify(err, null, 2));
+(async () => {
+    try {
+        if (type === 'alert') {
+            await sendAlertEmail(recipient, 'Test Admin', 'Room 101 — Science Building', 18.4, 'Moderate');
+            console.log('✅ Alert email sent successfully! Check your inbox.');
+        } else {
+            await sendOTPEmail(recipient, 'Test User', '123456', 'signup');
+            console.log('✅ OTP email sent successfully! Check your inbox.');
+        }
+    } catch (err) {
+        console.error('❌ Email send failed:', err.message);
         process.exit(1);
     }
-    console.log('\n✅ SMTP verified OK — sending test email...\n');
-
-    transporter.sendMail({
-        from: `"FreshZone Test" <${process.env.GMAIL_USER}>`,
-        to: recipient,
-        subject: 'FreshZone OTP Test',
-        text: 'If you received this, Gmail is working correctly!',
-    }, (err, info) => {
-        if (err) {
-            console.error('\n❌ SEND FAILED:', err.message);
-            console.error('Full error:', JSON.stringify(err, null, 2));
-        } else {
-            console.log('\n✅ EMAIL SENT! Message ID:', info.messageId);
-            console.log('Check your inbox (and spam folder).');
-        }
-        process.exit(0);
-    });
-});
+})();

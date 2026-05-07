@@ -1,5 +1,6 @@
-﻿// ============================================================
+// ============================================================
 //  api/readings.js — Sensor data from ESP32 + live dashboard
+//  PM1.0 ONLY — pm2.5 / pm10 from external sources are BLOCKED
 // ============================================================
 const express  = require('express');
 const router   = express.Router();
@@ -22,22 +23,15 @@ function broadcastSSE(data) {
     }
 }
 
-// ── AQI Calculator ───────────────────────────────────────────
-function calculateAQI(pm25) {
-    const breakpoints = [
-        { cLow: 0.0,   cHigh: 12.0,  iLow: 0,   iHigh: 50,  category: 'Good' },
-        { cLow: 12.1,  cHigh: 35.4,  iLow: 51,  iHigh: 100, category: 'Moderate' },
-        { cLow: 35.5,  cHigh: 55.4,  iLow: 101, iHigh: 150, category: 'Unhealthy for Sensitive Groups' },
-        { cLow: 55.5,  cHigh: 150.4, iLow: 151, iHigh: 200, category: 'Unhealthy' },
-        { cLow: 150.5, cHigh: 250.4, iLow: 201, iHigh: 300, category: 'Very Unhealthy' },
-        { cLow: 250.5, cHigh: 500.4, iLow: 301, iHigh: 500, category: 'Hazardous' },
-    ];
-    const bp = breakpoints.find(b => pm25 >= b.cLow && pm25 <= b.cHigh)
-             || breakpoints[breakpoints.length - 1];
-    const aqi = Math.round(
-        ((bp.iHigh - bp.iLow) / (bp.cHigh - bp.cLow)) * (pm25 - bp.cLow) + bp.iLow
-    );
-    return { aqi, category: bp.category };
+// ── PM1.0 AQI Calculator ─────────────────────────────────────
+// FreshZone uses PM1.0 thresholds (ultra-fine aerosol / vape detection)
+function calculatePM1Category(pm1) {
+    if (pm1 <= 12)  return { aqi: Math.round((50  / 12)   * pm1),        category: 'Good' };
+    if (pm1 <= 35)  return { aqi: Math.round(((100-51)/(35-12.1)) * (pm1-12.1) + 51), category: 'Moderate' };
+    if (pm1 <= 55)  return { aqi: Math.round(((150-101)/(55-35.5)) * (pm1-35.5) + 101), category: 'Unhealthy for Sensitive Groups' };
+    if (pm1 <= 150) return { aqi: Math.round(((200-151)/(150-55.5)) * (pm1-55.5) + 151), category: 'Unhealthy' };
+    if (pm1 <= 250) return { aqi: Math.round(((300-201)/(250-150.5)) * (pm1-150.5) + 201), category: 'Very Unhealthy' };
+    return { aqi: Math.min(500, Math.round(((500-301)/(500.4-250.5)) * (pm1-250.5) + 301)), category: 'Hazardous' };
 }
 
 function isValidReading(val, min, max) {
@@ -57,11 +51,34 @@ router.post('/', verifyNodeHmac, async (req, res) => {
         return res.status(401).json({ success: false, message: 'Missing per-device authentication.' });
     }
 
+    // ── BLOCK pm2.5 / pm10 primary submissions ──────────────────
+    // This system only accepts PM1.0 as the detection metric.
+    // If a device sends pm2_5 or pm10 without pm1_0, it is rejected.
+    const hasPm1  = req.body.pm1_0  !== undefined && req.body.pm1_0  !== null && req.body.pm1_0  !== '';
+    const hasPm25 = req.body.pm2_5  !== undefined && req.body.pm2_5  !== null && req.body.pm2_5  !== '';
+    const hasPm10 = req.body.pm10   !== undefined && req.body.pm10   !== null && req.body.pm10   !== '';
+
+    if (!hasPm1) {
+        logger.warn({ body: req.body }, 'Reading rejected: pm1_0 is required — this system only accepts PM1.0 readings');
+        return res.status(400).json({ success: false, message: 'pm1_0 is required. This system only accepts PM1.0 sensor readings.' });
+    }
+
+    if (hasPm25 && !hasPm1) {
+        logger.warn({ body: req.body }, 'Reading blocked: pm2_5 submitted without pm1_0');
+        return res.status(400).json({ success: false, message: 'pm2_5-only submissions are not accepted. Send pm1_0 only.' });
+    }
+
+    if (hasPm10 && !hasPm1) {
+        logger.warn({ body: req.body }, 'Reading blocked: pm10 submitted without pm1_0');
+        return res.status(400).json({ success: false, message: 'pm10-only submissions are not accepted. Send pm1_0 only.' });
+    }
+
     // --- Parse & coerce values from ESP32 (may arrive as strings) ---
     const node_code = req.body.node_code;
-    const pm1_0  = req.body.pm1_0  !== undefined ? Number(req.body.pm1_0)  : undefined;
-    const pm2_5  = Number(req.body.pm2_5);
-    const pm10   = req.body.pm10   !== undefined ? Number(req.body.pm10)   : undefined;
+    const pm1_0  = Number(req.body.pm1_0);
+    // pm2_5 and pm10 are stored if present (for historical reference) but do NOT affect detection
+    const pm2_5  = hasPm25 ? Number(req.body.pm2_5) : null;
+    const pm10   = hasPm10 ? Number(req.body.pm10)  : null;
 
     // --- Validation ---
     if (!node_code || typeof node_code !== 'string' || node_code.trim().length === 0) {
@@ -71,14 +88,16 @@ router.post('/', verifyNodeHmac, async (req, res) => {
     if (node_code.length > 50) {
         return res.status(400).json({ success: false, message: 'Invalid node_code.' });
     }
-    if (!isValidReading(pm2_5, 0, 1000)) {
-        return res.status(400).json({ success: false, message: 'pm2_5 must be 0–1000.' });
+    // PM1.0 is the only required, validated detection metric
+    if (!isValidReading(pm1_0, 0, 1000)) {
+        return res.status(400).json({ success: false, message: 'pm1_0 must be a number between 0 and 1000.' });
     }
-    if (pm1_0 !== undefined && !isValidReading(pm1_0, 0, 1000)) {
-        return res.status(400).json({ success: false, message: 'pm1_0 must be 0–1000.' });
+    // pm2_5 and pm10 optional — validate only if present, but they do NOT drive detection
+    if (pm2_5 !== null && !isValidReading(pm2_5, 0, 1000)) {
+        return res.status(400).json({ success: false, message: 'pm2_5 must be 0–1000 if provided.' });
     }
-    if (pm10 !== undefined && !isValidReading(pm10, 0, 1000)) {
-        return res.status(400).json({ success: false, message: 'pm10 must be 0–1000.' });
+    if (pm10 !== null && !isValidReading(pm10, 0, 1000)) {
+        return res.status(400).json({ success: false, message: 'pm10 must be 0–1000 if provided.' });
     }
 
     try {
@@ -92,16 +111,18 @@ router.post('/', verifyNodeHmac, async (req, res) => {
         }
 
         const node = nodes[0];
-        const { aqi, category } = calculateAQI(pm2_5);
+
+        // ── ALL detection is based on PM1.0 only ─────────────────
+        const { aqi, category } = calculatePM1Category(pm1_0);
         const smokeDetected = pm1_0 > 12;
         const ledColor = smokeDetected ? 'red' : 'green';
 
-        // --- Save reading ---
+        // --- Save reading (pm2_5 / pm10 stored as null if not sent) ---
         const [result] = await db.query(
             `INSERT INTO sensor_readings
                 (node_id, pm1_0, pm2_5, pm10, aqi_value, aqi_category, smoke_detected, led_color)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [node.id, pm1_0 ?? null, pm2_5, pm10 ?? null, aqi, category, smokeDetected ? 1 : 0, ledColor]
+            [node.id, pm1_0, pm2_5, pm10, aqi, category, smokeDetected ? 1 : 0, ledColor]
         );
 
         await db.query('UPDATE sensor_nodes SET last_seen = NOW() WHERE id = ?', [node.id]);
@@ -112,11 +133,6 @@ router.post('/', verifyNodeHmac, async (req, res) => {
             // 'Acknowledged'→ staff saw it, still in progress
             // 'Cleared'     → already resolved — do NOT re-trigger until a clean
             //                 reading has come in first (handled by the reset flag below)
-            //
-            // We track whether the node had a "clean" reading after the last Cleared
-            // event by checking that no open event exists. Once resolved, the ESP32
-            // sending more high readings will NOT create new events — only a clean
-            // reading followed by a new spike will trigger a fresh alert.
             const [openEvents] = await db.query(
                 `SELECT id, event_status FROM detection_events
                  WHERE node_id = ? AND event_status IN ('Detected', 'Acknowledged')
@@ -125,8 +141,6 @@ router.post('/', verifyNodeHmac, async (req, res) => {
             );
 
             if (!openEvents.length) {
-                // Check if the node has had a clean reading since the last Cleared event,
-                // OR if there has never been any event — only then create a new one.
                 const [lastCleared] = await db.query(
                     `SELECT resolved_at FROM detection_events
                      WHERE node_id = ? AND event_status = 'Cleared'
@@ -137,9 +151,8 @@ router.post('/', verifyNodeHmac, async (req, res) => {
                 let shouldCreateEvent = true;
 
                 if (lastCleared.length) {
-                    // There was a previous Cleared event. Only allow a new alert if
-                    // there has been at least one clean reading (pm2_5 <= 35.4) after
-                    // that resolved_at time. This prevents immediate re-triggering.
+                    // Allow new alert only if there has been at least one clean
+                    // PM1.0 reading (pm1_0 <= 12) since the last resolved event.
                     const [cleanReadings] = await db.query(
                         `SELECT id FROM sensor_readings
                          WHERE node_id = ? AND smoke_detected = 0
@@ -155,7 +168,8 @@ router.post('/', verifyNodeHmac, async (req, res) => {
                         `INSERT INTO detection_events
                             (node_id, reading_id, location_name, pm2_5_value, aqi_value, aqi_category)
                          VALUES (?, ?, ?, ?, ?, ?)`,
-                        [node.id, result.insertId, node.location_name, pm2_5, aqi, category]
+                        // pm2_5_value column stores pm1_0 here (legacy column name, PM1.0 value)
+                        [node.id, result.insertId, node.location_name, pm1_0, aqi, category]
                     );
 
                     // Notify all admins
@@ -163,10 +177,6 @@ router.post('/', verifyNodeHmac, async (req, res) => {
                         `SELECT full_name, email FROM accounts
                          WHERE position = 'Administrator' AND is_active = 1`
                     );
-
-                    const pm1ForEmail = pm1_0 !== undefined && pm1_0 !== null && !Number.isNaN(Number(pm1_0))
-                        ? Number(pm1_0)
-                        : null;
 
                     for (const admin of admins) {
                         await db.query(
@@ -177,7 +187,7 @@ router.post('/', verifyNodeHmac, async (req, res) => {
                              `🚨 Vape/Smoke Detected — ${node.location_name}`]
                         );
                         try {
-                            await sendAlertEmail(admin.email, admin.full_name, node.location_name, pm1ForEmail, category);
+                            await sendAlertEmail(admin.email, admin.full_name, node.location_name, pm1_0, category);
                             await db.query(
                                 `UPDATE push_notifications SET send_status='sent', sent_at=NOW()
                                  WHERE recipient_email=? AND event_id=? AND send_status='pending'`,
@@ -193,10 +203,9 @@ router.post('/', verifyNodeHmac, async (req, res) => {
                     }
 
                     try {
-                        const pm1Push = pm1ForEmail != null ? `${pm1ForEmail.toFixed(1)}` : '—';
                         await sendPushToAll(
                             `🚨 Alert: ${node.location_name}`,
-                            `Vape/Smoke detected! PM1.0: ${pm1Push} (${category})`,
+                            `Vape/Smoke detected! PM1.0: ${pm1_0.toFixed(1)} µg/m³ (${category})`,
                             'dashboard.html'
                         );
                     } catch (pushErr) {
@@ -205,19 +214,17 @@ router.post('/', verifyNodeHmac, async (req, res) => {
                 }
                 // else: last event was Cleared but no clean reading yet — silently skip
             } else {
-                // Open event exists — just update its latest values, never change status
+                // Open event exists — update its latest PM1.0 values
                 await db.query(
                     `UPDATE detection_events
                      SET pm2_5_value = ?, aqi_value = ?, aqi_category = ?, reading_id = ?
                      WHERE id = ?`,
-                    [pm2_5, aqi, category, result.insertId, openEvents[0].id]
+                    [pm1_0, aqi, category, result.insertId, openEvents[0].id]
                 );
             }
         }
         // NOTE: We do NOT auto-clear events when air is clean.
-        // Only a human clicking Resolve clears an event. The ESP32
-        // returning to clean air simply stops updating the open event,
-        // and once resolved, a clean reading "unlocks" the next alert cycle.
+        // Only a human clicking Resolve clears an event.
 
         res.json({
             success: true,
@@ -228,19 +235,17 @@ router.post('/', verifyNodeHmac, async (req, res) => {
             led_color: ledColor
         });
 
-        // Push latest reading to all connected SSE clients
+        // Push latest reading to all connected SSE clients (PM1.0 only in payload)
         broadcastSSE({
-            node_code:     node.node_code,
-            location_name: node.location_name,
-            pm1_0:         pm1_0 ?? null,
-            pm2_5,
-            pm10:          pm10 ?? null,
-            aqi_value:     aqi,
-            aqi_category:  category,
+            node_code:      node.node_code,
+            location_name:  node.location_name,
+            pm1_0,
+            aqi_value:      aqi,
+            aqi_category:   category,
             smoke_detected: smokeDetected,
-            led_color:     ledColor,
-            recorded_at:   new Date().toISOString(),
-            node_active:   1,
+            led_color:      ledColor,
+            recorded_at:    new Date().toISOString(),
+            node_active:    1,
         });
 
     } catch (err) {
@@ -258,7 +263,7 @@ router.get('/live', authMiddleware, async (req, res) => {
                 sn.location_name,
                 sn.last_seen,
                 CASE WHEN sn.last_seen >= NOW() - INTERVAL 15 SECOND THEN 1 ELSE 0 END AS node_active,
-                sr.pm1_0, sr.pm2_5, sr.pm10,
+                sr.pm1_0,
                 sr.aqi_value, sr.aqi_category,
                 sr.smoke_detected, sr.led_color, sr.recorded_at
             FROM sensor_nodes sn
@@ -270,7 +275,7 @@ router.get('/live', authMiddleware, async (req, res) => {
         `);
         res.json({ success: true, data: rows });
     } catch (err) {
-        console.error('[readings GET /live] Error:', err.message);
+        logger.error({ err }, '[readings GET /live] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
@@ -300,7 +305,8 @@ router.get('/open-events', authMiddleware, async (req, res) => {
     try {
         const [rows] = await db.query(`
             SELECT
-                de.id, de.location_name, de.pm2_5_value,
+                de.id, de.location_name,
+                de.pm2_5_value AS pm1_0_value,
                 de.aqi_value, de.aqi_category, de.event_status,
                 de.detected_at, de.acknowledged_at,
                 sn.node_code, sn.location_name AS sensor_location
@@ -311,13 +317,13 @@ router.get('/open-events', authMiddleware, async (req, res) => {
         `);
         res.json({ success: true, data: rows });
     } catch (err) {
-        console.error('[readings GET /open-events] Error:', err.message);
+        logger.error({ err }, '[readings GET /open-events] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
 
 // ── POST /api/readings/acknowledge/:eventId ───────────────────
-// Accessible to any logged-in user (admin OR staff) — removed adminOnly
+// Accessible to any logged-in user (admin OR staff)
 router.post('/acknowledge/:eventId', authMiddleware, async (req, res) => {
     const eventId = parseInt(req.params.eventId, 10);
     const { notes } = req.body;
@@ -350,7 +356,7 @@ router.post('/acknowledge/:eventId', authMiddleware, async (req, res) => {
 
         res.json({ success: true, message: 'Alert acknowledged.', event_id: eventId });
     } catch (err) {
-        console.error('[acknowledge] Error:', err.message);
+        logger.error({ err }, '[acknowledge] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
@@ -390,7 +396,7 @@ router.post('/resolve/:eventId', authMiddleware, async (req, res) => {
 
         res.json({ success: true, message: 'Alert resolved.' });
     } catch (err) {
-        console.error('[resolve] Error:', err.message);
+        logger.error({ err }, '[resolve] Error');
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });

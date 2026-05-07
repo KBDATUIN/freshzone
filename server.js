@@ -222,10 +222,9 @@ app.get('*', (req, res) => {
 cron.schedule('*/5 * * * *', async () => {
     try {
         const [pending] = await db.query(
-            `SELECT pn.*, de.location_name, de.pm2_5_value, de.aqi_category, sr.pm1_0 AS pm1_for_email
+            `SELECT pn.*, de.location_name, de.pm2_5_value AS pm1_for_email, de.aqi_category
              FROM push_notifications pn
              LEFT JOIN detection_events de ON de.id = pn.event_id
-             LEFT JOIN sensor_readings sr ON sr.id = de.reading_id
              WHERE pn.send_status = 'pending' LIMIT 10`
         );
         for (const notif of pending) {
@@ -242,9 +241,8 @@ cron.schedule('*/5 * * * *', async () => {
 cron.schedule('*/5 * * * *', async () => {
     try {
         const [unacked] = await db.query(
-            `SELECT de.*, sn.location_name, sn.last_seen, sr.pm1_0 AS pm1_for_email FROM detection_events de
+            `SELECT de.*, sn.location_name, sn.last_seen, de.pm2_5_value AS pm1_for_email FROM detection_events de
              JOIN sensor_nodes sn ON sn.id = de.node_id
-             LEFT JOIN sensor_readings sr ON sr.id = de.reading_id
              WHERE de.event_status = 'Detected'
              AND de.detected_at < DATE_SUB(NOW(), INTERVAL 5 MINUTE)
              AND (de.last_escalated_at IS NULL OR de.last_escalated_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE))
@@ -289,9 +287,8 @@ cron.schedule('* * * * *', async () => {
     if (!adminEmail) return;
     try {
         const [events] = await db.query(
-            `SELECT de.id, de.location_name, de.aqi_category, sr.pm1_0 AS pm1_for_email
+            `SELECT de.id, de.location_name, de.aqi_category, de.pm2_5_value AS pm1_for_email
              FROM detection_events de
-             LEFT JOIN sensor_readings sr ON sr.id = de.reading_id
              WHERE de.event_status = 'Detected'
                AND de.acknowledged_at IS NULL
                AND de.detected_at < DATE_SUB(NOW(), INTERVAL 5 MINUTE)`
