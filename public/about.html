@@ -456,7 +456,7 @@
                 Why FreshZone Exists
             </h2>
             <p style="color:#335a70; line-height:1.75; margin-bottom:1rem;">
-                Vaping inside campus buildings is a growing concern. Traditional enforcement relies on manual patrols — slow, inconsistent, and easy to evade. FreshZone replaces guesswork with data: low-cost ESP32-based sensors continuously sample the air for PM1.0, PM2.5, and PM10 particulate matter, then stream readings to a live web dashboard accessible to all authorized staff.
+                Vaping inside campus buildings is a growing concern. Traditional enforcement relies on manual patrols — slow, inconsistent, and easy to evade. FreshZone replaces guesswork with data: low-cost ESP32-based sensors continuously sample the air for PM1.0 particulate matter — the ultra-fine particles produced by vape aerosol — then stream readings to a live web dashboard accessible to all authorized staff.
             </p>
             <p style="color:#335a70; line-height:1.75; margin: 0;">
                 When aerosol concentrations exceed safe thresholds, the system automatically flags the location, sends push notifications to registered staff, and logs the incident for review. The goal is faster response, better documentation, and measurable improvement in campus air quality.
@@ -469,9 +469,6 @@
             <h2 style="font-size:1.3rem; margin-bottom:0.9rem; color:#003855;">What FreshZone Monitors</h2>
             <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1.25rem;">
                 <span class="sensor-badge"><span class="sensor-badge-dot"></span>PM1.0 µg/m³</span>
-                <span class="sensor-badge"><span class="sensor-badge-dot"></span>PM2.5 µg/m³</span>
-                <span class="sensor-badge"><span class="sensor-badge-dot"></span>PM10 µg/m³</span>
-                <span class="sensor-badge"><span class="sensor-badge-dot"></span>AQI Score</span>
                 <span class="sensor-badge"><span class="sensor-badge-dot"></span>Detection Events</span>
                 <span class="sensor-badge"><span class="sensor-badge-dot"></span>Sensor Health</span>
             </div>
@@ -481,12 +478,12 @@
                     <p style="font-size:0.84rem;line-height:1.6;">Particles smaller than 1 µm. These penetrate deepest into lung tissue and are a primary indicator of vape aerosol presence indoors.</p>
                 </div>
                 <div class="aq-card" style="padding:1.1rem 1rem;">
-                    <h4>PM2.5 – Fine particles</h4>
-                    <p style="font-size:0.84rem;line-height:1.6;">The WHO's benchmark for indoor air health. FreshZone uses PM2.5 to calculate AQI and trigger alerts automatically.</p>
+                    
+                    
                 </div>
                 <div class="aq-card" style="padding:1.1rem 1rem;">
-                    <h4>AQI – Air Quality Index</h4>
-                    <p style="font-size:0.84rem;line-height:1.6;">A 0–500 scale derived from PM2.5. Bands: Good (0–50), Moderate (51–100), Unhealthy (101+). Alerts fire at Moderate+.</p>
+                    
+                    
                 </div>
             </div>
         </div>
@@ -508,7 +505,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
                     </div>
                     <h4>Real-time</h4>
-                    <p>Sensor data updates every 3 seconds. Staff sees live AQI before manual inspection would even begin.</p>
+                    <p>Sensor data updates every 3 seconds. Staff sees live PM1.0 data before manual inspection would even begin.</p>
                 </div>
                 <div class="value-card">
                     <div class="value-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
@@ -522,7 +519,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
                     </div>
                     <h4>Accountable</h4>
-                    <p>Every detection event is logged with timestamp, location, and AQI peak. Full history is exportable as CSV.</p>
+                    <p>Every detection event is logged with timestamp, location, and PM1.0 peak reading. Full history is exportable as CSV.</p>
                 </div>
             </div>
         </div>
@@ -610,7 +607,7 @@
                     <div class="timeline-dot"></div>
                     <div class="timeline-year">2025 Q3 — Dashboard</div>
                     <div class="timeline-title">Web UI, Auth & Notifications</div>
-                    <p class="timeline-desc">Launched the live dashboard with role-based access, OTP email auth, real-time AQI cards, and Web Push alerts for staff and admins.</p>
+                    <p class="timeline-desc">Launched the live dashboard with role-based access, OTP email auth, real-time PM1.0 detection cards, and Web Push alerts for staff and admins.</p>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-dot" style="background:linear-gradient(135deg,#0ea266,#1de9b6);"></div>
