@@ -475,15 +475,15 @@
             <div class="aq-guide-grid" style="gap:1rem;">
                 <div class="aq-card" style="padding:1.1rem 1rem;">
                     <h4>PM1.0 — Ultra-fine aerosol</h4>
-                    <p style="font-size:0.84rem;line-height:1.6;">Particles under 1 µm — the dominant output of vape devices. FreshZone uses PM1.0 exclusively because it is specific to fresh fine aerosol and avoids the false positives of broader metrics.</p>
+                    <p style="font-size:0.84rem;line-height:1.6;">Particles under 1 µm are the primary output of vape devices. FreshZone focuses on PM1.0 exclusively because it is highly specific to fresh fine aerosol and produces far fewer false positives than broader particle metrics.</p>
                 </div>
                 <div class="aq-card" style="padding:1.1rem 1rem;">
                     <h4>PMS7003 laser sensor</h4>
-                    <p style="font-size:0.84rem;line-height:1.6;">The sensor fires a laser through a sampling chamber. Particles scatter the beam — the scatter intensity maps directly to PM1.0 concentration in µg/m³, sampled every second.</p>
+                    <p style="font-size:0.84rem;line-height:1.6;">The PMS7003 fires a precision laser through a sampling chamber. Airborne particles scatter the beam, and the scatter intensity maps directly to a PM1.0 concentration value in µg/m³, sampled once every second.</p>
                 </div>
                 <div class="aq-card" style="padding:1.1rem 1rem;">
-                    <h4>ESP32 + real-time push</h4>
-                    <p style="font-size:0.84rem;line-height:1.6;">The ESP32 microcontroller reads the sensor and posts data to Render every 3–5 seconds. When PM1.0 exceeds the threshold, the server instantly pushes a Web Push notification to all registered staff devices.</p>
+                    <h4>ESP32 microcontroller</h4>
+                    <p style="font-size:0.84rem;line-height:1.6;">The ESP32 reads the sensor output and transmits readings to the FreshZone server every 3–5 seconds over Wi-Fi. When PM1.0 exceeds the threshold, the server immediately pushes a Web Push alert to all registered staff devices.</p>
                 </div>
             </div>
         </div>
