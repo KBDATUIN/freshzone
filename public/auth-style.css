@@ -4,79 +4,92 @@
    Loads after style.css — safe overrides only
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── 1. AUTH WRAPPER BASE — solid gradient fills full viewport ── */
+/* ── 1. AUTH WRAPPER — transparent so body animated gradient shows ──
+   The body in style-v3.css already has the animated teal gradient + bodyPan.
+   We must NOT set background here or we paint over it.
+   ─────────────────────────────────────────────────────────────────── */
 .auth-wrapper {
-    background:
-        linear-gradient(155deg,
-            #003860 0%,
-            #005f96 30%,
-            #007ab5 55%,
-            #0097c4 75%,
-            #00c8e6 100%
-        ) !important;
-}
-[data-theme="dark"] .auth-wrapper {
-    background:
-        linear-gradient(155deg,
-            #030810 0%,
-            #060e1a 35%,
-            #091626 60%,
-            #0a1e32 100%
-        ) !important;
+    background: transparent !important;
+    overflow: hidden;
 }
 
-/* ── MESH OVERLAY — breathes gently, no conflicting rotate ────── */
+/* ── GLASS REFLECTION ORBS (::before) ────────────────────────────
+   Replicates the large white/cyan sphere visible top-left on mobile.
+   Uses position:fixed so it covers the full viewport behind the card.
+   ─────────────────────────────────────────────────────────────────── */
 .auth-wrapper::before {
     content: '';
     position: fixed;
     inset: 0;
     z-index: 0;
-    background:
-        radial-gradient(ellipse 110% 75% at 12% 12%, rgba(0,200,230,0.28) 0%, transparent 58%),
-        radial-gradient(ellipse 85% 100% at 88% 78%, rgba(0,60,110,0.38) 0%, transparent 58%),
-        radial-gradient(ellipse 65% 65% at 42% 88%, rgba(14,207,239,0.20) 0%, transparent 68%),
-        radial-gradient(circle at 72% 22%, rgba(255,255,255,0.07) 0%, transparent 48%);
-    animation: meshBreathe 18s ease-in-out infinite alternate;
     pointer-events: none;
+    background:
+        /* Large top-left glass reflection — the dominant mobile orb */
+        radial-gradient(ellipse 55% 55% at -5% -5%,
+            rgba(255,255,255,0.28) 0%,
+            rgba(180,240,255,0.18) 30%,
+            transparent 65%),
+        /* Secondary soft orb — bottom right depth */
+        radial-gradient(ellipse 70% 60% at 105% 108%,
+            rgba(0,50,100,0.45) 0%,
+            rgba(0,100,180,0.25) 35%,
+            transparent 65%),
+        /* Centre ambient glow */
+        radial-gradient(ellipse 80% 50% at 50% 50%,
+            rgba(14,207,239,0.10) 0%,
+            transparent 70%),
+        /* Right-edge highlight */
+        radial-gradient(ellipse 35% 60% at 100% 35%,
+            rgba(0,180,216,0.18) 0%,
+            transparent 55%);
+    animation: authOrbDrift 22s ease-in-out infinite alternate;
     will-change: transform, opacity;
 }
-@keyframes meshBreathe {
-    0%   { opacity: 0.80; transform: scale(1)    translate(0,    0   ); }
-    33%  { opacity: 0.95; transform: scale(1.03) translate(0.8%, -1%); }
-    66%  { opacity: 0.88; transform: scale(1.05) translate(-0.5%, 0.8%); }
-    100% { opacity: 1.00; transform: scale(1.02) translate(0.3%, -0.5%); }
+@keyframes authOrbDrift {
+    0%   { opacity: 0.85; transform: scale(1)    translate(0,     0   ); }
+    33%  { opacity: 1.00; transform: scale(1.04) translate(0.8%, -1.2%); }
+    66%  { opacity: 0.90; transform: scale(1.06) translate(-0.6%, 0.9%); }
+    100% { opacity: 0.95; transform: scale(1.02) translate(0.4%, -0.5%); }
 }
 [data-theme="dark"] .auth-wrapper::before {
     background:
-        radial-gradient(ellipse 110% 75% at 12% 12%, rgba(34,211,238,0.11) 0%, transparent 58%),
-        radial-gradient(ellipse 85% 100% at 88% 78%, rgba(125,211,252,0.09) 0%, transparent 58%),
-        radial-gradient(ellipse 65% 65% at 42% 88%, rgba(34,211,238,0.07) 0%, transparent 68%);
+        radial-gradient(ellipse 55% 55% at -5% -5%,
+            rgba(34,211,238,0.14) 0%,
+            rgba(125,211,252,0.08) 30%,
+            transparent 65%),
+        radial-gradient(ellipse 70% 60% at 105% 108%,
+            rgba(0,30,60,0.55) 0%,
+            rgba(0,60,100,0.30) 35%,
+            transparent 65%),
+        radial-gradient(ellipse 80% 50% at 50% 50%,
+            rgba(34,211,238,0.06) 0%,
+            transparent 70%);
 }
 
-/* ── PARTICLE LAYER — tiny drifting dots ─────────────────────── */
+/* ── PARTICLE LAYER (::after) — tiny drifting specular dots ────── */
 .auth-wrapper::after {
     content: '';
     position: fixed;
     inset: 0;
     z-index: 1;
+    pointer-events: none;
     background-image:
-        radial-gradient(circle 2px   at 20% 30%, rgba(255,255,255,0.80) 0%, transparent 50%),
-        radial-gradient(circle 1.5px at 75% 68%, rgba(0,200,230,0.65)   0%, transparent 50%),
-        radial-gradient(circle 1px   at 10% 88%, rgba(14,207,239,0.70)  0%, transparent 50%),
-        radial-gradient(circle 1px   at 58% 18%, rgba(255,255,255,0.45) 0%, transparent 50%),
-        radial-gradient(circle 1.5px at 45% 55%, rgba(0,180,216,0.50)   0%, transparent 50%);
+        radial-gradient(circle 2px   at 20% 30%, rgba(255,255,255,0.75) 0%, transparent 50%),
+        radial-gradient(circle 1.5px at 75% 68%, rgba(0,200,230,0.60)   0%, transparent 50%),
+        radial-gradient(circle 1px   at 10% 88%, rgba(14,207,239,0.65)  0%, transparent 50%),
+        radial-gradient(circle 1px   at 58% 18%, rgba(255,255,255,0.40) 0%, transparent 50%),
+        radial-gradient(circle 1.5px at 45% 55%, rgba(0,180,216,0.45)   0%, transparent 50%);
     background-size: 100px 100px, 130px 130px, 90px 90px, 115px 115px, 80px 80px;
     background-position: 0 0, 40px 60px, 80px 20px, 20px 80px, 60px 35px;
     animation: particleDrift 28s linear infinite;
-    pointer-events: none;
-    opacity: 0.50;
+    opacity: 0.45;
     will-change: background-position;
 }
 @keyframes particleDrift {
-    from { background-position: 0 0,       40px 60px,  80px 20px,  20px 80px,  60px 35px; }
+    from { background-position: 0 0,        40px 60px,   80px 20px,   20px 80px,   60px 35px; }
     to   { background-position: 100px 100px, 170px 190px, 170px 110px, 135px 195px, 140px 115px; }
 }
-[data-theme="dark"] .auth-wrapper::after { opacity: 0.22; }
+[data-theme="dark"] .auth-wrapper::after { opacity: 0.18; }
 
 /* ── 2. AUTH HEADER — ELEVATED TYPOGRAPHY + GLOW ─────────────── */
 .auth-header h1 {
@@ -649,43 +662,27 @@
     filter: blur(18px) !important;
 }
 
-/* ── MOBILE BACKGROUND OPTIMISATION (< 540px) ────────────────── */
+/* ── MOBILE (< 540px) — layout + reduced motion only ─────────── */
 @media (max-width: 540px) {
-    /* Ensure gradient base always shows on small screens */
+    /* Ensure viewport fills correctly on iOS */
     .auth-wrapper {
-        background:
-            linear-gradient(155deg,
-                #003860 0%,
-                #005f96 30%,
-                #007ab5 55%,
-                #0097c4 75%,
-                #00c8e6 100%
-            ) !important;
         min-height: 100dvh !important;
-    }
-    [data-theme="dark"] .auth-wrapper {
-        background:
-            linear-gradient(155deg,
-                #030810 0%,
-                #060e1a 35%,
-                #091626 60%,
-                #0a1e32 100%
-            ) !important;
+        /* Keep transparent — body animated gradient shows through */
     }
 
-    /* Keep mesh but reduce scale to prevent overflow on small screens */
+    /* Gentler orb drift on small screens */
     .auth-wrapper::before {
-        animation: meshBreatheMobile 18s ease-in-out infinite alternate;
+        animation: authOrbDriftMobile 22s ease-in-out infinite alternate;
     }
-    @keyframes meshBreatheMobile {
-        0%   { opacity: 0.80; transform: scale(1)    translate(0, 0); }
-        50%  { opacity: 0.95; transform: scale(1.02) translate(0.4%, -0.6%); }
-        100% { opacity: 1.00; transform: scale(1.01) translate(-0.2%, 0.4%); }
+    @keyframes authOrbDriftMobile {
+        0%   { opacity: 0.85; transform: scale(1)    translate(0, 0); }
+        50%  { opacity: 0.98; transform: scale(1.02) translate(0.4%, -0.6%); }
+        100% { opacity: 0.92; transform: scale(1.01) translate(-0.2%, 0.4%); }
     }
 
-    /* Reduce particle opacity slightly on mobile — saves battery */
-    .auth-wrapper::after { opacity: 0.35 !important; }
+    /* Lighter particles on mobile to save battery */
+    .auth-wrapper::after { opacity: 0.30 !important; }
 
-    /* Smoke particles stay visible but not overwhelming on small screen */
-    .auth-wrapper .smoke-container { opacity: 0.45 !important; }
+    /* Smoke — match desktop */
+    .auth-wrapper .smoke-container { opacity: 0.50 !important; }
 }
