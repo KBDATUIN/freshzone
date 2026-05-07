@@ -474,16 +474,16 @@
             </div>
             <div class="aq-guide-grid" style="gap:1rem;">
                 <div class="aq-card" style="padding:1.1rem 1rem;">
-                    <h4>PM1.0 – Ultra-fine particles</h4>
-                    <p style="font-size:0.84rem;line-height:1.6;">Particles smaller than 1 µm. These penetrate deepest into lung tissue and are a primary indicator of vape aerosol presence indoors.</p>
+                    <h4>PM1.0 — Ultra-fine aerosol</h4>
+                    <p style="font-size:0.84rem;line-height:1.6;">Particles under 1 µm — the dominant output of vape devices. FreshZone uses PM1.0 exclusively because it is specific to fresh fine aerosol and avoids the false positives of broader metrics.</p>
                 </div>
                 <div class="aq-card" style="padding:1.1rem 1rem;">
-                    
-                    
+                    <h4>PMS7003 laser sensor</h4>
+                    <p style="font-size:0.84rem;line-height:1.6;">The sensor fires a laser through a sampling chamber. Particles scatter the beam — the scatter intensity maps directly to PM1.0 concentration in µg/m³, sampled every second.</p>
                 </div>
                 <div class="aq-card" style="padding:1.1rem 1rem;">
-                    
-                    
+                    <h4>ESP32 + real-time push</h4>
+                    <p style="font-size:0.84rem;line-height:1.6;">The ESP32 microcontroller reads the sensor and posts data to Render every 3–5 seconds. When PM1.0 exceeds the threshold, the server instantly pushes a Web Push notification to all registered staff devices.</p>
                 </div>
             </div>
         </div>
