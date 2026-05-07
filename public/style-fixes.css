@@ -981,3 +981,71 @@ footer {
 @media (max-width: 380px) {
     .aq-guide-grid { grid-template-columns: 1fr !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   HISTORY PAGE — GUIDE SECTION MOBILE OPTIMISATION
+   Target: phones < 540px. Desktop layout is untouched.
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 540px) {
+
+    /* Guide cards: single straight column */
+    .aq-guide-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Info strip (Filtering / Exporting / Status meanings): single column */
+    .live-sensor-strip {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+    }
+
+    /* AQI bands: all 4 in one straight row — they're short labels so they fit */
+    .aqi-bands {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 0.35rem !important;
+    }
+
+    /* Slightly reduce band padding so 4 fit comfortably */
+    .aqi-band {
+        padding: 0.42rem 0.2rem !important;
+        font-size: 0.62rem !important;
+    }
+
+    /* Guide head: keep title + chip on same line but allow wrap only if truly needed */
+    .aq-guide-head {
+        flex-wrap: nowrap !important;
+        gap: 0.4rem !important;
+        align-items: center !important;
+    }
+
+    /* Chip: slightly smaller so it doesn't push to new line */
+    .aq-guide-chip {
+        font-size: 0.65rem !important;
+        padding: 0.25rem 0.55rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Guide title: prevent overflow */
+    .aq-guide h3 {
+        font-size: 0.88rem !important;
+        white-space: normal !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+}
+
+/* Extra-small phones: let chip wrap below title rather than overflow */
+@media (max-width: 380px) {
+    .aq-guide-head {
+        flex-wrap: wrap !important;
+    }
+    .aq-guide-chip {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+    /* 4 bands still fits at 380px but shrink more */
+    .aqi-band {
+        font-size: 0.58rem !important;
+        padding: 0.38rem 0.1rem !important;
+    }
+}
