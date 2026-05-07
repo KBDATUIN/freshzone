@@ -4,75 +4,143 @@
    Loads after style.css — safe overrides only
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── 1. AUTH WRAPPER — transparent so body animated gradient shows ──
-   The body in style-v3.css already has the animated teal gradient + bodyPan.
-   We must NOT set background here or we paint over it.
+/* ── 1. AUTH WRAPPER — critical fixes ────────────────────────────
+   • background: transparent so body's bodyPan animation shows through
+   • overflow: visible (NOT hidden) — hidden clips fixed pseudo-elements
+     into rectangles on mobile/Safari, causing the rectangular crop bug
+   • position: relative is kept (from style-v2) but we prevent it from
+     creating a new stacking context that traps position:fixed children
+     by NOT using transform/filter on the wrapper itself
    ─────────────────────────────────────────────────────────────────── */
 .auth-wrapper {
     background: transparent !important;
-    overflow: hidden;
+    overflow: visible !important;   /* CRITICAL: kills the rectangle clip */
 }
 
-/* ── GLASS REFLECTION ORBS (::before) ────────────────────────────
-   Replicates the large white/cyan sphere visible top-left on mobile.
-   Uses position:fixed so it covers the full viewport behind the card.
+/* ── PSEUDO-ELEMENT RESET ─────────────────────────────────────────
+   style-v2.css uses .auth-wrapper::before for a cursor halo (position:fixed,
+   left:var(--cx), top:var(--cy)). That conflicts with our orb.
+   We neutralise both ::before and ::after here so nothing clips or fights.
+   The actual orb effect is rendered via real DOM divs in the smoke-container
+   (injected by auth-style itself via JS below, or via the HTML smoke divs).
    ─────────────────────────────────────────────────────────────────── */
-.auth-wrapper::before {
-    content: '';
+.auth-wrapper::before,
+.auth-wrapper::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Also suppress the cursor halo rule from style-v2 on desktop */
+@media (hover: hover) and (pointer: fine) {
+    .auth-wrapper::before {
+        content: none !important;
+        display: none !important;
+    }
+}
+
+/* ── REAL-DOM ORB DIVS (injected by script at bottom of auth-style) ──
+   .auth-orb elements are position:fixed, NOT inside any transformed
+   ancestor, so they render full-viewport correctly on ALL browsers.
+   ─────────────────────────────────────────────────────────────────── */
+.auth-orb {
     position: fixed;
-    inset: 0;
-    z-index: 0;
+    border-radius: 50%;
     pointer-events: none;
-    background:
-        /* Large top-left glass reflection — the dominant mobile orb */
-        radial-gradient(ellipse 55% 55% at -5% -5%,
-            rgba(255,255,255,0.28) 0%,
-            rgba(180,240,255,0.18) 30%,
-            transparent 65%),
-        /* Secondary soft orb — bottom right depth */
-        radial-gradient(ellipse 70% 60% at 105% 108%,
-            rgba(0,50,100,0.45) 0%,
-            rgba(0,100,180,0.25) 35%,
-            transparent 65%),
-        /* Centre ambient glow */
-        radial-gradient(ellipse 80% 50% at 50% 50%,
-            rgba(14,207,239,0.10) 0%,
-            transparent 70%),
-        /* Right-edge highlight */
-        radial-gradient(ellipse 35% 60% at 100% 35%,
-            rgba(0,180,216,0.18) 0%,
-            transparent 55%);
-    animation: authOrbDrift 22s ease-in-out infinite alternate;
+    z-index: 0;
     will-change: transform, opacity;
 }
-@keyframes authOrbDrift {
-    0%   { opacity: 0.85; transform: scale(1)    translate(0,     0   ); }
-    33%  { opacity: 1.00; transform: scale(1.04) translate(0.8%, -1.2%); }
-    66%  { opacity: 0.90; transform: scale(1.06) translate(-0.6%, 0.9%); }
-    100% { opacity: 0.95; transform: scale(1.02) translate(0.4%, -0.5%); }
+
+/* Orb 1 — large white/cyan glass sphere, top-left (the mobile look) */
+.auth-orb-1 {
+    width: 65vw;
+    height: 65vw;
+    max-width: 700px;
+    max-height: 700px;
+    top: -20vw;
+    left: -18vw;
+    background: radial-gradient(circle at 35% 38%,
+        rgba(255,255,255,0.32) 0%,
+        rgba(180,240,255,0.22) 22%,
+        rgba(0,180,216,0.12) 48%,
+        transparent 72%);
+    animation: orbFloat1 20s ease-in-out infinite alternate;
+    opacity: 0.90;
 }
-[data-theme="dark"] .auth-wrapper::before {
-    background:
-        radial-gradient(ellipse 55% 55% at -5% -5%,
-            rgba(34,211,238,0.14) 0%,
-            rgba(125,211,252,0.08) 30%,
-            transparent 65%),
-        radial-gradient(ellipse 70% 60% at 105% 108%,
-            rgba(0,30,60,0.55) 0%,
-            rgba(0,60,100,0.30) 35%,
-            transparent 65%),
-        radial-gradient(ellipse 80% 50% at 50% 50%,
-            rgba(34,211,238,0.06) 0%,
-            transparent 70%);
+@keyframes orbFloat1 {
+    0%   { transform: translate(0,     0   ) scale(1);    opacity: 0.90; }
+    40%  { transform: translate(2%,   -3%  ) scale(1.04); opacity: 1.00; }
+    70%  { transform: translate(-1.5%, 2%  ) scale(1.06); opacity: 0.88; }
+    100% { transform: translate(1%,   -1.5%) scale(1.02); opacity: 0.94; }
 }
 
-/* ── PARTICLE LAYER (::after) — tiny drifting specular dots ────── */
-.auth-wrapper::after {
-    content: '';
+/* Orb 2 — deep navy/teal sphere, bottom-right */
+.auth-orb-2 {
+    width: 55vw;
+    height: 55vw;
+    max-width: 600px;
+    max-height: 600px;
+    bottom: -18vw;
+    right: -15vw;
+    background: radial-gradient(circle at 60% 62%,
+        rgba(0,40,80,0.50) 0%,
+        rgba(0,90,150,0.30) 30%,
+        rgba(0,180,216,0.12) 55%,
+        transparent 75%);
+    animation: orbFloat2 26s ease-in-out infinite alternate;
+    opacity: 0.85;
+}
+@keyframes orbFloat2 {
+    0%   { transform: translate(0,     0   ) scale(1);    opacity: 0.85; }
+    35%  { transform: translate(-2%,   2%  ) scale(1.05); opacity: 0.95; }
+    70%  { transform: translate(1.5%, -1.5%) scale(1.03); opacity: 0.88; }
+    100% { transform: translate(-1%,   1%  ) scale(1.01); opacity: 0.92; }
+}
+
+/* Orb 3 — small right-edge accent highlight */
+.auth-orb-3 {
+    width: 35vw;
+    height: 35vw;
+    max-width: 400px;
+    max-height: 400px;
+    top: 15%;
+    right: -8vw;
+    background: radial-gradient(circle at 50% 50%,
+        rgba(0,200,230,0.18) 0%,
+        rgba(14,207,239,0.08) 45%,
+        transparent 70%);
+    animation: orbFloat3 32s ease-in-out infinite alternate;
+    opacity: 0.70;
+}
+@keyframes orbFloat3 {
+    0%   { transform: translate(0,   0  ) scale(1);    opacity: 0.70; }
+    50%  { transform: translate(-3%, 4% ) scale(1.08); opacity: 0.85; }
+    100% { transform: translate(2%, -2% ) scale(0.96); opacity: 0.72; }
+}
+
+/* Dark mode orb adjustments */
+[data-theme="dark"] .auth-orb-1 {
+    background: radial-gradient(circle at 35% 38%,
+        rgba(34,211,238,0.16) 0%,
+        rgba(125,211,252,0.10) 25%,
+        rgba(34,211,238,0.04) 50%,
+        transparent 72%);
+    opacity: 0.80;
+}
+[data-theme="dark"] .auth-orb-2 {
+    background: radial-gradient(circle at 60% 62%,
+        rgba(0,20,40,0.70) 0%,
+        rgba(0,50,90,0.40) 35%,
+        transparent 65%);
+    opacity: 0.80;
+}
+[data-theme="dark"] .auth-orb-3 { opacity: 0.40; }
+
+/* ── SPECULAR PARTICLE LAYER — also on a real DOM div ────────── */
+.auth-particles {
     position: fixed;
     inset: 0;
-    z-index: 1;
     pointer-events: none;
+    z-index: 1;
     background-image:
         radial-gradient(circle 2px   at 20% 30%, rgba(255,255,255,0.75) 0%, transparent 50%),
         radial-gradient(circle 1.5px at 75% 68%, rgba(0,200,230,0.60)   0%, transparent 50%),
@@ -82,14 +150,14 @@
     background-size: 100px 100px, 130px 130px, 90px 90px, 115px 115px, 80px 80px;
     background-position: 0 0, 40px 60px, 80px 20px, 20px 80px, 60px 35px;
     animation: particleDrift 28s linear infinite;
-    opacity: 0.45;
+    opacity: 0.42;
     will-change: background-position;
 }
 @keyframes particleDrift {
     from { background-position: 0 0,        40px 60px,   80px 20px,   20px 80px,   60px 35px; }
     to   { background-position: 100px 100px, 170px 190px, 170px 110px, 135px 195px, 140px 115px; }
 }
-[data-theme="dark"] .auth-wrapper::after { opacity: 0.18; }
+[data-theme="dark"] .auth-particles { opacity: 0.15; }
 
 /* ── 2. AUTH HEADER — ELEVATED TYPOGRAPHY + GLOW ─────────────── */
 .auth-header h1 {
@@ -662,27 +730,31 @@
     filter: blur(18px) !important;
 }
 
-/* ── MOBILE (< 540px) — layout + reduced motion only ─────────── */
+/* ── MOBILE (< 540px) — layout + performance tuning ─────────── */
 @media (max-width: 540px) {
     /* Ensure viewport fills correctly on iOS */
-    .auth-wrapper {
-        min-height: 100dvh !important;
-        /* Keep transparent — body animated gradient shows through */
-    }
+    .auth-wrapper { min-height: 100dvh !important; }
 
-    /* Gentler orb drift on small screens */
-    .auth-wrapper::before {
-        animation: authOrbDriftMobile 22s ease-in-out infinite alternate;
+    /* Orb 1 — reposition so it sits clearly in top-left on narrow screens */
+    .auth-orb-1 {
+        width: 90vw;
+        height: 90vw;
+        top: -30vw;
+        left: -25vw;
     }
-    @keyframes authOrbDriftMobile {
-        0%   { opacity: 0.85; transform: scale(1)    translate(0, 0); }
-        50%  { opacity: 0.98; transform: scale(1.02) translate(0.4%, -0.6%); }
-        100% { opacity: 0.92; transform: scale(1.01) translate(-0.2%, 0.4%); }
+    /* Orb 2 — scale back slightly for mobile */
+    .auth-orb-2 {
+        width: 75vw;
+        height: 75vw;
+        bottom: -25vw;
+        right: -20vw;
     }
+    /* Orb 3 — hide on very small screens (saves overdraw) */
+    .auth-orb-3 { opacity: 0 !important; }
 
-    /* Lighter particles on mobile to save battery */
-    .auth-wrapper::after { opacity: 0.30 !important; }
+    /* Lighter particles on mobile */
+    .auth-particles { opacity: 0.28 !important; }
 
-    /* Smoke — match desktop */
-    .auth-wrapper .smoke-container { opacity: 0.50 !important; }
+    /* Smoke rising particles */
+    .auth-wrapper .smoke-container { opacity: 0.45 !important; }
 }
