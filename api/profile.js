@@ -5,7 +5,7 @@ const express = require('express');
 const bcrypt  = require('bcryptjs');
 const router  = express.Router();
 const db      = require('../db');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, adminOnly } = require('../middleware/auth');
 
 function sanitizeStr(val, maxLen = 100) {
     if (typeof val !== 'string') return '';
@@ -197,6 +197,51 @@ router.post('/hard-delete', authMiddleware, async (req, res) => {
         res.json({ success: true, message: `All personal data permanently erased. ${deletedCount} records deleted.` });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Server error during data erasure.' });
+    }
+});
+
+// ── GET /api/profile/all-users ─────────────────────────────────
+// Admin only: returns every account so the admin panel can list users
+router.get('/all-users', authMiddleware, adminOnly, async (req, res) => {
+    try {
+        const [rows] = await db.query(
+            `SELECT id, employee_id, full_name, email, contact_number,
+                    position, is_active, date_joined, last_login
+             FROM accounts
+             ORDER BY full_name ASC`
+        );
+        res.json({ success: true, users: rows });
+    } catch (err) {
+        console.error('[admin] GET /all-users error:', err);
+        res.status(500).json({ success: false, message: 'Server error fetching users.' });
+    }
+});
+
+// ── PATCH /api/profile/toggle-active/:id ───────────────────────
+// Admin only: activate or deactivate any account except your own
+router.patch('/toggle-active/:id', authMiddleware, adminOnly, async (req, res) => {
+    const targetId = parseInt(req.params.id, 10);
+    if (isNaN(targetId) || targetId <= 0)
+        return res.status(400).json({ success: false, message: 'Invalid user ID.' });
+
+    if (targetId === req.user.id)
+        return res.status(400).json({ success: false, message: 'You cannot change your own active status.' });
+
+    const is_active = (req.body.is_active === 1 || req.body.is_active === true) ? 1 : 0;
+
+    try {
+        const [check] = await db.query('SELECT id FROM accounts WHERE id = ?', [targetId]);
+        if (!check.length)
+            return res.status(404).json({ success: false, message: 'User not found.' });
+
+        await db.query(
+            'UPDATE accounts SET is_active = ?, updated_at = NOW() WHERE id = ?',
+            [is_active, targetId]
+        );
+        res.json({ success: true, message: is_active ? 'User activated.' : 'User deactivated.' });
+    } catch (err) {
+        console.error('[admin] PATCH /toggle-active error:', err);
+        res.status(500).json({ success: false, message: 'Server error updating user status.' });
     }
 });
 
