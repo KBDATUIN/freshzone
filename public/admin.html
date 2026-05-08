@@ -90,16 +90,32 @@
         @media (max-width:900px) { .push-toggle-wrap { gap:6px; display: none; } }
 
         /* ── ADMIN PAGE STYLES ── */
-        .admin-header {
-            display:flex; align-items:flex-start; justify-content:space-between;
-            flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;
+        /* Page header matches contact-page-header from style.css */
+        .admin-page-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1.75rem 2rem;
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+            background: linear-gradient(155deg, rgba(215,241,255,0.98), rgba(195,230,255,0.96)) !important;
+            border: 1px solid rgba(0,100,160,0.15) !important;
         }
-        .admin-header h1 {
-            margin:0 0 0.25rem; font-size:1.75rem;
-            font-family:'Space Grotesk', sans-serif;
-            color:var(--primary); letter-spacing:-0.02em;
+        .admin-page-header h1 {
+            margin: 0 0 0.35rem;
+            font-size: 1.65rem;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #003a5c;
+            font-weight: 800;
+            letter-spacing: -0.03em;
         }
-        .admin-header p { margin:0; color:var(--gray); font-size:0.88rem; }
+        .admin-page-header p { margin: 0; color: var(--gray); font-size: 0.9rem; }
+        [data-theme="dark"] .admin-page-header {
+            background: rgba(10,20,36,0.98) !important;
+            border-color: rgba(34,211,238,0.1) !important;
+        }
+        [data-theme="dark"] .admin-page-header h1 { color: #7dd3fc; }
 
         /* Status pills */
         .status-pill {
@@ -227,11 +243,12 @@
     </div>
 
     <div id="admin-content" style="display:none;">
-        <div class="admin-header">
-            <div>
-                <h1>User Management</h1>
-                <p>Activate or deactivate staff and administrator accounts.</p>
-            </div>
+        <div class="admin-page-header">
+            <h1>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;color:var(--secondary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                User Management
+            </h1>
+            <p>Activate or deactivate staff and administrator accounts.</p>
         </div>
 
         <div class="log-container">
