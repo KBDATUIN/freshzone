@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <style>/* Anti-flash */html{background:linear-gradient(135deg,#90e0ef,#00b4d8,#004e7a);}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
+    <script>(function(){var t=localStorage.getItem('fz-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | Admin</title>
@@ -12,20 +13,24 @@
     <link rel="stylesheet" href="style-v2.css">
     <link rel="stylesheet" href="style-v3.css">
     <link rel="stylesheet" href="style-fixes.css">
+    <link rel="stylesheet" href="premium-style.css">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#004e7a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FreshZone">
     <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
     <link rel="stylesheet" href="/pwa.css">
     <style>
+        /* ICON SYSTEM — identical to dashboard */
         .icon { display:inline-block; width:1em; height:1em; vertical-align:-0.125em; flex-shrink:0; }
         .nav-icon { width:1.05rem; height:1.05rem; margin-right:5px; vertical-align:-0.15em; opacity:0.85; }
         .btn-icon { width:0.9rem; height:0.9rem; margin-right:4px; vertical-align:-0.1em; }
         .h-icon   { width:1.1rem; height:1.1rem; margin-right:6px; vertical-align:-0.18em; }
         .sm-icon  { width:0.8rem; height:0.8rem; vertical-align:-0.08em; margin-right:3px; }
 
-        /* ── NAV LAYOUT — identical to dashboard/history/profile/contact/about ── */
+        /* ── NAV LAYOUT — identical to dashboard ── */
         .nav-container {
             display: flex !important;
             flex-wrap: nowrap !important;
@@ -84,34 +89,75 @@
         .push-toggle-label { display:none !important; }
         @media (max-width:900px) { .push-toggle-wrap { gap:6px; display: none; } }
 
-        /* ── ADMIN PAGE CONTENT ── */
+        /* ── ADMIN PAGE STYLES ── */
         .admin-header {
-            display:flex; align-items:center; justify-content:space-between;
+            display:flex; align-items:flex-start; justify-content:space-between;
             flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;
         }
-        .admin-header h1 { margin:0; font-size:1.5rem; color:var(--primary); }
-        .admin-header p  { margin:0; color:var(--gray); font-size:0.88rem; }
-
-        .toggle-btn {
-            padding:5px 14px; border:none; border-radius:8px; font-size:0.78rem;
-            font-weight:700; cursor:pointer; transition:all 0.2s; width:auto; margin:0;
-            display:inline-flex; align-items:center; gap:5px;
+        .admin-header h1 {
+            margin:0 0 0.25rem; font-size:1.75rem;
+            font-family:'Space Grotesk', sans-serif;
+            color:var(--primary); letter-spacing:-0.02em;
         }
-        .toggle-btn.activate   { background:#dcfce7; color:#15803d; }
-        .toggle-btn.deactivate { background:#fee2e2; color:#dc2626; }
-        .toggle-btn:hover { filter:brightness(0.92); transform:none; box-shadow:none; }
-        .toggle-btn::after { display:none !important; }
+        .admin-header p { margin:0; color:var(--gray); font-size:0.88rem; }
 
+        /* Status pills */
         .status-pill {
-            display:inline-block; padding:2px 10px; border-radius:99px;
-            font-size:0.72rem; font-weight:700;
+            display:inline-block; padding:3px 12px; border-radius:99px;
+            font-size:0.74rem; font-weight:700; letter-spacing:0.02em;
         }
         .status-pill.active   { background:#dcfce7; color:#15803d; }
         .status-pill.inactive { background:#fee2e2; color:#dc2626; }
+        [data-theme="dark"] .status-pill.active   { background:rgba(34,197,94,0.15);  color:#4ade80; }
+        [data-theme="dark"] .status-pill.inactive { background:rgba(239,68,68,0.15);  color:#f87171; }
 
+        /* Action buttons */
+        .toggle-btn {
+            padding:5px 16px; border:none; border-radius:8px; font-size:0.78rem;
+            font-weight:700; cursor:pointer; transition:all 0.18s; width:auto; margin:0;
+            display:inline-flex; align-items:center; gap:5px; letter-spacing:0.01em;
+        }
+        .toggle-btn.activate   { background:#dcfce7; color:#15803d; }
+        .toggle-btn.deactivate { background:#fee2e2; color:#dc2626; }
+        .toggle-btn:hover      { filter:brightness(0.90); transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,0,0,0.10); }
+        .toggle-btn::after     { display:none !important; }
+        [data-theme="dark"] .toggle-btn.activate   { background:rgba(34,197,94,0.15);  color:#4ade80; }
+        [data-theme="dark"] .toggle-btn.deactivate { background:rgba(239,68,68,0.15);  color:#f87171; }
+
+        /* Access denied state */
         .admin-access-denied {
-            text-align:center; padding:3rem 1rem; color:var(--danger);
+            text-align:center; padding:4rem 1rem; color:var(--danger);
             font-size:1rem; font-weight:600;
+        }
+
+        /* Table overrides to match dashboard style */
+        #users-table th {
+            font-size: 0.72rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            color: var(--gray) !important;
+            padding: 0.85rem 1rem !important;
+            white-space: nowrap;
+        }
+        #users-table td {
+            padding: 0.9rem 1rem !important;
+            font-size: 0.875rem !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid rgba(0,78,122,0.06) !important;
+        }
+        #users-table tr:last-child td { border-bottom: none !important; }
+        #users-table tbody tr {
+            transition: background 0.15s;
+        }
+        #users-table tbody tr:hover {
+            background: rgba(0,180,216,0.04) !important;
+        }
+        [data-theme="dark"] #users-table td {
+            border-bottom-color: rgba(255,255,255,0.05) !important;
+        }
+        [data-theme="dark"] #users-table tbody tr:hover {
+            background: rgba(0,180,216,0.06) !important;
         }
     </style>
 </head>
@@ -176,6 +222,7 @@
 <div class="container" style="position:relative;z-index:10;">
 
     <div id="access-denied-msg" class="admin-access-denied" style="display:none;">
+        <svg style="width:2.5rem;height:2.5rem;display:block;margin:0 auto 1rem;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         Access denied. Administrator role required.
     </div>
 
@@ -199,7 +246,7 @@
                     </tr>
                 </thead>
                 <tbody id="users-tbody">
-                    <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gray);">Loading users…</td></tr>
+                    <tr><td colspan="5" style="text-align:center;padding:2.5rem;color:var(--gray);">Loading users…</td></tr>
                 </tbody>
             </table>
         </div>
@@ -228,7 +275,6 @@
 <script src="cookie-consent.js?v=3" defer></script>
 <script src="utils.js"></script>
 <script>
-    // Auth guard — admin only
     let currentUser = null;
 
     (async function initAdmin() {
@@ -249,7 +295,6 @@
 
     async function loadUsers() {
         try {
-            // Use raw fetch so we can inspect status codes before parsing JSON
             const apiBase = (typeof API !== 'undefined') ? API : '';
             const res = await fetch(`${apiBase}/api/profile/all-users`, {
                 credentials: 'include',
@@ -260,6 +305,7 @@
             if (res.status === 403) { showNotification('Access denied: Administrator only.', 'error'); return; }
             if (res.status === 404) {
                 showNotification('Admin API route not found — deploy the updated profile.js to the server.', 'error');
+                document.getElementById('users-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--danger);">Route not found on server. Deploy the updated profile.js.</td></tr>';
                 return;
             }
 
@@ -270,7 +316,9 @@
             }
             renderUsers(data.users);
         } catch(e) {
+            console.error('[admin] loadUsers error:', e);
             showNotification('Network error — check your connection.', 'error');
+            document.getElementById('users-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--danger);">Connection error. Check console for details.</td></tr>';
         }
     }
 
@@ -282,8 +330,8 @@
         }
         tbody.innerHTML = users.map(u => `
             <tr id="row-${u.id}">
-                <td data-label="Name">${escHtml(u.full_name || '—')}</td>
-                <td data-label="Employee ID">${escHtml(u.employee_id || '—')}</td>
+                <td data-label="Name"><strong>${escHtml(u.full_name || '—')}</strong></td>
+                <td data-label="Employee ID" style="font-family:'Space Grotesk',monospace;font-size:0.82rem;">${escHtml(u.employee_id || '—')}</td>
                 <td data-label="Position">${escHtml(u.position || '—')}</td>
                 <td data-label="Status">
                     <span class="status-pill ${u.is_active ? 'active' : 'inactive'}">
