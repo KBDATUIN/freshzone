@@ -23,29 +23,68 @@
         .nav-icon { width:1.05rem; height:1.05rem; margin-right:5px; vertical-align:-0.15em; opacity:0.85; }
         .btn-icon { width:0.9rem; height:0.9rem; margin-right:4px; vertical-align:-0.1em; }
         .h-icon   { width:1.1rem; height:1.1rem; margin-right:6px; vertical-align:-0.18em; }
+        .sm-icon  { width:0.8rem; height:0.8rem; vertical-align:-0.08em; margin-right:3px; }
+
+        /* ── NAV LAYOUT — identical to dashboard/history/profile/contact/about ── */
         .nav-container {
-            display:flex !important; flex-wrap:nowrap !important; align-items:center !important;
-            gap:0 !important; height:100% !important; max-width:1200px !important;
-            margin:0 auto !important; padding:0 !important;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 0 !important;
+            height: 100% !important;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
         }
-        .nav-container .logo { flex-shrink:0 !important; margin-right:1.25rem !important; }
+        .nav-container .logo {
+            flex-shrink: 0 !important;
+            margin-right: 1.25rem !important;
+        }
         .nav-links {
-            display:flex !important; flex:1 1 auto !important; min-width:0 !important;
-            align-items:center !important; flex-wrap:nowrap !important;
-            gap:0.15rem !important; overflow:visible !important;
+            display: flex !important;
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            gap: 0.15rem !important;
+            overflow: visible !important;
         }
         .nav-controls {
-            display:flex !important; flex-shrink:0 !important; flex-wrap:nowrap !important;
-            align-items:center !important; gap:10px !important; margin-left:auto !important;
+            display: flex !important;
+            flex-shrink: 0 !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 10px !important;
+            margin-left: auto !important;
         }
-        .nav-controls .hamburger { display:none !important; }
-        @media (max-width:900px) {
-            .nav-links { display:none !important; }
-            .nav-controls .hamburger { display:flex !important; }
-            .nav-user { display:none !important; }
+        .nav-controls .hamburger { display: none !important; }
+        @media (max-width: 900px) {
+            .nav-links { display: none !important; }
+            .nav-controls .hamburger { display: flex !important; }
+            .nav-user { display: none !important; }
         }
 
-        /* Admin table */
+        /* ── PUSH TOGGLE — identical to dashboard ── */
+        .push-toggle-wrap { display:inline-flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; user-select:none; min-height:38px; }
+        .push-toggle-icon { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; line-height:0; margin:0; flex-shrink:0; color:var(--gray); }
+        .push-toggle-icon svg { width:18px; height:18px; display:block; }
+        .push-toggle-switch {
+            position:relative; width:44px; height:24px; background:#ccc; border-radius:12px;
+            cursor:pointer; transition:background 0.25s; outline:none; flex-shrink:0;
+        }
+        .push-toggle-switch:focus-visible { box-shadow: 0 0 0 3px rgba(0,200,150,0.4); }
+        .push-toggle-switch.active { background: var(--secondary, #00c896); }
+        .push-toggle-knob {
+            position:absolute; top:3px; left:3px; width:18px; height:18px; background:white;
+            border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.25);
+            transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); will-change:transform;
+        }
+        .push-toggle-switch.active .push-toggle-knob { transform: translateX(20px); }
+        .push-toggle-label { display:none !important; }
+        @media (max-width:900px) { .push-toggle-wrap { gap:6px; display: none; } }
+
+        /* ── ADMIN PAGE CONTENT ── */
         .admin-header {
             display:flex; align-items:center; justify-content:space-between;
             flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;
@@ -78,12 +117,19 @@
 </head>
 <body>
 
+<div class="smoke-container" aria-hidden="true">
+    <div class="smoke-particle" style="left:10%;width:200px;height:200px;animation-delay:0s;"></div>
+    <div class="smoke-particle" style="left:30%;width:150px;height:150px;animation-delay:2s;"></div>
+    <div class="smoke-particle" style="left:60%;width:250px;height:250px;animation-delay:4s;"></div>
+    <div class="smoke-particle" style="left:85%;width:180px;height:180px;animation-delay:1s;"></div>
+</div>
+
 <nav role="navigation" aria-label="Main navigation">
     <div class="nav-container">
         <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
             <img src="logo1.png" alt="FreshZone Logo">
         </a>
-        <div class="nav-links">
+        <div class="nav-links" id="desktop-nav">
             <a href="dashboard.html">Dashboard</a>
             <a href="history.html">History</a>
             <a href="about.html">About</a>
@@ -97,9 +143,14 @@
                 <span class="nav-user-dot"></span>
                 <span id="nav-user-name">—</span>
             </div>
-            <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </button>
+            <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+            <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
+                <span class="push-toggle-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+                <div class="push-toggle-switch" id="push-btn" onclick="togglePushNotifications()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')togglePushNotifications()">
+                    <div class="push-toggle-knob"></div>
+                </div>
+                <span class="push-toggle-label" id="push-label">OFF</span>
+            </label>
             <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false">
                 <span></span><span></span><span></span>
             </button>
@@ -110,14 +161,15 @@
 <div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true" aria-label="Navigation menu">
     <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
         <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="history.html">History</a>
-        <a href="about.html">About</a>
-        <a href="profile.html">Profile</a>
-        <a href="contact.html">Contact</a>
-        <a href="admin.html" class="active">Admin</a>
+        <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
+        <a href="history.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
+        <a href="about.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> About</a>
+        <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
+        <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
+        <a href="admin.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Admin</a>
         <div class="mobile-nav-divider"></div>
-        <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout">Logout</a>
+        <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
+        <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notifications</a>
     </div>
 </div>
 
@@ -173,6 +225,7 @@
     <p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p>
 </footer>
 
+<script src="cookie-consent.js?v=3" defer></script>
 <script src="utils.js"></script>
 <script>
     // Auth guard — admin only
@@ -186,12 +239,6 @@
         const nameEl = document.getElementById('nav-user-name');
         if (nameEl) nameEl.textContent = user.full_name || user.name || 'User';
 
-        // Show admin nav link (in case arriving directly)
-        const da = document.getElementById('admin-nav-link-desktop');
-        const ma = document.getElementById('admin-nav-link-mobile');
-        if (da) da.style.display = '';
-        if (ma) ma.style.display = '';
-
         if (user.position !== 'Administrator') {
             document.getElementById('access-denied-msg').style.display = 'block';
         } else {
@@ -202,14 +249,28 @@
 
     async function loadUsers() {
         try {
-            const data = await apiFetch('/profile/all-users');
+            // Use raw fetch so we can inspect status codes before parsing JSON
+            const apiBase = (typeof API !== 'undefined') ? API : '';
+            const res = await fetch(`${apiBase}/api/profile/all-users`, {
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (res.status === 401) { window.location.href = 'auth.html'; return; }
+            if (res.status === 403) { showNotification('Access denied: Administrator only.', 'error'); return; }
+            if (res.status === 404) {
+                showNotification('Admin API route not found — deploy the updated profile.js to the server.', 'error');
+                return;
+            }
+
+            const data = await res.json();
             if (!data || !data.success) {
                 showNotification(data?.message || 'Failed to load users.', 'error');
                 return;
             }
             renderUsers(data.users);
         } catch(e) {
-            showNotification('Connection error loading users.', 'error');
+            showNotification('Network error — check your connection.', 'error');
         }
     }
 
@@ -241,10 +302,20 @@
 
     async function toggleUser(userId, newActive) {
         try {
-            const data = await apiFetch(`/profile/toggle-active/${userId}`, {
+            const apiBase = (typeof API !== 'undefined') ? API : '';
+            const csrfMatch = document.cookie.match(/(?:^|;\s*)fz_csrf=([^;]+)/);
+            const csrfToken = csrfMatch ? decodeURIComponent(csrfMatch[1]) : '';
+            const res = await fetch(`${apiBase}/api/profile/toggle-active/${userId}`, {
                 method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken ? { 'x-csrf-token': csrfToken } : {})
+                },
                 body: JSON.stringify({ is_active: newActive })
             });
+            if (res.status === 401) { window.location.href = 'auth.html'; return; }
+            const data = await res.json();
             if (data && data.success) {
                 showNotification(newActive ? 'User activated.' : 'User deactivated.', 'success');
                 loadUsers();
@@ -252,7 +323,7 @@
                 showNotification(data?.message || 'Failed to update user.', 'error');
             }
         } catch(e) {
-            showNotification('Connection error.', 'error');
+            showNotification('Network error — check your connection.', 'error');
         }
     }
 
@@ -263,6 +334,5 @@
     initHotkeys('dashboard');
 </script>
 <script src="/pwa.js" defer></script>
-<script src="cookie-consent.js?v=3" defer></script>
 </body>
 </html>
