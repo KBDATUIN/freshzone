@@ -1080,7 +1080,7 @@
                 } catch(_) {}
 
                 if (!eventId) {
-                    showNotification('Alert already handled or still syncing. Refreshing…', 'info', 1800);
+                    showNotification('Alert already fully resolved.', 'info', 2000);
                     await fetchOpenEvents();
                     await fetchLiveData();
                     if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = 'Acknowledge Alert'; }

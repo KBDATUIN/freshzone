@@ -354,6 +354,23 @@ router.post('/acknowledge/:eventId', authMiddleware, async (req, res) => {
     }
 
     try {
+        // Check current status first
+        const [existing] = await db.query(
+            `SELECT id, event_status FROM detection_events WHERE id = ?`,
+            [eventId]
+        );
+
+        // Already cleared — return success but don't re-open
+        if (!existing.length || existing[0].event_status === 'Cleared') {
+            return res.json({ success: true, message: 'Already resolved.' });
+        }
+
+        // Already acknowledged — return success with the eventId so frontend can show resolve btn
+        if (existing[0].event_status === 'Acknowledged') {
+            broadcastSSE({ type: 'event_update', event_id: eventId, event_status: 'Acknowledged', acknowledged_by: req.user.id });
+            return res.json({ success: true, message: 'Already acknowledged.', event_id: eventId });
+        }
+
         const [updated] = await db.query(
             `UPDATE detection_events
              SET event_status = 'Acknowledged',
@@ -365,8 +382,7 @@ router.post('/acknowledge/:eventId', authMiddleware, async (req, res) => {
         );
 
         if (updated.affectedRows === 0) {
-            // Already acknowledged or resolved — still return success (idempotent)
-            return res.json({ success: true, message: 'Already acknowledged or resolved.' });
+            return res.json({ success: true, message: 'Already acknowledged or resolved.', event_id: eventId });
         }
 
         await db.query(

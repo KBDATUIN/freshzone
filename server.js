@@ -107,12 +107,24 @@ const pushLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+// ESP32 POST limiter — strict (only the sensor posts here)
 const esp32Limiter = rateLimit({
-    windowMs: 60 * 1000,       
-    max: 30,                   
+    windowMs: 60 * 1000,
+    max: 60,                   // 1 post/sec max from ESP32
     message: { success: false, message: 'Too many readings.' },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => req.method !== 'POST', // only limit POSTs
+});
+
+// Dashboard read limiter — relaxed (live, open-events, stream, acknowledge)
+const dashboardLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 300,                  // ~5 req/sec — covers polling + SSE + ack clicks
+    message: { success: false, message: 'Too many requests.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => req.method === 'POST' && req.path === '/', // don't double-limit ESP32 POST
 });
 
 app.use('/api/', generalLimiter);
@@ -176,7 +188,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ── API ROUTES ────────────────────────────────────────────────
 app.use('/api/auth',     authLimiter,  require('./api/auth'));
-app.use('/api/readings', esp32Limiter, require('./api/readings'));
+app.use('/api/readings', esp32Limiter, dashboardLimiter, require('./api/readings'));
 app.use('/api/history',               require('./api/history'));
 app.use('/api/profile',               require('./api/profile'));
 app.use('/api/contact',               require('./api/contact'));
