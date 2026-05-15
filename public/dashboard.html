@@ -1322,7 +1322,7 @@
             await fetchOpenEvents();  // must run first so renderZone has fresh state
             await fetchLiveData();
         }
-        setInterval(pollAll, 2000);
+        setInterval(pollAll, 4000);
 
         // ── SSE REAL-TIME UPDATES ──────────────────────────────
         // Connect to /api/readings/stream so acknowledge/resolve on any
@@ -1392,7 +1392,7 @@
                     sseSource.close();
                     sseSource = null;
                     // Reconnect after 6 s — staggered so we don't hammer the server
-                    sseRetryTimer = setTimeout(connectSSE, 2000);
+                    sseRetryTimer = setTimeout(connectSSE, 5000);
                 };
             }
 
