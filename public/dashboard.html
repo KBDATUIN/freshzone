@@ -838,7 +838,7 @@
             if (nameEl) nameEl.textContent = user.full_name || user.name || 'User';
             const sessionText = document.getElementById('hero-session-text');
             if (sessionText) sessionText.textContent = `Logged in as ${user.full_name || user.name} — ${user.position || 'User'}`;
-            pollAll();
+            fetchOpenEvents().then(() => pollAll());
         })();
 
         // Zone code → card element mapping
@@ -1065,18 +1065,19 @@
             if (ackBtn) { ackBtn.disabled = true; ackBtn.textContent = 'Acknowledging…'; }
 
             try {
-                // If local map doesn't have the event ID yet, fetch it now
-                if (!eventId) {
-                    const eventsData = await apiFetch('/readings/open-events');
-                    if (eventsData?.success) {
-                        const match = eventsData.data.find(e => e.node_code === nodeCode);
-                        if (match?.id) {
-                            eventId = match.id;
-                            zoneEventIds[nodeCode] = match.id;
-                            openEventStatusByZone[nodeCode] = match.event_status;
-                        }
+                // ALWAYS fetch fresh open-events before ACK so eventId is never stale
+                try {
+                    const fresh = await apiFetch('/readings/open-events');
+                    if (fresh?.success) {
+                        fresh.data.forEach(e => {
+                            if (!e.node_code) return;
+                            zoneEventIds[e.node_code] = e.id;
+                            openEventStatusByZone[e.node_code] = e.event_status;
+                            if (e.event_status === 'Acknowledged') acknowledgedZones.add(e.node_code);
+                        });
+                        eventId = zoneEventIds[nodeCode];
                     }
-                }
+                } catch(_) {}
 
                 if (!eventId) {
                     showNotification('Alert already handled or still syncing. Refreshing…', 'info', 1800);
@@ -1126,7 +1127,8 @@
                     showNotification(`Alert acknowledged for ${locationName}. Staff notified.`, 'success');
 
                     // Background sync to confirm DB state — doesn't affect the card display
-                    setTimeout(async () => { await fetchOpenEvents(); await fetchLiveData(); }, 1500);
+                    await fetchOpenEvents();
+                    await fetchLiveData();
 
                 } else {
                     showNotification(result?.message || 'Failed to acknowledge. Try again.', 'error');
@@ -1175,7 +1177,8 @@
                                 if (cached) renderZone(zc, cached);
                             }
                         }
-                        setTimeout(async () => { await fetchOpenEvents(); await fetchLiveData(); }, 1000);
+                        fetchOpenEvents();
+                        fetchLiveData();
                     }
                 } catch(err) {
                     console.warn('[staffRespond] Error:', err.message);
@@ -1236,8 +1239,9 @@
                         }
                     }
 
-                    // Background sync — fetchOpenEvents first, then fetchLiveData
-                    setTimeout(async () => { await fetchOpenEvents(); await fetchLiveData(); }, 1500);
+                    // Immediate sync after resolve
+                    await fetchOpenEvents();
+                    await fetchLiveData();
                 } else {
                     showNotification(result?.message || 'Failed to resolve. Try again.', 'error');
                     if (resolveBtn) { resolveBtn.disabled = false; resolveBtn.textContent = 'Mark as Resolved'; }
@@ -1318,7 +1322,7 @@
             await fetchOpenEvents();  // must run first so renderZone has fresh state
             await fetchLiveData();
         }
-        setInterval(pollAll, 5000);
+        setInterval(pollAll, 2000);
 
         // ── SSE REAL-TIME UPDATES ──────────────────────────────
         // Connect to /api/readings/stream so acknowledge/resolve on any
@@ -1379,9 +1383,8 @@
                                 }
                             }
                         }
-                        // Background sync to confirm full DB state
-                        await fetchOpenEvents();
-                        await fetchLiveData();
+                        fetchOpenEvents();
+                        fetchLiveData();
                     }
                 };
 
@@ -1389,7 +1392,7 @@
                     sseSource.close();
                     sseSource = null;
                     // Reconnect after 6 s — staggered so we don't hammer the server
-                    sseRetryTimer = setTimeout(connectSSE, 6000);
+                    sseRetryTimer = setTimeout(connectSSE, 2000);
                 };
             }
 

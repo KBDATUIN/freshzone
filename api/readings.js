@@ -282,7 +282,7 @@ router.get('/live', authMiddleware, async (req, res) => {
                 sn.node_code,
                 sn.location_name,
                 sn.last_seen,
-                CASE WHEN sn.last_seen >= NOW() - INTERVAL 15 SECOND THEN 1 ELSE 0 END AS node_active,
+                CASE WHEN sn.last_seen >= NOW() - INTERVAL 8 SECOND THEN 1 ELSE 0 END AS node_active,
                 sr.pm1_0,
                 sr.aqi_value, sr.aqi_category,
                 sr.smoke_detected, sr.led_color, sr.recorded_at
