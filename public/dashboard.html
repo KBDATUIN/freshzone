@@ -605,6 +605,9 @@
                     <span class="nav-user-dot"></span>
                     <span id="nav-user-name">—</span>
                 </div>
+                <button class="dark-toggle" id="sound-toggle-btn" onclick="toggleSound()" aria-label="Toggle alarm sound" style="position:relative;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                </button>
                 <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
                 <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
                     <span class="push-toggle-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
@@ -663,6 +666,23 @@
 
         <div class="last-updated-bar" id="last-updated-bar">Fetching sensor data…</div>
 
+        <!-- ── STATS SUMMARY STRIP ──────────────────────────── -->
+        <div id="stats-strip" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;animation:fadeInUp 0.4s ease both;">
+            <div class="stat-chip" id="stat-active-alerts" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;color:#dc2626;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span id="stat-alerts-text">0 Active Alerts</span>
+                <span id="alert-count-badge" style="display:none;background:#ef4444;color:white;border-radius:999px;padding:1px 7px;font-size:0.75rem;font-weight:700;min-width:20px;text-align:center;line-height:20px;"></span>
+            </div>
+            <div class="stat-chip" style="background:rgba(0,180,216,0.08);border:1px solid rgba(0,180,216,0.2);border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;color:var(--primary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span id="stat-online-text">— Sensors Online</span>
+            </div>
+            <div class="stat-chip" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;color:#15803d;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><polyline points="20 6 9 17 4 12"/></svg>
+                <span id="stat-clear-text">— Clear</span>
+            </div>
+        </div>
+
         <div class="grid" id="sensor-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px,1fr));">
 
             <div class="location-card" id="card-zone1" role="region" aria-label="4th Floor Male CR status">
@@ -677,7 +697,8 @@
                 <div class="pm1-display" id="aqi-zone1"><span class="pm1-value" id="pm1-val-zone1">—</span><span class="pm1-unit">µg/m³ PM1.0</span></div>
                 <div style="display:none" id="pm-zone1"></div>
                 <small class="card-timestamp" id="ts-zone1">Last reading: —</small>
-                <button class="ack-btn" id="ack-zone1" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE1','4th Floor Male CR')">
+                <canvas id="sparkline-zone1" width="220" height="36" style="width:100%;height:36px;margin:6px 0 2px;border-radius:6px;opacity:0.85;" aria-hidden="true"></canvas>
+                <button class="ack-btn" id="ack-zone1" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE1','4th Floor Male CR')">>
                     Acknowledge Alert
                 </button>
                 <button class="resolve-btn" id="resolve-zone1" style="display:none;" onclick="resolveAlert('ESP32-ZONE1','4th Floor Male CR')">
@@ -697,7 +718,8 @@
                 <div class="pm1-display" id="aqi-zone2"><span class="pm1-value" id="pm1-val-zone2">—</span><span class="pm1-unit">µg/m³ PM1.0</span></div>
                 <div style="display:none" id="pm-zone2"></div>
                 <small class="card-timestamp" id="ts-zone2">Last reading: —</small>
-                <button class="ack-btn" id="ack-zone2" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE2','4th Floor Female CR')">
+                <canvas id="sparkline-zone2" width="220" height="36" style="width:100%;height:36px;margin:6px 0 2px;border-radius:6px;opacity:0.85;" aria-hidden="true"></canvas>
+                <button class="ack-btn" id="ack-zone2" style="display:none;" onclick="acknowledgeAlert('ESP32-ZONE2','4th Floor Female CR')">>
                     Acknowledge Alert
                 </button>
                 <button class="resolve-btn" id="resolve-zone2" style="display:none;" onclick="resolveAlert('ESP32-ZONE2','4th Floor Female CR')">
@@ -838,16 +860,113 @@
             if (nameEl) nameEl.textContent = user.full_name || user.name || 'User';
             const sessionText = document.getElementById('hero-session-text');
             if (sessionText) sessionText.textContent = `Logged in as ${user.full_name || user.name} — ${user.position || 'User'}`;
+            updateSoundBtnUI();
             pollAll();
         })();
 
         // Zone code → card element mapping
         const ZONES = {
-            'ESP32-ZONE1': { card:'card-zone1', dot:'dot-zone1', statusText:'status-text-zone1', aqi:'aqi-zone1', pm:'pm-zone1', ts:'ts-zone1', ackBtn:'ack-zone1', resolveBtn:'resolve-zone1' },
-            'ESP32-ZONE2': { card:'card-zone2', dot:'dot-zone2', statusText:'status-text-zone2', aqi:'aqi-zone2', pm:'pm-zone2', ts:'ts-zone2', ackBtn:'ack-zone2', resolveBtn:'resolve-zone2' },
+            'ESP32-ZONE1': { card:'card-zone1', dot:'dot-zone1', statusText:'status-text-zone1', aqi:'aqi-zone1', pm:'pm-zone1', ts:'ts-zone1', ackBtn:'ack-zone1', resolveBtn:'resolve-zone1', sparkline:'sparkline-zone1' },
+            'ESP32-ZONE2': { card:'card-zone2', dot:'dot-zone2', statusText:'status-text-zone2', aqi:'aqi-zone2', pm:'pm-zone2', ts:'ts-zone2', ackBtn:'ack-zone2', resolveBtn:'resolve-zone2', sparkline:'sparkline-zone2' },
         };
+        // ── STATS STRIP UPDATER ────────────────────────────────
+        function updateStatsStrip(zones) {
+            const total = zones.length;
+            const online = zones.filter(z => z.node_active).length;
+            const alertCount = zones.filter(z => z.smoke_detected && !acknowledgedZones.has(z.node_code)).length;
+            const clearCount = online - alertCount;
+
+            const alertText = document.getElementById('stat-alerts-text');
+            const onlineText = document.getElementById('stat-online-text');
+            const clearText = document.getElementById('stat-clear-text');
+            const alertChip = document.getElementById('stat-active-alerts');
+
+            if (alertText) alertText.textContent = alertCount === 0 ? 'No Active Alerts' : `${alertCount} Active Alert${alertCount > 1 ? 's' : ''}`;
+            if (onlineText) onlineText.textContent = `${online}/${total} Sensors Online`;
+            if (clearText) clearText.textContent = `${clearCount} Zone${clearCount !== 1 ? 's' : ''} Clear`;
+            if (alertChip) alertChip.style.background = alertCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.08)';
+            if (alertChip) alertChip.style.borderColor = alertCount > 0 ? 'rgba(239,68,68,0.35)' : 'rgba(34,197,94,0.25)';
+            if (alertChip) alertChip.style.color = alertCount > 0 ? '#dc2626' : '#15803d';
+        }
+
         // Track event IDs per zone for resolve (populated from DB via fetchOpenEvents)
         const zoneEventIds = {};
+        const pm1History = {}; // nodeCode → array of {t, v}
+        const PM1_HISTORY_MAX = 20;
+
+        function recordPM1(nodeCode, value) {
+            if (!pm1History[nodeCode]) pm1History[nodeCode] = [];
+            pm1History[nodeCode].push({ t: Date.now(), v: parseFloat(value) });
+            if (pm1History[nodeCode].length > PM1_HISTORY_MAX) pm1History[nodeCode].shift();
+        }
+
+        function drawSparkline(nodeCode) {
+            const z = ZONES[nodeCode];
+            if (!z?.sparkline) return;
+            const canvas = document.getElementById(z.sparkline);
+            if (!canvas) return;
+            const history = pm1History[nodeCode] || [];
+            if (history.length < 2) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            const vals = history.map(p => p.v);
+            const min = Math.min(...vals, 0);
+            const max = Math.max(...vals, 15);
+            const range = max - min || 1;
+            // Determine color from last value
+            const last = vals[vals.length - 1];
+            const color = last > 50 ? '#ef4444' : last > 20 ? '#f59e0b' : '#22c55e';
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            // Fill gradient
+            const grad = ctx.createLinearGradient(0, 0, 0, H);
+            grad.addColorStop(0, color.replace(')', ',0.25)').replace('rgb', 'rgba'));
+            grad.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.beginPath();
+            history.forEach((p, i) => {
+                const x = (i / (history.length - 1)) * W;
+                const y = H - ((p.v - min) / range) * (H - 4) - 2;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            });
+            // Stroke line
+            ctx.stroke();
+            // Fill area
+            ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+        }
+
+        // ── SOUND MUTE STATE ───────────────────────────────────
+        let soundMuted = localStorage.getItem('fz-sound-muted') === 'true';
+        function updateSoundBtnUI() {
+            const btn = document.getElementById('sound-toggle-btn');
+            if (!btn) return;
+            btn.title = soundMuted ? 'Unmute alarm sounds' : 'Mute alarm sounds';
+            btn.innerHTML = soundMuted
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
+        }
+        function toggleSound() {
+            soundMuted = !soundMuted;
+            localStorage.setItem('fz-sound-muted', soundMuted);
+            updateSoundBtnUI();
+            showNotification(soundMuted ? 'Alarm sound muted' : 'Alarm sound enabled', 'info', 1500);
+        }
+
+        // ── ALERT COUNTER ──────────────────────────────────────
+        function updateAlertBadge() {
+            const count = Object.values(activeAlerts).filter(Boolean).length;
+            const badge = document.getElementById('alert-count-badge');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'inline-flex' : 'none';
+            }
+            // Update page title
+            document.title = count > 0 ? `(${count}) ALERT — FreshZone Dashboard` : 'FreshZone | Dashboard';
+        }
 
         // Track acknowledged zones — driven from DB event_status, not sessionStorage
         const acknowledgedZones = new Set();
@@ -969,6 +1088,13 @@
 
 
             ts.textContent = 'Last reading: ' + recordedAt;
+
+            // Record PM1 history and redraw sparkline
+            recordPM1(zoneCode, data.pm1_0 || 0);
+            drawSparkline(zoneCode);
+
+            // Update alert badge and page title
+            updateAlertBadge();
         }
 
         // ── FETCH LIVE SENSOR DATA ─────────────────────────────
@@ -982,6 +1108,7 @@
 
                 clearAPIError();
                 data.data.forEach(zone => renderZone(zone.node_code, zone));
+                updateStatsStrip(data.data);
 
                 const bar = document.getElementById('last-updated-bar');
                 if (bar) {
@@ -1001,9 +1128,9 @@
 
                 // Rebuild acknowledged state from DB — this is the source of truth
                 acknowledgedZones.clear();
-                // Clear maps to avoid stale IDs/status between polls
-                Object.keys(zoneEventIds).forEach(k => delete zoneEventIds[k]);
-                Object.keys(openEventStatusByZone).forEach(k => delete openEventStatusByZone[k]);
+                // NOTE: Do NOT clear zoneEventIds/openEventStatusByZone here — clearing them
+                // causes a race condition where acknowledgeAlert sees no eventId and falsely
+                // shows "already handled". Instead, update entries in-place below.
 
                 // Pick one active event per node. Prioritize "Detected" if both exist.
                 const latestPerNode = {};
@@ -1019,10 +1146,14 @@
                     }
                 });
 
+                // Track which node codes appeared in this poll so we can clear stale ones
+                const activeCodes = new Set();
+
                 Object.values(latestPerNode).forEach(event => {
                     if (!event?.node_code) return;
+                    activeCodes.add(event.node_code);
 
-                    // Store event ID for resolve button
+                    // Store event ID for resolve/acknowledge button
                     zoneEventIds[event.node_code] = event.id;
                     openEventStatusByZone[event.node_code] = event.event_status;
 
@@ -1039,6 +1170,14 @@
                     }
                 });
 
+                // Clear stale entries for zones no longer in open events
+                Object.keys(zoneEventIds).forEach(k => {
+                    if (!activeCodes.has(k)) {
+                        delete zoneEventIds[k];
+                        delete openEventStatusByZone[k];
+                    }
+                });
+
             } catch(err) {}
         }
 
@@ -1052,21 +1191,32 @@
             if (ackBtn) { ackBtn.disabled = true; ackBtn.textContent = 'Acknowledging…'; }
 
             try {
-                // Fallback refresh only if poll has not yet filled local event map
-                if (!eventId) {
-                    const eventsData = await apiFetch('/readings/open-events');
-                    if (eventsData?.success) {
-                        const match = eventsData.data.find(e => e.node_code === nodeCode);
-                        if (match?.id) {
-                            eventId = match.id;
+                // Always do a fresh fetch to get the latest event ID — this prevents the
+                // race condition where the polling loop cleared zoneEventIds just before the click
+                const eventsData = await apiFetch('/readings/open-events');
+                if (eventsData?.success && eventsData.data) {
+                    const match = eventsData.data.find(e => e.node_code === nodeCode);
+                    if (match?.id) {
+                        // If DB already shows Acknowledged, don't re-acknowledge — just update UI
+                        if (match.event_status === 'Acknowledged') {
+                            showNotification(`Alert for ${locationName} was already acknowledged.`, 'info', 2500);
                             zoneEventIds[nodeCode] = match.id;
-                            openEventStatusByZone[nodeCode] = match.event_status;
+                            openEventStatusByZone[nodeCode] = 'Acknowledged';
+                            acknowledgedZones.add(nodeCode);
+                            if (ackBtn) ackBtn.style.display = 'none';
+                            const resolveBtn = z.resolveBtn ? document.getElementById(z.resolveBtn) : null;
+                            if (resolveBtn) resolveBtn.style.display = 'block';
+                            setTimeout(() => { fetchLiveData(); fetchOpenEvents(); }, 500);
+                            return;
                         }
+                        eventId = match.id;
+                        zoneEventIds[nodeCode] = match.id;
+                        openEventStatusByZone[nodeCode] = match.event_status;
                     }
                 }
 
                 if (!eventId) {
-                    showNotification('This alert is already handled or syncing. Refreshing…', 'info', 1800);
+                    showNotification('No active alert found — it may have already been resolved. Refreshing…', 'info', 2500);
                     setTimeout(() => { fetchOpenEvents(); fetchLiveData(); }, 500);
                     if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = 'Acknowledge Alert'; }
                     return;
@@ -1159,14 +1309,27 @@
         async function resolveAlert(nodeCode, locationName) {
             const z = ZONES[nodeCode];
             const resolveBtn = z ? document.getElementById(z.resolveBtn) : null;
-            const eventId = zoneEventIds[nodeCode];
-
-            if (!eventId) {
-                showNotification('No event ID found. Refresh and try again.', 'error');
-                return;
-            }
+            let eventId = zoneEventIds[nodeCode];
 
             if (resolveBtn) { resolveBtn.disabled = true; resolveBtn.textContent = 'Resolving…'; }
+
+            // Fresh fetch to ensure we have the latest event ID
+            if (!eventId) {
+                try {
+                    const eventsData = await apiFetch('/readings/open-events');
+                    if (eventsData?.success && eventsData.data) {
+                        const match = eventsData.data.find(e => e.node_code === nodeCode);
+                        if (match?.id) { eventId = match.id; zoneEventIds[nodeCode] = match.id; }
+                    }
+                } catch(e) {}
+            }
+
+            if (!eventId) {
+                showNotification('No event ID found — alert may already be resolved. Refreshing…', 'info', 2500);
+                setTimeout(() => { fetchOpenEvents(); fetchLiveData(); }, 500);
+                if (resolveBtn) { resolveBtn.disabled = false; resolveBtn.textContent = 'Mark as Resolved'; }
+                return;
+            }
 
             try {
                 const result = await apiFetch(`/readings/resolve/${eventId}`, {
@@ -1237,6 +1400,7 @@
         }
 
         function playAlarmSound() {
+            if (soundMuted) return; // respect mute
             try {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 if (!AudioCtx) return;
