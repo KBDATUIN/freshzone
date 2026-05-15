@@ -83,6 +83,16 @@ router.post('/', verifyNodeHmac, async (req, res) => {
     const pm2_5  = hasPm25 ? Number(req.body.pm2_5) : null;
     const pm10   = hasPm10 ? Number(req.body.pm10)  : null;
 
+    // ── ESP32 spike-filtered detection result ────────────────────
+    // The ESP32 firmware runs an EMA baseline + spike threshold filter
+    // (SPIKE_THRESHOLD=25, CONFIRM_TIME=6000ms) before deciding if vape
+    // is truly present. We trust that result when it is provided so the
+    // server never false-triggers on slow ambient dust rises.
+    // If vape_detected is not sent (old firmware), fall back to the raw
+    // pm1_0 > 35 threshold so nothing breaks for other nodes.
+    const hasVapeFlag   = req.body.vape_detected !== undefined && req.body.vape_detected !== null && req.body.vape_detected !== '';
+    const vapeFlagValue = hasVapeFlag ? (req.body.vape_detected === true || req.body.vape_detected === 'true' || req.body.vape_detected === 1 || req.body.vape_detected === '1') : null;
+
     // --- Validation ---
     if (!node_code || typeof node_code !== 'string' || node_code.trim().length === 0) {
         logger.warn({ body: req.body }, 'Reading rejected: Missing node_code');
@@ -115,13 +125,17 @@ router.post('/', verifyNodeHmac, async (req, res) => {
 
         const node = nodes[0];
 
-        // ── ALL detection is based on PM1.0 only ─────────────────
-        // Thresholds match ESP32 firmware: PM1_TRIGGER=35, PM1_HEAVY=80
+        // ── Detection: trust ESP32 spike-filtered result ────────────
+        // The firmware runs EMA baseline + SPIKE_THRESHOLD=25 +
+        // CONFIRM_TIME=6000ms before setting vape_detected=true.
+        // We use that flag when present so the server never false-triggers
+        // on slow ambient dust.  Old nodes without the flag fall back to
+        // the raw pm1_0 > 35 threshold so nothing breaks.
         const { aqi, category } = calculatePM1Category(pm1_0);
-        const smokeDetected = pm1_0 > 35;   // matches Arduino PM1_TRIGGER = 35
-        // DB ENUM only has 'green'/'red' — store orange as 'red', frontend derives color from pm1_0
-        const ledColor    = pm1_0 > 35 ? 'red' : 'green';              // stored in DB
-        const ledColorSSE = pm1_0 > 80 ? 'red' : pm1_0 > 35 ? 'orange' : 'green';  // sent to dashboard
+        const smokeDetected = hasVapeFlag ? vapeFlagValue : (pm1_0 > 35);
+        // DB ENUM only has 'green'/'red' — frontend derives orange from pm1_0
+        const ledColor    = smokeDetected ? 'red' : 'green';
+        const ledColorSSE = smokeDetected ? (pm1_0 > 80 ? 'red' : 'orange') : 'green';
 
         // --- Save reading (pm2_5 / pm10 stored as null if not sent) ---
         const [result] = await db.query(
