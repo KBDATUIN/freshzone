@@ -326,9 +326,10 @@ router.get('/open-events', authMiddleware, async (req, res) => {
         const [rows] = await db.query(`
             SELECT
                 de.id, de.location_name,
-                de.pm2_5_value AS pm1_0_value,
+                de.pm2_5_value  AS pm1_0_value,
                 de.aqi_value, de.aqi_category, de.event_status,
                 de.detected_at, de.acknowledged_at,
+                de.acknowledged_by,
                 sn.node_code, sn.location_name AS sensor_location
             FROM detection_events de
             JOIN sensor_nodes sn ON sn.id = de.node_id
@@ -374,6 +375,14 @@ router.post('/acknowledge/:eventId', authMiddleware, async (req, res) => {
             [req.user.id, `Event #${eventId} acknowledged by user #${req.user.id}`, req.ip]
         );
 
+        // Broadcast SSE so all open tabs/browsers update instantly
+        broadcastSSE({
+            type:       'event_update',
+            event_id:   eventId,
+            event_status: 'Acknowledged',
+            acknowledged_by: req.user.id,
+        });
+
         res.json({ success: true, message: 'Alert acknowledged.', event_id: eventId });
     } catch (err) {
         logger.error({ err }, '[acknowledge] Error');
@@ -413,6 +422,14 @@ router.post('/resolve/:eventId', authMiddleware, async (req, res) => {
              VALUES (?, 'Alert Resolved', ?, ?)`,
             [req.user.id, `Event #${eventId} resolved by user #${req.user.id}`, req.ip]
         );
+
+        // Broadcast SSE so all open tabs/browsers update instantly
+        broadcastSSE({
+            type:       'event_update',
+            event_id:   eventId,
+            event_status: 'Cleared',
+            resolved_by: req.user.id,
+        });
 
         res.json({ success: true, message: 'Alert resolved.' });
     } catch (err) {
