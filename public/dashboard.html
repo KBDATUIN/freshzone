@@ -851,6 +851,7 @@
 
         // Track acknowledged zones — driven from DB event_status, not sessionStorage
         const acknowledgedZones = new Set();
+        const resolvedZones = new Set();
 
         // Track which zones currently have active alerts
         const activeAlerts = {};
@@ -914,7 +915,7 @@
                 if (resolveBtn) resolveBtn.style.display = 'block';
                 activeAlerts[zoneCode] = false;
 
-            } else if (openStatus === 'Detected' || (smoke && !acknowledgedZones.has(zoneCode))) {
+            } else if (openStatus === 'Detected' || (smoke && !acknowledgedZones.has(zoneCode) && !resolvedZones.has(zoneCode))) {
                 // Distinguish medium (orange, 36-80 µg/m³) from heavy (red, >80 µg/m³) — matches Arduino PM1_TRIGGER=35, PM1_HEAVY=80
                 const pm1Raw = parseFloat(data.pm1_0 || 0);
                 const isHeavy = pm1Raw > 80;
@@ -942,9 +943,23 @@
                 const monitorLink = document.querySelector('#fz-bottom-nav a[href="dashboard.html"]');
                 if (monitorLink) monitorLink.classList.add('has-alert');
 
+            } else if (resolvedZones.has(zoneCode)) {
+                // Resolved by human but ESP32 still sending smoke -- show Resolved not alert
+                card.className = 'location-card clear';
+                dot.className  = 'status-dot dot-clear';
+                statusText.innerHTML = '<svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Resolved';
+                statusText.style.color = 'var(--success)';
+                aqiBadge.className = 'pm1-display pm1-clear';
+                const pm1ValRes = document.getElementById('pm1-val-' + zoneCode.replace('ESP32-', '').toLowerCase());
+                if (pm1ValRes) pm1ValRes.textContent = parseFloat(data.pm1_0 || 0).toFixed(1);
+                if (ackBtn) ackBtn.style.display = 'none';
+                if (resolveBtn) resolveBtn.style.display = 'none';
+                activeAlerts[zoneCode] = false;
+
             } else {
                 // Sensor is genuinely clear
                 acknowledgedZones.delete(zoneCode);
+                resolvedZones.delete(zoneCode);
                 alarmShownFor.delete(zoneCode); // reset so next real detection triggers again
                 card.className = 'location-card clear';
                 dot.className  = 'status-dot dot-clear';
@@ -1215,6 +1230,7 @@
 
                     // Remove from all local state — DB is now Cleared
                     acknowledgedZones.delete(nodeCode);
+                    resolvedZones.add(nodeCode);
                     delete zoneEventIds[nodeCode];
                     delete openEventStatusByZone[nodeCode];
                     alarmShownFor.delete(nodeCode);
@@ -1375,6 +1391,7 @@
                                 if (eid === msg.event_id) {
                                     delete openEventStatusByZone[zc];
                                     acknowledgedZones.delete(zc);
+                                    resolvedZones.add(zc);
                                     delete zoneEventIds[zc];
                                     alarmShownFor.delete(zc);
                                     activeAlerts[zc] = false;
