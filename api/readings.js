@@ -24,12 +24,15 @@ function broadcastSSE(data) {
 }
 
 // ── PM1.0 AQI Calculator ─────────────────────────────────────
-// FreshZone uses PM1.0 thresholds (ultra-fine aerosol / vape detection)
+// FreshZone uses PM1.0 thresholds aligned with ESP32 firmware:
+//   PM1_NORMAL_MAX = 20  → "Good"     (clean air / fan airflow)
+//   PM1_MEDIUM_MAX = 50  → "Moderate" (vape aerosol detected)
+//   > 50             → "Unhealthy" and above (heavy vape cloud)
 function calculatePM1Category(pm1) {
-    if (pm1 <= 12)  return { aqi: Math.round((50  / 12)   * pm1),        category: 'Good' };
-    if (pm1 <= 35)  return { aqi: Math.round(((100-51)/(35-12.1)) * (pm1-12.1) + 51), category: 'Moderate' };
-    if (pm1 <= 55)  return { aqi: Math.round(((150-101)/(55-35.5)) * (pm1-35.5) + 101), category: 'Unhealthy for Sensitive Groups' };
-    if (pm1 <= 150) return { aqi: Math.round(((200-151)/(150-55.5)) * (pm1-55.5) + 151), category: 'Unhealthy' };
+    if (pm1 <= 20)  return { aqi: Math.round((50  / 20)   * pm1),                        category: 'Good' };
+    if (pm1 <= 50)  return { aqi: Math.round(((100-51)/(50-20.1)) * (pm1-20.1) + 51),   category: 'Moderate' };
+    if (pm1 <= 75)  return { aqi: Math.round(((150-101)/(75-50.5)) * (pm1-50.5) + 101), category: 'Unhealthy for Sensitive Groups' };
+    if (pm1 <= 150) return { aqi: Math.round(((200-151)/(150-75.5)) * (pm1-75.5) + 151), category: 'Unhealthy' };
     if (pm1 <= 250) return { aqi: Math.round(((300-201)/(250-150.5)) * (pm1-150.5) + 201), category: 'Very Unhealthy' };
     return { aqi: Math.min(500, Math.round(((500-301)/(500.4-250.5)) * (pm1-250.5) + 301)), category: 'Hazardous' };
 }
@@ -113,9 +116,10 @@ router.post('/', verifyNodeHmac, async (req, res) => {
         const node = nodes[0];
 
         // ── ALL detection is based on PM1.0 only ─────────────────
+        // Thresholds match ESP32 firmware: PM1_NORMAL_MAX=20, PM1_MEDIUM_MAX=50
         const { aqi, category } = calculatePM1Category(pm1_0);
-        const smokeDetected = pm1_0 > 12;
-        const ledColor = smokeDetected ? 'red' : 'green';
+        const smokeDetected = pm1_0 > 20;   // was 12 — raised to match ESP32 PM1_NORMAL_MAX
+        const ledColor = pm1_0 > 50 ? 'red' : pm1_0 > 20 ? 'orange' : 'green';
 
         // --- Save reading (pm2_5 / pm10 stored as null if not sent) ---
         const [result] = await db.query(
@@ -152,7 +156,7 @@ router.post('/', verifyNodeHmac, async (req, res) => {
 
                 if (lastCleared.length) {
                     // Allow new alert only if there has been at least one clean
-                    // PM1.0 reading (pm1_0 <= 12) since the last resolved event.
+                    // PM1.0 reading (pm1_0 <= 20) since the last resolved event.
                     const [cleanReadings] = await db.query(
                         `SELECT id FROM sensor_readings
                          WHERE node_id = ? AND smoke_detected = 0

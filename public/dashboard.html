@@ -95,6 +95,19 @@
         [data-theme="dark"] .location-card.detecting { background: rgba(220,53,69,0.1) !important; }
         [data-theme="dark"] .location-card.offline { opacity: 0.5; }
 
+        /* MEDIUM / ORANGE state (PM1.0 21-50 ug/m3) */
+        .location-card.detecting-medium {
+            background: #fff8f0 !important;
+            border-left-color: #e67e22 !important;
+            animation: cardPulseOrange 2s ease-in-out infinite;
+        }
+        @keyframes cardPulseOrange {
+            0%,100% { box-shadow: 0 0 0 0 rgba(230,126,34,0.2); }
+            50%      { box-shadow: 0 0 0 10px rgba(230,126,34,0); }
+        }
+        [data-theme="dark"] .location-card.detecting-medium { background: rgba(230,126,34,0.1) !important; }
+        .dot-detecting-medium { background:#e67e22; box-shadow:0 0 6px #e67e22; animation:dotBlink 1s ease-in-out infinite; }
+
         /* ── STATUS DOT ───────────────────────────────────── */
         .status-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
         .dot-clear    { background:#22c55e; box-shadow:0 0 6px #22c55e; }
@@ -712,7 +725,7 @@
             <div class="aq-guide-grid">
                 <article class="aq-card">
                     <h4>What the PM1.0 number means</h4>
-                    <p>The number shown on each card is the current PM1.0 concentration in µg/m³. Normal campus air reads 2–8. A reading above 12 means something is present. Above 35 is a confirmed heavy detection.</p>
+                    <p>The number shown on each card is the current PM1.0 concentration in µg/m³. Normal campus air reads 2–8. A reading above 20 means aerosol is present. Above 50 is a confirmed heavy detection.</p>
                 </article>
                 <article class="aq-card">
                     <h4>Sensor offline status</h4>
@@ -899,11 +912,15 @@
                 activeAlerts[zoneCode] = false;
 
             } else if (openStatus === 'Detected' || (smoke && !acknowledgedZones.has(zoneCode))) {
-                card.className = 'location-card detecting';
-                dot.className  = 'status-dot dot-detecting';
+                // Distinguish medium (orange, 20-50 µg/m³) from heavy (red, >50 µg/m³)
+                const pm1Raw = parseFloat(data.pm1_0 || 0);
+                const isHeavy = pm1Raw > 50;
+                card.className = isHeavy ? 'location-card detecting' : 'location-card detecting detecting-medium';
+                dot.className  = isHeavy ? 'status-dot dot-detecting' : 'status-dot dot-detecting-medium';
                 statusText.innerHTML = '<strong><svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> VAPE AEROSOL DETECTED</strong>';
-                statusText.style.color = 'var(--danger)';
-                aqiBadge.className = 'pm1-display pm1-alert'; aqiBadge.querySelector && (aqiBadge.querySelector('.pm1-value') ? aqiBadge.querySelector('.pm1-value').textContent = parseFloat(data.pm1_0||0).toFixed(1) : null);
+                statusText.style.color = isHeavy ? 'var(--danger)' : '#e67e22';
+                aqiBadge.className = isHeavy ? 'pm1-display pm1-alert' : 'pm1-display pm1-warn';
+                aqiBadge.querySelector && (aqiBadge.querySelector('.pm1-value') ? aqiBadge.querySelector('.pm1-value').textContent = pm1Raw.toFixed(1) : null);
                 /* pm1 value updated via querySelector above */
 
                 // Show acknowledge button for admin only
