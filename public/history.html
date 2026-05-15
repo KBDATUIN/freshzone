@@ -607,7 +607,7 @@
                     allRecords = [];
                 }
                 renderTable();
-                loadStats();
+                await loadStats();
             } catch(err) {
                 showNotification('Failed to load history.', 'error');
             }
@@ -628,12 +628,17 @@
 
         function setHistoryStats(stats = {}) {
             const fallback = computeHistoryStats();
-            let today    = Number.isFinite(stats.today)    ? stats.today    : fallback.today;
-            let total    = Number.isFinite(stats.total)    ? stats.total    : fallback.total;
-            let resolved = Number.isFinite(stats.resolved) ? stats.resolved : fallback.resolved;
-            if (fallback.total > 0 && total === 0) total = fallback.total;
-            if (fallback.resolved > 0 && resolved === 0) resolved = fallback.resolved;
-            if (fallback.today > 0 && today === 0) today = fallback.today;
+            // Use Number() coercion so MySQL string counts (e.g. "1") are handled correctly
+            const apiToday    = Number(stats.today);
+            const apiTotal    = Number(stats.total);
+            const apiResolved = Number(stats.resolved);
+            let today    = Number.isFinite(apiToday)    ? apiToday    : fallback.today;
+            let total    = Number.isFinite(apiTotal)    ? apiTotal    : fallback.total;
+            let resolved = Number.isFinite(apiResolved) ? apiResolved : fallback.resolved;
+            // Always prefer the larger of API vs fallback to avoid showing 0 when records exist
+            if (fallback.total    > total)    total    = fallback.total;
+            if (fallback.resolved > resolved) resolved = fallback.resolved;
+            if (fallback.today    > today)    today    = fallback.today;
             setStatAnimated('stat-today', today);
             setStatAnimated('stat-total', total);
             setStatAnimated('stat-resolved', resolved);

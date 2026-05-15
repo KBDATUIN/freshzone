@@ -119,6 +119,8 @@ router.post('/', verifyNodeHmac, async (req, res) => {
         // Thresholds match ESP32 firmware: PM1_NORMAL_MAX=20, PM1_MEDIUM_MAX=50
         const { aqi, category } = calculatePM1Category(pm1_0);
         const smokeDetected = pm1_0 > 20;   // was 12 — raised to match ESP32 PM1_NORMAL_MAX
+        // NOTE: DB led_color column must be ENUM('green','orange','red')
+        // Run migrate_led_color.sql on your Railway DB before deploying this file.
         const ledColor = pm1_0 > 50 ? 'red' : pm1_0 > 20 ? 'orange' : 'green';
 
         // --- Save reading (pm2_5 / pm10 stored as null if not sent) ---

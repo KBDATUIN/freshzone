@@ -145,9 +145,9 @@ router.get('/stats', authMiddleware, async (req, res) => {
         res.json({
             success: true,
             stats: {
-                today:    todayRow.count,
-                total:    totalRow.count,
-                resolved: resolvedRow.count,
+                today:    Number(todayRow.count),
+                total:    Number(totalRow.count),
+                resolved: Number(resolvedRow.count),
             }
         });
     } catch (err) {
