@@ -121,7 +121,9 @@ router.post('/', verifyNodeHmac, async (req, res) => {
         const smokeDetected = pm1_0 > 20;   // was 12 — raised to match ESP32 PM1_NORMAL_MAX
         // NOTE: DB led_color column must be ENUM('green','orange','red')
         // Run migrate_led_color.sql on your Railway DB before deploying this file.
-        const ledColor = pm1_0 > 50 ? 'red' : pm1_0 > 20 ? 'orange' : 'green';
+        // DB ENUM only has 'green'/'red' — store orange as 'red', frontend derives color from pm1_0
+        const ledColor    = pm1_0 > 20 ? 'red' : 'green';   // stored in DB
+        const ledColorSSE = pm1_0 > 50 ? 'red' : pm1_0 > 20 ? 'orange' : 'green';  // sent to dashboard
 
         // --- Save reading (pm2_5 / pm10 stored as null if not sent) ---
         const [result] = await db.query(
@@ -238,7 +240,7 @@ router.post('/', verifyNodeHmac, async (req, res) => {
             aqi,
             category,
             smoke_detected: smokeDetected,
-            led_color: ledColor
+            led_color: ledColorSSE
         });
 
         // Push latest reading to all connected SSE clients (PM1.0 only in payload)
@@ -249,7 +251,7 @@ router.post('/', verifyNodeHmac, async (req, res) => {
             aqi_value:      aqi,
             aqi_category:   category,
             smoke_detected: smokeDetected,
-            led_color:      ledColor,
+            led_color:      ledColorSSE,
             recorded_at:    new Date().toISOString(),
             node_active:    1,
         });
