@@ -365,7 +365,7 @@ router.post('/acknowledge/:eventId', authMiddleware, async (req, res) => {
             return res.json({ success: true, message: 'Already resolved.' });
         }
 
-        // Already acknowledged — return success with the eventId so frontend can show resolve btn
+        // Already acknowledged — broadcast SSE and return event_id so frontend shows resolve btn
         if (existing[0].event_status === 'Acknowledged') {
             broadcastSSE({ type: 'event_update', event_id: eventId, event_status: 'Acknowledged', acknowledged_by: req.user.id });
             return res.json({ success: true, message: 'Already acknowledged.', event_id: eventId });
@@ -373,17 +373,26 @@ router.post('/acknowledge/:eventId', authMiddleware, async (req, res) => {
 
         const [updated] = await db.query(
             `UPDATE detection_events
-             SET event_status = 'Acknowledged',
+             SET event_status    = 'Acknowledged',
                  acknowledged_at = NOW(),
                  acknowledged_by = ?,
-                 notes = COALESCE(?, notes)
+                 notes           = COALESCE(?, notes)
              WHERE id = ? AND event_status = 'Detected'`,
             [req.user.id, notes || null, eventId]
         );
 
         if (updated.affectedRows === 0) {
-            return res.json({ success: true, message: 'Already acknowledged or resolved.', event_id: eventId });
+            // Race condition: another tab already acknowledged it — treat as success
+            return res.json({ success: true, message: 'Already acknowledged.', event_id: eventId });
         }
+
+        const [eventRow] = await db.query(
+            `SELECT de.id, sn.node_code FROM detection_events de
+             JOIN sensor_nodes sn ON sn.id = de.node_id
+             WHERE de.id = ?`,
+            [eventId]
+        );
+        const nodeCodeForSSE = eventRow.length ? eventRow[0].node_code : null;
 
         await db.query(
             `INSERT INTO system_logs (account_id, action, description, ip_address)
@@ -393,9 +402,10 @@ router.post('/acknowledge/:eventId', authMiddleware, async (req, res) => {
 
         // Broadcast SSE so all open tabs/browsers update instantly
         broadcastSSE({
-            type:       'event_update',
-            event_id:   eventId,
-            event_status: 'Acknowledged',
+            type:            'event_update',
+            event_id:        eventId,
+            node_code:       nodeCodeForSSE,
+            event_status:    'Acknowledged',
             acknowledged_by: req.user.id,
         });
 
@@ -433,6 +443,14 @@ router.post('/resolve/:eventId', authMiddleware, async (req, res) => {
             return res.json({ success: true, message: 'Already resolved.' });
         }
 
+        const [resolvedEventRow] = await db.query(
+            `SELECT de.id, sn.node_code FROM detection_events de
+             JOIN sensor_nodes sn ON sn.id = de.node_id
+             WHERE de.id = ?`,
+            [eventId]
+        );
+        const nodeCodeForResolveSSE = resolvedEventRow.length ? resolvedEventRow[0].node_code : null;
+
         await db.query(
             `INSERT INTO system_logs (account_id, action, description, ip_address)
              VALUES (?, 'Alert Resolved', ?, ?)`,
@@ -441,10 +459,11 @@ router.post('/resolve/:eventId', authMiddleware, async (req, res) => {
 
         // Broadcast SSE so all open tabs/browsers update instantly
         broadcastSSE({
-            type:       'event_update',
-            event_id:   eventId,
+            type:         'event_update',
+            event_id:     eventId,
+            node_code:    nodeCodeForResolveSSE,
             event_status: 'Cleared',
-            resolved_by: req.user.id,
+            resolved_by:  req.user.id,
         });
 
         res.json({ success: true, message: 'Alert resolved.' });

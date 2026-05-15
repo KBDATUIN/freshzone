@@ -1036,15 +1036,19 @@
                     }
                 });
 
-                // Remove zones from local maps that DB no longer has open
-                // BUT do NOT remove zones we just acknowledged locally (they may still be
-                // in-flight to DB — keep local Acknowledged state for up to one poll cycle)
+                // Remove zones from local maps that DB no longer has open,
+                // BUT protect zones that we locally set to Acknowledged — the DB write
+                // may still be in-flight.  Only clear a locally-acknowledged zone if
+                // DB explicitly confirms it is Cleared (not present = resolved).
                 for (const zc of Object.keys(openEventStatusByZone)) {
                     if (!dbPerNode[zc]) {
-                        // DB says nothing open for this zone — clear it
-                        delete openEventStatusByZone[zc];
-                        delete zoneEventIds[zc];
-                        acknowledgedZones.delete(zc);
+                        // DB says nothing open: safe to clear ONLY if we didn't just ACK locally
+                        if (openEventStatusByZone[zc] !== 'Acknowledged' || !acknowledgedZones.has(zc)) {
+                            delete openEventStatusByZone[zc];
+                            delete zoneEventIds[zc];
+                            acknowledgedZones.delete(zc);
+                        }
+                        // else: keep the locally-set Acknowledged state until DB confirms
                     }
                 }
 
@@ -1056,7 +1060,11 @@
                     if (event.event_status === 'Acknowledged') {
                         acknowledgedZones.add(event.node_code);
                     } else {
-                        acknowledgedZones.delete(event.node_code);
+                        // DB still says Detected — only clear local ACK if we haven't
+                        // received a successful ACK response for this zone yet
+                        if (!acknowledgedZones.has(event.node_code)) {
+                            acknowledgedZones.delete(event.node_code);
+                        }
                     }
 
                     // Show staff modal for brand-new Detected events only
@@ -1210,10 +1218,28 @@
         async function resolveAlert(nodeCode, locationName) {
             const z = ZONES[nodeCode];
             const resolveBtn = z ? document.getElementById(z.resolveBtn) : null;
-            const eventId = zoneEventIds[nodeCode];
+            let eventId = zoneEventIds[nodeCode];
 
             if (!eventId) {
-                showNotification('No event ID found. Refresh and try again.', 'error');
+                // zoneEventIds may be stale — fetch fresh before giving up
+                if (resolveBtn) { resolveBtn.disabled = true; resolveBtn.textContent = 'Resolving…'; }
+                try {
+                    const fresh = await apiFetch('/readings/open-events');
+                    if (fresh?.success) {
+                        fresh.data.forEach(e => {
+                            if (!e.node_code) return;
+                            zoneEventIds[e.node_code] = e.id;
+                            openEventStatusByZone[e.node_code] = e.event_status;
+                        });
+                        eventId = zoneEventIds[nodeCode];
+                    }
+                } catch(_) {}
+            }
+
+            if (!eventId) {
+                showNotification('No open event found for this zone. It may already be resolved.', 'info', 3000);
+                if (resolveBtn) { resolveBtn.disabled = false; resolveBtn.textContent = 'Mark as Resolved'; }
+                await fetchOpenEvents();
                 return;
             }
 
@@ -1377,28 +1403,40 @@
                     // Event status change (acknowledge or resolve from any user/tab)
                     if (msg.type === 'event_update') {
                         if (msg.event_status === 'Acknowledged') {
-                            for (const [zc, eid] of Object.entries(zoneEventIds)) {
-                                if (eid === msg.event_id) {
-                                    openEventStatusByZone[zc] = 'Acknowledged';
-                                    acknowledgedZones.add(zc);
-                                    // Immediately re-render with cached data
-                                    const cached = lastLiveDataByZone[zc];
-                                    if (cached) renderZone(zc, cached);
-                                }
+                            // Prefer node_code from payload (new server); fall back to zoneEventIds scan
+                            const affectedZones = new Set();
+                            if (msg.node_code && ZONES[msg.node_code]) {
+                                affectedZones.add(msg.node_code);
                             }
+                            for (const [zc, eid] of Object.entries(zoneEventIds)) {
+                                if (eid === msg.event_id) affectedZones.add(zc);
+                            }
+                            affectedZones.forEach(zc => {
+                                openEventStatusByZone[zc] = 'Acknowledged';
+                                acknowledgedZones.add(zc);
+                                // Ensure eventId is stored so resolve button works
+                                if (msg.event_id) zoneEventIds[zc] = msg.event_id;
+                                const cached = lastLiveDataByZone[zc];
+                                if (cached) renderZone(zc, cached);
+                            });
                         } else if (msg.event_status === 'Cleared') {
-                            for (const [zc, eid] of Object.entries(zoneEventIds)) {
-                                if (eid === msg.event_id) {
-                                    delete openEventStatusByZone[zc];
-                                    acknowledgedZones.delete(zc);
-                                    resolvedZones.add(zc);
-                                    delete zoneEventIds[zc];
-                                    alarmShownFor.delete(zc);
-                                    activeAlerts[zc] = false;
-                                    const cached = lastLiveDataByZone[zc];
-                                    if (cached) renderZone(zc, cached);
-                                }
+                            const affectedZones = new Set();
+                            if (msg.node_code && ZONES[msg.node_code]) {
+                                affectedZones.add(msg.node_code);
                             }
+                            for (const [zc, eid] of Object.entries(zoneEventIds)) {
+                                if (eid === msg.event_id) affectedZones.add(zc);
+                            }
+                            affectedZones.forEach(zc => {
+                                delete openEventStatusByZone[zc];
+                                acknowledgedZones.delete(zc);
+                                resolvedZones.add(zc);
+                                delete zoneEventIds[zc];
+                                alarmShownFor.delete(zc);
+                                activeAlerts[zc] = false;
+                                const cached = lastLiveDataByZone[zc];
+                                if (cached) renderZone(zc, cached);
+                            });
                         }
                         fetchOpenEvents();
                         fetchLiveData();

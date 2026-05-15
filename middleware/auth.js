@@ -7,13 +7,16 @@ function authMiddleware(req, res, next) {
     const authHeader = req.headers['authorization'];
     const bearerToken = authHeader && authHeader.split(' ')[1];
     const cookieToken = req.cookies?.fz_token;
-    const token = cookieToken || bearerToken;
+    // EventSource (SSE) cannot send headers — allow token via query string as fallback
+    const queryToken  = req.query?.token || null;
+    const token = cookieToken || bearerToken || queryToken;
 
     if (!token) {
         return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });
     }
 
-    if (process.env.NODE_ENV === 'production' && !cookieToken && bearerToken) {
+    // In production, cookie is preferred but query-token is allowed for SSE streams
+    if (process.env.NODE_ENV === 'production' && !cookieToken && bearerToken && !queryToken) {
         return res.status(401).json({ success: false, message: 'Token must be sent via cookie in production.' });
     }
 
