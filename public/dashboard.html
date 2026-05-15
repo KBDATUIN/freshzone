@@ -975,6 +975,10 @@
             ts.textContent = 'Last reading: ' + recordedAt;
         }
 
+        // Cache the latest live reading per zone so acknowledge/resolve can
+        // immediately re-render without waiting for the next poll
+        const lastLiveDataByZone = {};
+
         // ── FETCH LIVE SENSOR DATA ─────────────────────────────
         async function fetchLiveData() {
             try {
@@ -985,7 +989,10 @@
                 }
 
                 clearAPIError();
-                data.data.forEach(zone => renderZone(zone.node_code, zone));
+                data.data.forEach(zone => {
+                    lastLiveDataByZone[zone.node_code] = zone;  // cache for instant re-render
+                    renderZone(zone.node_code, zone);
+                });
 
                 const bar = document.getElementById('last-updated-bar');
                 if (bar) {
@@ -1003,36 +1010,38 @@
                 const data = await apiFetch('/readings/open-events');
                 if (!data || !data.success) return;
 
-                // Rebuild acknowledged state from DB — this is the source of truth
-                acknowledgedZones.clear();
-                // Clear maps to avoid stale IDs/status between polls
-                Object.keys(zoneEventIds).forEach(k => delete zoneEventIds[k]);
-                Object.keys(openEventStatusByZone).forEach(k => delete openEventStatusByZone[k]);
-
-                // Pick one active event per node. Prioritize "Detected" if both exist.
-                const latestPerNode = {};
+                // Build a fresh picture of what DB says is open right now
+                const dbPerNode = {};
                 data.data.forEach(event => {
                     if (!event.node_code) return;
-                    const current = latestPerNode[event.node_code];
-                    if (!current) {
-                        latestPerNode[event.node_code] = event;
-                        return;
-                    }
-                    if (current.event_status !== 'Detected' && event.event_status === 'Detected') {
-                        latestPerNode[event.node_code] = event;
+                    const cur = dbPerNode[event.node_code];
+                    // Prioritize Detected over Acknowledged when multiple rows exist
+                    if (!cur || (cur.event_status !== 'Detected' && event.event_status === 'Detected')) {
+                        dbPerNode[event.node_code] = event;
                     }
                 });
 
-                Object.values(latestPerNode).forEach(event => {
-                    if (!event?.node_code) return;
+                // Remove zones from local maps that DB no longer has open
+                // BUT do NOT remove zones we just acknowledged locally (they may still be
+                // in-flight to DB — keep local Acknowledged state for up to one poll cycle)
+                for (const zc of Object.keys(openEventStatusByZone)) {
+                    if (!dbPerNode[zc]) {
+                        // DB says nothing open for this zone — clear it
+                        delete openEventStatusByZone[zc];
+                        delete zoneEventIds[zc];
+                        acknowledgedZones.delete(zc);
+                    }
+                }
 
-                    // Store event ID for resolve button
+                // Merge DB state in — DB is always authoritative when it responds
+                Object.values(dbPerNode).forEach(event => {
                     zoneEventIds[event.node_code] = event.id;
                     openEventStatusByZone[event.node_code] = event.event_status;
 
-                    // If DB says Acknowledged, mark zone locally so renderZone shows resolve btn
                     if (event.event_status === 'Acknowledged') {
                         acknowledgedZones.add(event.node_code);
+                    } else {
+                        acknowledgedZones.delete(event.node_code);
                     }
 
                     // Show staff modal for brand-new Detected events only
@@ -1056,7 +1065,7 @@
             if (ackBtn) { ackBtn.disabled = true; ackBtn.textContent = 'Acknowledging…'; }
 
             try {
-                // Fallback refresh only if poll has not yet filled local event map
+                // If local map doesn't have the event ID yet, fetch it now
                 if (!eventId) {
                     const eventsData = await apiFetch('/readings/open-events');
                     if (eventsData?.success) {
@@ -1070,8 +1079,9 @@
                 }
 
                 if (!eventId) {
-                    showNotification('This alert is already handled or syncing. Refreshing…', 'info', 1800);
-                    setTimeout(async () => { await fetchOpenEvents(); await fetchLiveData(); }, 500);
+                    showNotification('Alert already handled or still syncing. Refreshing…', 'info', 1800);
+                    await fetchOpenEvents();
+                    await fetchLiveData();
                     if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = 'Acknowledge Alert'; }
                     return;
                 }
@@ -1082,40 +1092,44 @@
                 });
 
                 if (result && result.success) {
-                    showNotification(`Alert acknowledged for ${locationName}. Staff notified.`, 'success');
-
-                    // Update local state immediately (DB will confirm on next fetchOpenEvents poll)
+                    // ── Update local state IMMEDIATELY ───────────────
                     acknowledgedZones.add(nodeCode);
                     openEventStatusByZone[nodeCode] = 'Acknowledged';
                     zoneEventIds[nodeCode] = eventId;
 
-                    // Update card immediately — show resolve button
-                    if (z) {
-                        const card = document.getElementById(z.card);
-                        const dot = document.getElementById(z.dot);
-                        const statusText = document.getElementById(z.statusText);
-                        const resolveBtn = z.resolveBtn ? document.getElementById(z.resolveBtn) : null;
-                        if (card) card.className = 'location-card clear';
-                        if (dot) dot.className = 'status-dot dot-clear';
-                        if (statusText) {
-                            statusText.innerHTML = '<svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acknowledged — Awaiting Resolution';
-                            statusText.style.color = '#f39c12';
+                    // ── Re-render the card RIGHT NOW using cached live data ──
+                    // This makes the card switch to Acknowledged state instantly
+                    // without waiting for the next 5-second poll cycle.
+                    const cachedData = lastLiveDataByZone[nodeCode];
+                    if (cachedData) {
+                        renderZone(nodeCode, cachedData);
+                    } else {
+                        // No cached data yet — do a minimal direct DOM update
+                        if (z) {
+                            const card       = document.getElementById(z.card);
+                            const dot        = document.getElementById(z.dot);
+                            const statusText = document.getElementById(z.statusText);
+                            const resolveBtn = z.resolveBtn ? document.getElementById(z.resolveBtn) : null;
+                            const aqiBadgeEl = document.getElementById(z.aqi);
+                            if (card) card.className = 'location-card clear';
+                            if (dot) dot.className = 'status-dot dot-clear';
+                            if (statusText) {
+                                statusText.innerHTML = '<svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Acknowledged — Awaiting Resolution';
+                                statusText.style.color = '#f39c12';
+                            }
+                            if (aqiBadgeEl) aqiBadgeEl.className = 'pm1-display pm1-warn';
+                            if (ackBtn) ackBtn.style.display = 'none';
+                            if (resolveBtn) resolveBtn.style.display = 'block';
                         }
-                        // Bug 4 fix: update the pm1 badge class AND value immediately
-                        const aqiBadgeAck = document.getElementById(z.aqi);
-                        if (aqiBadgeAck) aqiBadgeAck.className = 'pm1-display pm1-warn';
-                        const pm1ValAck = document.getElementById('pm1-val-' + nodeCode.replace('ESP32-', '').toLowerCase());
-                        if (pm1ValAck && pm1ValAck.textContent === '—') {
-                            // leave as-is if we don't have a value yet
-                        }
-                        if (ackBtn) ackBtn.style.display = 'none';
-                        if (resolveBtn) resolveBtn.style.display = 'block';
                     }
 
-                    // Refresh after short delay — fetchOpenEvents first so renderZone has fresh state
+                    showNotification(`Alert acknowledged for ${locationName}. Staff notified.`, 'success');
+
+                    // Background sync to confirm DB state — doesn't affect the card display
                     setTimeout(async () => { await fetchOpenEvents(); await fetchLiveData(); }, 1500);
+
                 } else {
-                    showNotification('Failed to acknowledge. Try again.', 'error');
+                    showNotification(result?.message || 'Failed to acknowledge. Try again.', 'error');
                     if (ackBtn) { ackBtn.disabled = false; ackBtn.textContent = 'Acknowledge Alert'; }
                 }
             } catch(err) {
@@ -1152,7 +1166,15 @@
                         body: JSON.stringify({ notes: `Staff responded: ${user.full_name || user.name}` })
                     });
                     if (result && result.success) {
-                        // fetchOpenEvents first so renderZone gets correct Acknowledged state
+                        // Find which zone owns this event ID and update immediately
+                        for (const [zc, eid] of Object.entries(zoneEventIds)) {
+                            if (eid === currentStaffEventId) {
+                                openEventStatusByZone[zc] = 'Acknowledged';
+                                acknowledgedZones.add(zc);
+                                const cached = lastLiveDataByZone[zc];
+                                if (cached) renderZone(zc, cached);
+                            }
+                        }
                         setTimeout(async () => { await fetchOpenEvents(); await fetchLiveData(); }, 1000);
                     }
                 } catch(err) {
@@ -1192,28 +1214,29 @@
                     acknowledgedZones.delete(nodeCode);
                     delete zoneEventIds[nodeCode];
                     delete openEventStatusByZone[nodeCode];
-                    // Bug 7 fix: clear alarmShownFor so if sensor re-triggers a genuine
-                    // new event, the alarm overlay appears again
                     alarmShownFor.delete(nodeCode);
                     activeAlerts[nodeCode] = false;
 
-                    // Update card to clear immediately
-                    if (z) {
-                        const card = document.getElementById(z.card);
-                        const dot = document.getElementById(z.dot);
-                        const statusText = document.getElementById(z.statusText);
-                        if (card) card.className = 'location-card clear';
-                        if (dot) dot.className = 'status-dot dot-clear';
-                        if (statusText) {
-                            statusText.innerHTML = '<svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Resolved';
-                            statusText.style.color = 'var(--success)';
+                    // Immediately re-render with cached data so card shows Resolved instantly
+                    const cachedResolved = lastLiveDataByZone[nodeCode];
+                    if (cachedResolved) {
+                        renderZone(nodeCode, cachedResolved);
+                    } else {
+                        if (z) {
+                            const card = document.getElementById(z.card);
+                            const dot = document.getElementById(z.dot);
+                            const statusText = document.getElementById(z.statusText);
+                            if (card) card.className = 'location-card clear';
+                            if (dot) dot.className = 'status-dot dot-clear';
+                            if (statusText) {
+                                statusText.innerHTML = '<svg class="sm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Resolved';
+                                statusText.style.color = 'var(--success)';
+                            }
+                            if (resolveBtn) resolveBtn.style.display = 'none';
                         }
-                        if (resolveBtn) resolveBtn.style.display = 'none';
                     }
 
-                    // Bug 5 fix: fetchOpenEvents first so openEventStatusByZone is up-to-date
-                    // before fetchLiveData triggers renderZone — prevents smoke=true from
-                    // re-flipping card back to "Detected" when ESP32 hasn't latched off yet.
+                    // Background sync — fetchOpenEvents first, then fetchLiveData
                     setTimeout(async () => { await fetchOpenEvents(); await fetchLiveData(); }, 1500);
                 } else {
                     showNotification(result?.message || 'Failed to resolve. Try again.', 'error');
@@ -1322,22 +1345,25 @@
                     let msg;
                     try { msg = JSON.parse(e.data); } catch(_) { return; }
 
-                    // Sensor reading update — re-render immediately
+                    // Sensor reading update — cache it and re-render immediately.
+                    // renderZone reads openEventStatusByZone itself, so acknowledged
+                    // cards won't flip back even if smoke_detected is still true.
                     if (msg.node_code) {
-                        openEventStatusByZone[msg.node_code] = openEventStatusByZone[msg.node_code] || null;
+                        lastLiveDataByZone[msg.node_code] = msg;
                         renderZone(msg.node_code, msg);
                         return;
                     }
 
                     // Event status change (acknowledge or resolve from any user/tab)
                     if (msg.type === 'event_update') {
-                        // Sync local state maps then re-render affected zone
                         if (msg.event_status === 'Acknowledged') {
-                            // Find which zone owns this event_id
                             for (const [zc, eid] of Object.entries(zoneEventIds)) {
                                 if (eid === msg.event_id) {
                                     openEventStatusByZone[zc] = 'Acknowledged';
                                     acknowledgedZones.add(zc);
+                                    // Immediately re-render with cached data
+                                    const cached = lastLiveDataByZone[zc];
+                                    if (cached) renderZone(zc, cached);
                                 }
                             }
                         } else if (msg.event_status === 'Cleared') {
@@ -1348,10 +1374,12 @@
                                     delete zoneEventIds[zc];
                                     alarmShownFor.delete(zc);
                                     activeAlerts[zc] = false;
+                                    const cached = lastLiveDataByZone[zc];
+                                    if (cached) renderZone(zc, cached);
                                 }
                             }
                         }
-                        // Full re-sync from DB to pick up any missed state
+                        // Background sync to confirm full DB state
                         await fetchOpenEvents();
                         await fetchLiveData();
                     }
