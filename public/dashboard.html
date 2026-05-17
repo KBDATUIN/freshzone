@@ -1059,9 +1059,14 @@
 
                     if (event.event_status === 'Acknowledged') {
                         acknowledgedZones.add(event.node_code);
-                    } else {
-                        // DB still says Detected — only clear local ACK if we haven't
-                        // received a successful ACK response for this zone yet
+                        // A new real event replaces any resolved state for this zone
+                        resolvedZones.delete(event.node_code);
+                    } else if (event.event_status === 'Detected') {
+                        // New Detected event — clear any stale resolved/acknowledged state
+                        // so the alert renders correctly again
+                        resolvedZones.delete(event.node_code);
+                        // Only clear local ACK if we haven't received a successful ACK
+                        // response for this specific zone in this session yet
                         if (!acknowledgedZones.has(event.node_code)) {
                             acknowledgedZones.delete(event.node_code);
                         }
@@ -1377,9 +1382,10 @@
             function connectSSE() {
                 if (sseSource) { sseSource.close(); sseSource = null; }
 
-                // Build URL with auth token so the authMiddleware accepts it
-                const token = localStorage.getItem('fz-token') || sessionStorage.getItem('fz-token') || '';
-                const url = '/api/readings/stream' + (token ? '?token=' + encodeURIComponent(token) : '');
+                // withCredentials:true sends the fz_token cookie automatically.
+                // The server authMiddleware reads req.cookies.fz_token — no
+                // manual token injection needed and no ?token= query param required.
+                const url = (typeof API !== 'undefined' && API ? API : '') + '/api/readings/stream';
 
                 sseSource = new EventSource(url, { withCredentials: true });
 

@@ -243,8 +243,41 @@ router.post('/', verifyNodeHmac, async (req, res) => {
                 );
             }
         }
-        // NOTE: We do NOT auto-clear events when air is clean.
-        // Only a human clicking Resolve clears an event.
+        // ── Auto-resolve when ESP32 confirms air is genuinely clean ─────
+        // The firmware latches vapeActive=false only after pm1_0 has stayed
+        // below CLEAR_THRESHOLD for CLEAR_SECS (12 s) continuously.
+        // When that flag arrives we auto-resolve any stuck 'Detected' event
+        // so the dashboard clears without needing a manual click.
+        // 'Acknowledged' events are intentionally left for a human to resolve
+        // because staff are already responding to that one.
+        if (!smokeDetected && hasVapeFlag && vapeFlagValue === false) {
+            const [staleEvents] = await db.query(
+                `SELECT id FROM detection_events
+                 WHERE node_id = ? AND event_status = 'Detected'
+                 LIMIT 1`,
+                [node.id]
+            );
+            if (staleEvents.length) {
+                await db.query(
+                    `UPDATE detection_events
+                     SET event_status    = 'Cleared',
+                         resolved_at     = NOW(),
+                         acknowledged_at = COALESCE(acknowledged_at, NOW()),
+                         notes           = COALESCE(notes, 'Auto-resolved: ESP32 confirmed air is clean')
+                     WHERE id = ?`,
+                    [staleEvents[0].id]
+                );
+                // Broadcast so all open dashboards clear immediately
+                broadcastSSE({
+                    type:         'event_update',
+                    event_id:     staleEvents[0].id,
+                    node_code:    node.node_code,
+                    event_status: 'Cleared',
+                });
+                logger.info({ nodeId: node.id, eventId: staleEvents[0].id },
+                    '[readings] Auto-resolved stale Detected event — ESP32 vape_detected=false');
+            }
+        }
 
         res.json({
             success: true,
