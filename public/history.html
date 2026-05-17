@@ -859,6 +859,66 @@
 
 
         initHotkeys('history');
+
+        // ── SSE REAL-TIME UPDATES ──────────────────────────────
+        // Listen to the same stream the dashboard uses so that new
+        // detections immediately refresh Today's Alerts, Total Records,
+        // and Resolved counts without requiring a page reload.
+        (function initHistorySSE() {
+            let sseSource   = null;
+            let retryTimer  = null;
+            let _refreshPending = false;
+
+            // Debounce so rapid bursts of SSE messages only trigger one refresh
+            function scheduleRefresh() {
+                if (_refreshPending) return;
+                _refreshPending = true;
+                setTimeout(async function () {
+                    _refreshPending = false;
+                    try {
+                        const data = await apiFetch('/history');
+                        if (data && data.success) {
+                            allRecords = data.data;
+                        }
+                        renderTable();
+                        await loadStats();
+                    } catch (_) { /* silently ignore — next SSE event will retry */ }
+                }, 800);
+            }
+
+            function connectSSE() {
+                if (sseSource) { sseSource.close(); sseSource = null; }
+
+                const url = (typeof API !== 'undefined' && API ? API : '') + '/api/readings/stream';
+                sseSource = new EventSource(url, { withCredentials: true });
+
+                sseSource.onopen = function () {
+                    if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
+                };
+
+                sseSource.onmessage = function (e) {
+                    let msg;
+                    try { msg = JSON.parse(e.data); } catch (_) { return; }
+
+                    // New detection (node reading with smoke) OR event status change
+                    if (msg.node_code || msg.type === 'event_update') {
+                        scheduleRefresh();
+                    }
+                };
+
+                sseSource.onerror = function () {
+                    sseSource.close();
+                    sseSource = null;
+                    retryTimer = setTimeout(connectSSE, 6000);
+                };
+            }
+
+            connectSSE();
+
+            window.addEventListener('beforeunload', function () {
+                if (sseSource) sseSource.close();
+            });
+        })();
     </script>
     <script src="/pwa.js" defer></script>
     <script defer src="enhance.js"></script>
