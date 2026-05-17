@@ -840,48 +840,60 @@
     }
 
     // ── SENSORS ────────────────────────────────────────────────────
+    // Uses the same /api/readings/live endpoint as the dashboard so
+    // online/offline status is always in sync — driven by node_active.
     async function loadSensors() {
         const el = document.getElementById('sensors-content');
         try {
             const apiBase = (typeof API !== 'undefined') ? API : '';
-            const res = await fetch(`${apiBase}/api/readings/nodes`, { credentials: 'include' }).catch(() => null);
+            const res = await fetch(`${apiBase}/api/readings/live`, { credentials: 'include' }).catch(() => null);
             if (!res || !res.ok) {
-                el.innerHTML = renderDefaultSensors();
+                el.innerHTML = '<div class="admin-empty">Unable to load sensor data.</div>';
                 return;
             }
             const data = await res.json().catch(() => null);
-            const nodes = data?.nodes || data?.data || [];
-            if (!nodes.length) {
-                el.innerHTML = renderDefaultSensors();
+            // dashboard response shape: { success: true, data: [ { node_code, node_active, location_name, last_seen, pm1_0, … } ] }
+            const zones = data?.data || data?.zones || data?.nodes || [];
+            if (!zones.length) {
+                el.innerHTML = '<div class="admin-empty">No sensors found.</div>';
                 return;
             }
-            el.innerHTML = nodes.map(n => `
+            el.innerHTML = zones.map(n => {
+                // node_active is the authoritative flag — same field dashboard uses
+                const isOnline = !!n.node_active;
+                const nodeId   = n.node_code || n.node_id || n.name || '—';
+                const location = n.location_name || n.location || '—';
+                const lastSeen = n.last_seen ? formatSensorTS(n.last_seen) : '—';
+                const pm1      = n.pm1_0 !== undefined && n.pm1_0 !== null ? parseFloat(n.pm1_0).toFixed(1) + ' µg/m³' : '—';
+                return `
                 <div class="sensor-row">
-                    <span class="sensor-dot ${n.online || n.is_online ? 'online' : 'offline'}"></span>
-                    <div style="flex:1;">
-                        <div style="font-weight:700;font-size:0.88rem;">${escHtml(n.node_id || n.name || '—')}</div>
-                        <div style="font-size:0.76rem;color:var(--gray);">${escHtml(n.location || '—')}</div>
+                    <span class="sensor-dot ${isOnline ? 'online' : 'offline'}"></span>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:700;font-size:0.88rem;">${escHtml(nodeId)}</div>
+                        <div style="font-size:0.76rem;color:var(--gray);">${escHtml(location)}</div>
                     </div>
-                    <span class="status-pill ${n.online || n.is_online ? 'online' : 'offline'}">${n.online || n.is_online ? 'Online' : 'Offline'}</span>
-                    <span style="font-family:'Space Grotesk',monospace;font-size:0.76rem;color:var(--gray);min-width:80px;text-align:right;">${n.last_seen || n.updated_at || '—'}</span>
-                </div>
-            `).join('');
+                    <div style="text-align:right;flex-shrink:0;">
+                        <span class="status-pill ${isOnline ? 'online' : 'offline'}">${isOnline ? 'Online' : 'Offline'}</span>
+                        <div style="font-family:'Space Grotesk',monospace;font-size:0.72rem;color:var(--gray);margin-top:2px;">${isOnline ? pm1 : (n.last_seen ? 'Last seen: ' + lastSeen : 'No data received')}</div>
+                    </div>
+                </div>`;
+            }).join('');
         } catch(e) {
-            el.innerHTML = renderDefaultSensors();
+            console.error('[admin] loadSensors error:', e);
+            el.innerHTML = '<div class="admin-empty" style="color:var(--danger);">Error loading sensor data.</div>';
         }
     }
 
-    function renderDefaultSensors() {
-        return `
-            <div class="sensor-row">
-                <span class="sensor-dot online"></span>
-                <div style="flex:1;">
-                    <div style="font-weight:700;font-size:0.88rem;">ESP32-ZONE2</div>
-                    <div style="font-size:0.76rem;color:var(--gray);">4th Floor Female CR</div>
-                </div>
-                <span class="status-pill online">Online</span>
-            </div>
-        `;
+    // Format timestamp the same way dashboard does
+    function formatSensorTS(val) {
+        if (!val) return '—';
+        const d = new Date(val);
+        if (isNaN(d)) return String(val);
+        const sec = Math.floor((Date.now() - d.getTime()) / 1000);
+        if (sec < 60)    return sec + 's ago';
+        if (sec < 3600)  return Math.floor(sec / 60) + 'm ago';
+        if (sec < 86400) return Math.floor(sec / 3600) + 'h ago';
+        return Math.floor(sec / 86400) + 'd ago';
     }
 
     // ── TICKETS ────────────────────────────────────────────────────
