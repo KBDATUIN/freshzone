@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style>/* Anti-flash */html{background:linear-gradient(135deg,#90e0ef,#00b4d8,#004e7a);}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
+    <style>html{background:linear-gradient(135deg,#90e0ef,#00b4d8,#004e7a);}html[data-theme="dark"]{background:linear-gradient(135deg,#0a1520,#0d2035,#071018);}</style>
     <script>(function(){var t=localStorage.getItem('fz-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshZone | Admin</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style-v2.css">
     <link rel="stylesheet" href="style-v3.css">
@@ -16,181 +15,214 @@
     <link rel="stylesheet" href="premium-style.css">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#004e7a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FreshZone">
     <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
     <link rel="stylesheet" href="/pwa.css">
     <style>
-        /* ICON SYSTEM — identical to dashboard */
-        .icon { display:inline-block; width:1em; height:1em; vertical-align:-0.125em; flex-shrink:0; }
-        .nav-icon { width:1.05rem; height:1.05rem; margin-right:5px; vertical-align:-0.15em; opacity:0.85; }
-        .btn-icon { width:0.9rem; height:0.9rem; margin-right:4px; vertical-align:-0.1em; }
-        .h-icon   { width:1.1rem; height:1.1rem; margin-right:6px; vertical-align:-0.18em; }
-        .sm-icon  { width:0.8rem; height:0.8rem; vertical-align:-0.08em; margin-right:3px; }
+        .icon{display:inline-block;width:1em;height:1em;vertical-align:-0.125em;flex-shrink:0;}
+        .nav-icon{width:1.05rem;height:1.05rem;margin-right:5px;vertical-align:-0.15em;opacity:0.85;}
+        .btn-icon{width:0.9rem;height:0.9rem;margin-right:4px;vertical-align:-0.1em;}
+        .sm-icon{width:0.8rem;height:0.8rem;vertical-align:-0.08em;margin-right:3px;}
 
-        /* ── NAV LAYOUT — identical to dashboard ── */
-        .nav-container {
-            display: flex !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            gap: 0 !important;
-            height: 100% !important;
-            max-width: 1200px !important;
-            margin: 0 auto !important;
-            padding: 0 !important;
-        }
-        .nav-container .logo {
-            flex-shrink: 0 !important;
-            margin-right: 1.25rem !important;
-        }
-        .nav-links {
-            display: flex !important;
-            flex: 1 1 auto !important;
-            min-width: 0 !important;
-            align-items: center !important;
-            flex-wrap: nowrap !important;
-            gap: 0.15rem !important;
-            overflow: visible !important;
-        }
-        .nav-controls {
-            display: flex !important;
-            flex-shrink: 0 !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-            gap: 10px !important;
-            margin-left: auto !important;
-        }
-        .nav-controls .hamburger { display: none !important; }
-        @media (max-width: 900px) {
-            .nav-links { display: none !important; }
-            .nav-controls .hamburger { display: flex !important; }
-            .nav-user { display: none !important; }
-        }
+        .nav-container{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;height:100%!important;max-width:1200px!important;margin:0 auto!important;padding:0!important;}
+        .nav-container .logo{flex-shrink:0!important;margin-right:1.25rem!important;}
+        .nav-links{display:flex!important;flex:1 1 auto!important;min-width:0!important;align-items:center!important;flex-wrap:nowrap!important;gap:0.15rem!important;overflow:visible!important;}
+        .nav-controls{display:flex!important;flex-shrink:0!important;flex-wrap:nowrap!important;align-items:center!important;gap:10px!important;margin-left:auto!important;}
+        .nav-controls .hamburger{display:none!important;}
+        @media(max-width:900px){.nav-links{display:none!important;}.nav-controls .hamburger{display:flex!important;}.nav-user{display:none!important;}}
 
-        /* ── PUSH TOGGLE — identical to dashboard ── */
-        .push-toggle-wrap { display:inline-flex; align-items:center; justify-content:center; gap:7px; cursor:pointer; user-select:none; min-height:38px; }
-        .push-toggle-icon { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; line-height:0; margin:0; flex-shrink:0; color:var(--gray); }
-        .push-toggle-icon svg { width:18px; height:18px; display:block; }
-        .push-toggle-switch {
-            position:relative; width:44px; height:24px; background:#ccc; border-radius:12px;
-            cursor:pointer; transition:background 0.25s; outline:none; flex-shrink:0;
-        }
-        .push-toggle-switch:focus-visible { box-shadow: 0 0 0 3px rgba(0,200,150,0.4); }
-        .push-toggle-switch.active { background: var(--secondary, #00c896); }
-        .push-toggle-knob {
-            position:absolute; top:3px; left:3px; width:18px; height:18px; background:white;
-            border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.25);
-            transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); will-change:transform;
-        }
-        .push-toggle-switch.active .push-toggle-knob { transform: translateX(20px); }
-        .push-toggle-label { display:none !important; }
-        @media (max-width:900px) { .push-toggle-wrap { gap:6px; display: none; } }
+        /* ── TABS ── */
+        .admin-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;}
+        .admin-tab{padding:8px 18px;border-radius:10px;border:none;background:rgba(0,78,122,0.07);color:var(--gray);font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.18s;display:inline-flex;align-items:center;gap:6px;position:relative;}
+        .admin-tab:hover{background:rgba(0,78,122,0.13);}
+        .admin-tab.active{background:var(--primary,#004e7a);color:#fff;box-shadow:0 2px 10px rgba(0,78,122,0.25);}
+        .admin-tab .tab-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;background:#ef4444;color:#fff;border-radius:99px;font-size:0.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1;}
+        [data-theme="dark"] .admin-tab{background:rgba(255,255,255,0.06);color:#94a3b8;}
+        [data-theme="dark"] .admin-tab.active{background:var(--secondary,#00c896);color:#0a1a2e;}
 
-        /* ── ADMIN PAGE STYLES ── */
-        /* Page header matches contact-page-header from style.css */
-        .admin-page-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            padding: 1.75rem 2rem;
-            background: var(--card-bg);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255,255,255,0.5);
-            background: linear-gradient(155deg, rgba(215,241,255,0.98), rgba(195,230,255,0.96)) !important;
-            border: 1px solid rgba(0,100,160,0.15) !important;
-        }
-        .admin-page-header h1 {
-            margin: 0 0 0.35rem;
-            font-size: 1.65rem;
-            font-family: 'Space Grotesk', sans-serif;
-            color: #003a5c;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-        }
-        .admin-page-header p { margin: 0; color: var(--gray); font-size: 0.9rem; }
-        [data-theme="dark"] .admin-page-header {
-            background: rgba(10,20,36,0.98) !important;
-            border-color: rgba(34,211,238,0.1) !important;
-        }
-        [data-theme="dark"] .admin-page-header h1 { color: #7dd3fc; }
+        /* ── STATS GRID ── */
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:1rem;margin-bottom:1.5rem;}
+        .stat-card{background:var(--card-bg,#fff);border-radius:14px;padding:1.1rem 1.3rem;box-shadow:0 2px 12px rgba(0,0,0,0.07);border:1px solid rgba(0,78,122,0.08);display:flex;flex-direction:column;gap:4px;transition:transform 0.15s,box-shadow 0.15s;}
+        .stat-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.10);}
+        .stat-card .stat-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gray);}
+        .stat-card .stat-value{font-size:1.85rem;font-weight:800;color:var(--primary,#004e7a);font-family:'Space Grotesk',sans-serif;line-height:1;}
+        .stat-card .stat-sub{font-size:0.75rem;color:var(--gray);margin-top:2px;}
+        .stat-card .stat-trend{font-size:0.72rem;font-weight:700;margin-top:4px;}
+        .stat-card .stat-trend.up{color:#16a34a;}
+        .stat-card .stat-trend.neutral{color:var(--gray);}
+        [data-theme="dark"] .stat-card{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.07);}
+        [data-theme="dark"] .stat-card .stat-value{color:#7dd3fc;}
 
-        /* Status pills */
-        .status-pill {
-            display:inline-block; padding:3px 12px; border-radius:99px;
-            font-size:0.74rem; font-weight:700; letter-spacing:0.02em;
-        }
-        .status-pill.active   { background:#dcfce7; color:#15803d; }
-        .status-pill.inactive { background:#fee2e2; color:#dc2626; }
-        [data-theme="dark"] .status-pill.active   { background:rgba(34,197,94,0.15);  color:#4ade80; }
-        [data-theme="dark"] .status-pill.inactive { background:rgba(239,68,68,0.15);  color:#f87171; }
+        /* ── SECTION HEADER ── */
+        .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
+        .section-title{font-size:1rem;font-weight:700;color:var(--dark,#1e293b);display:flex;align-items:center;gap:6px;}
+        [data-theme="dark"] .section-title{color:#e2e8f0;}
 
-        /* Action buttons */
-        .toggle-btn {
-            padding:5px 16px; border:none; border-radius:8px; font-size:0.78rem;
-            font-weight:700; cursor:pointer; transition:all 0.18s; width:auto; margin:0;
-            display:inline-flex; align-items:center; gap:5px; letter-spacing:0.01em;
-        }
-        .toggle-btn.activate   { background:#dcfce7; color:#15803d; }
-        .toggle-btn.deactivate { background:#fee2e2; color:#dc2626; }
-        .toggle-btn:hover      { filter:brightness(0.90); transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,0,0,0.10); }
-        .toggle-btn::after     { display:none !important; }
-        [data-theme="dark"] .toggle-btn.activate   { background:rgba(34,197,94,0.15);  color:#4ade80; }
-        [data-theme="dark"] .toggle-btn.deactivate { background:rgba(239,68,68,0.15);  color:#f87171; }
+        /* ── PAGE HEADER ── */
+        .admin-page-header{text-align:center;margin-bottom:1.5rem;padding:1.75rem 2rem;border-radius:var(--radius-xl,16px);box-shadow:0 4px 20px rgba(0,78,122,0.10);background:linear-gradient(155deg,rgba(215,241,255,0.98),rgba(195,230,255,0.96))!important;border:1px solid rgba(0,100,160,0.15)!important;}
+        .admin-page-header h1{margin:0 0 0.35rem;font-size:1.65rem;font-family:'Space Grotesk',sans-serif;color:#003a5c;font-weight:800;letter-spacing:-0.03em;}
+        .admin-page-header p{margin:0;color:var(--gray);font-size:0.9rem;}
+        [data-theme="dark"] .admin-page-header{background:rgba(10,20,36,0.98)!important;border-color:rgba(34,211,238,0.1)!important;}
+        [data-theme="dark"] .admin-page-header h1{color:#7dd3fc;}
 
-        /* Access denied state */
-        .admin-access-denied {
-            text-align:center; padding:4rem 1rem; color:var(--danger);
-            font-size:1rem; font-weight:600;
-        }
+        /* ── STATUS PILLS ── */
+        .status-pill{display:inline-block;padding:3px 11px;border-radius:99px;font-size:0.73rem;font-weight:700;letter-spacing:0.02em;}
+        .status-pill.active,.status-pill.online,.status-pill.cleared{background:#dcfce7;color:#15803d;}
+        .status-pill.inactive,.status-pill.offline{background:#f1f5f9;color:#64748b;}
+        .status-pill.detected{background:#fee2e2;color:#dc2626;}
+        .status-pill.acknowledged{background:#fef3c7;color:#d97706;}
+        [data-theme="dark"] .status-pill.active,[data-theme="dark"] .status-pill.online,[data-theme="dark"] .status-pill.cleared{background:rgba(34,197,94,0.15);color:#4ade80;}
+        [data-theme="dark"] .status-pill.inactive,[data-theme="dark"] .status-pill.offline{background:rgba(100,116,139,0.15);color:#94a3b8;}
+        [data-theme="dark"] .status-pill.detected{background:rgba(239,68,68,0.15);color:#f87171;}
+        [data-theme="dark"] .status-pill.acknowledged{background:rgba(245,158,11,0.15);color:#fbbf24;}
 
-        /* Table overrides to match dashboard style */
-        #users-table th {
-            font-size: 0.72rem !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.08em !important;
-            text-transform: uppercase !important;
-            color: var(--gray) !important;
-            padding: 0.85rem 1rem !important;
-            white-space: nowrap;
-        }
-        #users-table td {
-            padding: 0.9rem 1rem !important;
-            font-size: 0.875rem !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid rgba(0,78,122,0.06) !important;
-        }
-        #users-table tr:last-child td { border-bottom: none !important; }
-        #users-table tbody tr {
-            transition: background 0.15s;
-        }
-        #users-table tbody tr:hover {
-            background: rgba(0,180,216,0.04) !important;
-        }
-        [data-theme="dark"] #users-table td {
-            border-bottom-color: rgba(255,255,255,0.05) !important;
-        }
-        [data-theme="dark"] #users-table tbody tr:hover {
-            background: rgba(0,180,216,0.06) !important;
-        }
+        /* ── ACTION BUTTONS ── */
+        .toggle-btn{padding:5px 14px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.18s;display:inline-flex;align-items:center;gap:4px;letter-spacing:0.01em;}
+        .toggle-btn.activate{background:#dcfce7;color:#15803d;}
+        .toggle-btn.deactivate{background:#fee2e2;color:#dc2626;}
+        .toggle-btn.danger{background:#fee2e2;color:#dc2626;}
+        .toggle-btn.warn{background:#fef3c7;color:#d97706;}
+        .toggle-btn.info{background:rgba(0,180,216,0.1);color:var(--primary,#004e7a);}
+        .toggle-btn:hover{filter:brightness(0.9);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,0.10);}
+        .toggle-btn::after{display:none!important;}
+        [data-theme="dark"] .toggle-btn.activate{background:rgba(34,197,94,0.15);color:#4ade80;}
+        [data-theme="dark"] .toggle-btn.deactivate,[data-theme="dark"] .toggle-btn.danger{background:rgba(239,68,68,0.15);color:#f87171;}
+        [data-theme="dark"] .toggle-btn.warn{background:rgba(245,158,11,0.15);color:#fbbf24;}
+        [data-theme="dark"] .toggle-btn.info{background:rgba(0,180,216,0.12);color:#7dd3fc;}
+
+        .refresh-btn{padding:6px 14px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;background:rgba(0,180,216,0.1);color:var(--primary,#004e7a);transition:all 0.18s;display:inline-flex;align-items:center;gap:5px;}
+        .refresh-btn:hover{background:rgba(0,180,216,0.2);}
+        [data-theme="dark"] .refresh-btn{background:rgba(0,180,216,0.12);color:#7dd3fc;}
+
+        .export-btn{padding:6px 14px;border:none;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;background:rgba(22,163,74,0.1);color:#15803d;transition:all 0.18s;display:inline-flex;align-items:center;gap:5px;}
+        .export-btn:hover{background:rgba(22,163,74,0.18);}
+        [data-theme="dark"] .export-btn{background:rgba(74,222,128,0.12);color:#4ade80;}
+
+        /* ── TABLE ── */
+        .admin-table{width:100%;border-collapse:collapse;}
+        .admin-table th{font-size:0.71rem!important;font-weight:700!important;letter-spacing:0.08em!important;text-transform:uppercase!important;color:var(--gray)!important;padding:0.8rem 1rem!important;white-space:nowrap;text-align:left;}
+        .admin-table td{padding:0.85rem 1rem!important;font-size:0.875rem!important;vertical-align:middle!important;border-bottom:1px solid rgba(0,78,122,0.06)!important;}
+        .admin-table tr:last-child td{border-bottom:none!important;}
+        .admin-table tbody tr{transition:background 0.15s;}
+        .admin-table tbody tr:hover{background:rgba(0,180,216,0.04)!important;}
+        [data-theme="dark"] .admin-table td{border-bottom-color:rgba(255,255,255,0.05)!important;}
+        [data-theme="dark"] .admin-table tbody tr:hover{background:rgba(0,180,216,0.06)!important;}
+
+        /* ── LOG ENTRIES ── */
+        .log-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(0,78,122,0.06);font-size:0.83rem;}
+        .log-entry:last-child{border-bottom:none;}
+        .log-entry .log-time{color:var(--gray);white-space:nowrap;font-size:0.75rem;min-width:75px;}
+        .log-entry .log-action{font-weight:700;color:var(--primary,#004e7a);white-space:nowrap;}
+        .log-entry .log-desc{color:var(--dark,#1e293b);flex:1;}
+        [data-theme="dark"] .log-entry{border-bottom-color:rgba(255,255,255,0.05);}
+        [data-theme="dark"] .log-entry .log-action{color:#7dd3fc;}
+        [data-theme="dark"] .log-entry .log-desc{color:#cbd5e1;}
+
+        /* ── SENSOR NODE CARD ── */
+        .node-card{background:var(--card-bg,#fff);border-radius:14px;padding:1.2rem 1.4rem;border:1px solid rgba(0,78,122,0.08);box-shadow:0 2px 10px rgba(0,0,0,0.05);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+        .node-card .node-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+        .node-card .node-dot.online{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,0.2);animation:pulse-dot 2s infinite;}
+        .node-card .node-dot.offline{background:#94a3b8;}
+        @keyframes pulse-dot{0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,0.2);}50%{box-shadow:0 0 0 6px rgba(34,197,94,0.1);}}
+        .node-card .node-info{flex:1;min-width:0;}
+        .node-card .node-name{font-weight:700;font-size:0.95rem;color:var(--dark,#1e293b);}
+        .node-card .node-meta{font-size:0.78rem;color:var(--gray);margin-top:2px;}
+        .node-card .node-pm-bar{display:flex;align-items:center;gap:8px;margin-top:6px;}
+        .node-card .node-pm-track{height:5px;border-radius:99px;background:rgba(0,78,122,0.1);flex:1;max-width:180px;overflow:hidden;}
+        .node-card .node-pm-fill{height:100%;border-radius:99px;transition:width 0.5s;}
+        [data-theme="dark"] .node-card{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.07);}
+        [data-theme="dark"] .node-card .node-name{color:#e2e8f0;}
+        [data-theme="dark"] .node-card .node-pm-track{background:rgba(255,255,255,0.08);}
+
+        /* ── DANGER ZONE ── */
+        .danger-zone{border:1px solid rgba(220,38,38,0.3);border-radius:14px;padding:1.3rem 1.5rem;background:rgba(254,242,242,0.6);}
+        .danger-zone h3{color:#dc2626;margin:0 0 0.4rem;font-size:0.95rem;font-weight:700;}
+        .danger-zone p{color:#64748b;font-size:0.83rem;margin:0 0 1rem;}
+        [data-theme="dark"] .danger-zone{background:rgba(220,38,38,0.06);border-color:rgba(220,38,38,0.2);}
+        [data-theme="dark"] .danger-zone h3{color:#f87171;}
+
+        .admin-access-denied{text-align:center;padding:4rem 1rem;color:var(--danger);font-size:1rem;font-weight:600;}
+
+        /* ── TAB PANELS ── */
+        .tab-panel{display:none;}
+        .tab-panel.active{display:block;}
+
+        /* ── LIVE EVENTS ── */
+        .live-event-card{background:var(--card-bg,#fff);border-radius:14px;padding:1.1rem 1.3rem;border:1.5px solid rgba(220,38,38,0.25);box-shadow:0 2px 14px rgba(220,38,38,0.07);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;animation:slideIn 0.3s ease;}
+        .live-event-card.acknowledged-card{border-color:rgba(245,158,11,0.3);box-shadow:0 2px 14px rgba(245,158,11,0.07);}
+        @keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+        .event-pulse{width:10px;height:10px;border-radius:50%;background:#ef4444;flex-shrink:0;animation:event-blink 1.2s infinite;}
+        .event-pulse.warn{background:#f59e0b;}
+        @keyframes event-blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+        .event-info{flex:1;min-width:0;}
+        .event-location{font-weight:700;font-size:0.95rem;color:var(--dark,#1e293b);}
+        .event-meta{font-size:0.78rem;color:var(--gray);margin-top:2px;}
+        .event-actions{display:flex;gap:6px;flex-wrap:wrap;}
+        [data-theme="dark"] .live-event-card{background:rgba(255,255,255,0.04);}
+        [data-theme="dark"] .event-location{color:#e2e8f0;}
+
+        /* ── ANALYTICS ── */
+        .analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem;margin-bottom:1.5rem;}
+        .analytics-card{background:var(--card-bg,#fff);border-radius:14px;padding:1.2rem 1.4rem;border:1px solid rgba(0,78,122,0.08);box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+        .analytics-card h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--gray);margin:0 0 1rem;}
+        [data-theme="dark"] .analytics-card{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.07);}
+
+        /* Bar chart */
+        .bar-chart{display:flex;flex-direction:column;gap:8px;}
+        .bar-row{display:flex;align-items:center;gap:10px;font-size:0.8rem;}
+        .bar-label{width:80px;text-align:right;color:var(--gray);font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;}
+        .bar-track{flex:1;height:10px;background:rgba(0,78,122,0.08);border-radius:99px;overflow:hidden;}
+        .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#00b4d8,#004e7a);transition:width 0.6s cubic-bezier(0.22,1,0.36,1);}
+        .bar-val{font-size:0.75rem;font-weight:700;color:var(--primary,#004e7a);min-width:30px;}
+        [data-theme="dark"] .bar-track{background:rgba(255,255,255,0.07);}
+        [data-theme="dark"] .bar-fill{background:linear-gradient(90deg,#22d3ee,#0ea5e9);}
+        [data-theme="dark"] .bar-val{color:#7dd3fc;}
+
+        /* Donut mini */
+        .metric-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,78,122,0.06);}
+        .metric-row:last-child{border-bottom:none;}
+        .metric-label{font-size:0.82rem;color:var(--dark,#1e293b);}
+        .metric-val{font-size:0.85rem;font-weight:700;color:var(--primary,#004e7a);}
+        [data-theme="dark"] .metric-row{border-bottom-color:rgba(255,255,255,0.05);}
+        [data-theme="dark"] .metric-label{color:#cbd5e1;}
+        [data-theme="dark"] .metric-val{color:#7dd3fc;}
+
+        /* ── SEARCH ── */
+        .search-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+        .search-bar input,.search-bar select{padding:7px 12px;border-radius:9px;border:1.5px solid rgba(0,78,122,0.15);background:var(--card-bg,#fff);color:var(--dark,#1e293b);font-size:0.85rem;font-family:inherit;outline:none;transition:border-color 0.15s;}
+        .search-bar input{flex:1;min-width:160px;}
+        .search-bar input:focus,.search-bar select:focus{border-color:var(--primary,#004e7a);}
+        [data-theme="dark"] .search-bar input,[data-theme="dark"] .search-bar select{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);color:#e2e8f0;}
+
+        /* ── EMPTY STATE ── */
+        .empty-state{text-align:center;padding:3rem 1rem;color:var(--gray);}
+        .empty-state svg{display:block;margin:0 auto 0.75rem;opacity:0.35;}
+        .empty-state p{font-size:0.88rem;margin:0;}
+
+        /* ── NOTES MODAL ── */
+        #notesInput{width:100%;padding:10px;border:1.5px solid rgba(0,78,122,0.15);border-radius:8px;font-size:0.88rem;min-height:70px;resize:vertical;background:var(--card-bg,#fff);color:var(--dark,#1e293b);font-family:inherit;}
+        [data-theme="dark"] #notesInput{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);color:#e2e8f0;}
+
+        /* ── LOADING SPINNER ── */
+        .spin{display:inline-block;animation:spin 0.7s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+
+        /* ── AUTO-REFRESH TOGGLE ── */
+        .auto-refresh-wrap{display:flex;align-items:center;gap:7px;font-size:0.78rem;color:var(--gray);cursor:pointer;user-select:none;}
+        .auto-refresh-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;transition:background 0.2s;}
+        .auto-refresh-dot.paused{background:#94a3b8;}
     </style>
 </head>
 <body>
 
 <div class="smoke-container" aria-hidden="true">
     <div class="smoke-particle" style="left:10%;width:200px;height:200px;animation-delay:0s;"></div>
-    <div class="smoke-particle" style="left:30%;width:150px;height:150px;animation-delay:2s;"></div>
     <div class="smoke-particle" style="left:60%;width:250px;height:250px;animation-delay:4s;"></div>
     <div class="smoke-particle" style="left:85%;width:180px;height:180px;animation-delay:1s;"></div>
 </div>
 
 <nav role="navigation" aria-label="Main navigation">
     <div class="nav-container">
-        <a href="dashboard.html" class="logo" aria-label="FreshZone Home">
-            <img src="logo1.png" alt="FreshZone Logo">
-        </a>
+        <a href="dashboard.html" class="logo" aria-label="FreshZone Home"><img src="logo1.png" alt="FreshZone Logo"></a>
         <div class="nav-links" id="desktop-nav">
             <a href="dashboard.html">Dashboard</a>
             <a href="history.html">History</a>
@@ -201,37 +233,24 @@
             <a href="#" onclick="openLogoutModal();return false;">Logout</a>
         </div>
         <div class="nav-controls">
-            <div class="nav-user" id="nav-user-display">
-                <span class="nav-user-dot"></span>
-                <span id="nav-user-name">—</span>
-            </div>
+            <div class="nav-user" id="nav-user-display"><span class="nav-user-dot"></span><span id="nav-user-name">—</span></div>
             <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
-            <label class="push-toggle-wrap" title="Toggle push notifications" aria-label="Toggle push notifications">
-                <span class="push-toggle-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
-                <div class="push-toggle-switch" id="push-btn" onclick="togglePushNotifications()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')togglePushNotifications()">
-                    <div class="push-toggle-knob"></div>
-                </div>
-                <span class="push-toggle-label" id="push-label">OFF</span>
-            </label>
-            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false">
-                <span></span><span></span><span></span>
-            </button>
+            <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
         </div>
     </div>
 </nav>
 
-<div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true" aria-label="Navigation menu">
+<div class="mobile-nav" id="mobile-nav" onclick="closeMobileNav()" role="dialog" aria-modal="true">
     <div class="mobile-nav-drawer" onclick="event.stopPropagation()">
         <button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Monitor</a>
-        <a href="history.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/></svg> History</a>
-        <a href="about.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> About</a>
-        <a href="profile.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</a>
-        <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg> Contact</a>
-        <a href="admin.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Admin</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="history.html">History</a>
+        <a href="about.html">About</a>
+        <a href="profile.html">Profile</a>
+        <a href="contact.html">Contact</a>
+        <a href="admin.html" class="active">Admin</a>
         <div class="mobile-nav-divider"></div>
-        <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</a>
-        <a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notifications</a>
+        <a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout">Logout</a>
     </div>
 </div>
 
@@ -243,37 +262,258 @@
     </div>
 
     <div id="admin-content" style="display:none;">
+
         <div class="admin-page-header">
             <h1>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;color:var(--secondary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                User Management
+                Admin Panel
             </h1>
-            <p>Activate or deactivate staff and administrator accounts.</p>
+            <p>System overview, live events, user management, sensor nodes, analytics, and activity logs.</p>
         </div>
 
-        <div class="log-container">
-            <table id="users-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Employee ID</th>
-                        <th>Position</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="users-tbody">
-                    <tr><td colspan="5" style="text-align:center;padding:2.5rem;color:var(--gray);">Loading users…</td></tr>
-                </tbody>
-            </table>
+        <!-- ── STATS ── -->
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">—</div><div class="stat-sub">All accounts</div></div>
+            <div class="stat-card"><div class="stat-label">Active Users</div><div class="stat-value" id="stat-active">—</div><div class="stat-sub">Enabled accounts</div></div>
+            <div class="stat-card"><div class="stat-label">Open Events</div><div class="stat-value" id="stat-open" style="color:#ef4444;">—</div><div class="stat-sub">Need action</div></div>
+            <div class="stat-card"><div class="stat-label">Detections Today</div><div class="stat-value" id="stat-today">—</div><div class="stat-sub">Vape events</div></div>
+            <div class="stat-card"><div class="stat-label">Total Detections</div><div class="stat-value" id="stat-total">—</div><div class="stat-sub">All time</div></div>
+            <div class="stat-card"><div class="stat-label">Resolved</div><div class="stat-value" id="stat-resolved">—</div><div class="stat-sub">Cleared events</div></div>
+        </div>
+
+        <!-- ── TABS ── -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchTab('events',this)" id="tab-events">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Live Events
+                <span class="tab-badge" id="events-badge" style="display:none;">0</span>
+            </button>
+            <button class="admin-tab" onclick="switchTab('users',this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                User Management
+            </button>
+            <button class="admin-tab" onclick="switchTab('sensors',this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+                Sensor Nodes
+            </button>
+            <button class="admin-tab" onclick="switchTab('analytics',this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Analytics
+            </button>
+            <button class="admin-tab" onclick="switchTab('logs',this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Activity Log
+            </button>
+            <button class="admin-tab" onclick="switchTab('danger',this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Danger Zone
+            </button>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════ -->
+        <!-- ── TAB: LIVE EVENTS ────────────────────────────── -->
+        <!-- ══════════════════════════════════════════════════ -->
+        <div class="tab-panel active" id="panel-events">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    Open Detection Events
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <label class="auto-refresh-wrap" onclick="toggleAutoRefresh()">
+                        <div class="auto-refresh-dot" id="ar-dot"></div>
+                        <span id="ar-label">Auto-refresh on</span>
+                    </label>
+                    <button class="refresh-btn" onclick="loadOpenEvents()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            <div id="events-list" style="display:flex;flex-direction:column;gap:10px;">
+                <div class="empty-state"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><p>Loading events…</p></div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════ -->
+        <!-- ── TAB: USERS ──────────────────────────────────── -->
+        <!-- ══════════════════════════════════════════════════ -->
+        <div class="tab-panel" id="panel-users">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    All Accounts
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="export-btn" onclick="exportUsers()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export CSV
+                    </button>
+                    <button class="refresh-btn" onclick="loadUsers()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="search" id="user-search" placeholder="Search name, ID, email, position…" oninput="filterUsers()">
+                <select id="user-status-filter" onchange="filterUsers()">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="log-container">
+                <table class="admin-table" id="users-table">
+                    <thead><tr><th>Name</th><th>Employee ID</th><th>Position</th><th>Email</th><th>Joined</th><th>Last Login</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="users-tbody"><tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--gray);">Loading…</td></tr></tbody>
+                </table>
+            </div>
+            <div style="font-size:0.78rem;color:var(--gray);margin-top:8px;" id="user-count-label"></div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════ -->
+        <!-- ── TAB: SENSORS ────────────────────────────────── -->
+        <!-- ══════════════════════════════════════════════════ -->
+        <div class="tab-panel" id="panel-sensors">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg>
+                    Sensor Nodes
+                </div>
+                <button class="refresh-btn" onclick="loadSensors()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    Refresh
+                </button>
+            </div>
+            <div id="sensors-list" style="display:flex;flex-direction:column;gap:10px;">
+                <div class="empty-state"><p>Loading sensor nodes…</p></div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════ -->
+        <!-- ── TAB: ANALYTICS ──────────────────────────────── -->
+        <!-- ══════════════════════════════════════════════════ -->
+        <div class="tab-panel" id="panel-analytics">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    Detection Analytics
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="export-btn" onclick="exportHistory()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export History CSV
+                    </button>
+                    <button class="refresh-btn" onclick="loadAnalytics()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="analytics-grid" id="analytics-grid">
+                <div class="analytics-card"><h4>Detection Summary</h4><div id="analytics-summary"><p style="color:var(--gray);font-size:0.85rem;">Loading…</p></div></div>
+                <div class="analytics-card"><h4>Detections by Hour (last 7 days)</h4><div class="bar-chart" id="analytics-hours"></div></div>
+                <div class="analytics-card"><h4>Response Performance</h4><div id="analytics-perf"><p style="color:var(--gray);font-size:0.85rem;">Loading…</p></div></div>
+                <div class="analytics-card"><h4>Handled By (top staff)</h4><div class="bar-chart" id="analytics-staff"></div></div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════ -->
+        <!-- ── TAB: LOGS ───────────────────────────────────── -->
+        <!-- ══════════════════════════════════════════════════ -->
+        <div class="tab-panel" id="panel-logs">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Recent Activity
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <select id="log-status-filter" onchange="loadLogs()" style="padding:6px 10px;border-radius:8px;border:1.5px solid rgba(0,78,122,0.15);background:var(--card-bg,#fff);color:var(--dark,#1e293b);font-size:0.82rem;font-family:inherit;">
+                        <option value="">All Status</option>
+                        <option value="Detected">Detected</option>
+                        <option value="Acknowledged">Acknowledged</option>
+                        <option value="Cleared">Cleared</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadLogs()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="log-container">
+                <div id="logs-list" style="padding:0.5rem 1rem;"><div class="empty-state"><p>Loading activity logs…</p></div></div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════ -->
+        <!-- ── TAB: DANGER ZONE ────────────────────────────── -->
+        <!-- ══════════════════════════════════════════════════ -->
+        <div class="tab-panel" id="panel-danger">
+            <div style="display:flex;flex-direction:column;gap:1.2rem;">
+                <div class="danger-zone">
+                    <h3>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Clear All Detection History
+                    </h3>
+                    <p>Permanently deletes all detection events, sensor readings, push notifications, system logs, and login attempts. This cannot be undone.</p>
+                    <button class="toggle-btn danger" onclick="confirmClearHistory()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                        Clear All History
+                    </button>
+                </div>
+
+                <div class="danger-zone" style="border-color:rgba(0,78,122,0.3);background:rgba(240,249,255,0.6);">
+                    <h3 style="color:var(--primary,#004e7a);">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        System Information
+                    </h3>
+                    <p>Details about the current FreshZone deployment.</p>
+                    <div id="sys-info" style="font-size:0.83rem;color:var(--gray);line-height:1.9;">
+                        <div><strong>Node:</strong> ESP32-ZONE2 (4th Floor Female CR)</div>
+                        <div><strong>Server:</strong> freshzone-production.up.railway.app</div>
+                        <div><strong>Detection:</strong> PM1.0 only — EMA spike filter (α=0.05, threshold=30, confirm=8s, clear=12s)</div>
+                        <div><strong>Thresholds:</strong> Trigger &gt;35 µg/m³ · Heavy &gt;80 µg/m³ · Clear &lt;22 µg/m³</div>
+                        <div><strong>Poll interval:</strong> 4 s (dashboard) · 3 s (ESP32 send)</div>
+                        <div id="sys-uptime"><strong>Admin session:</strong> <span id="session-duration">—</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /admin-content -->
+</div>
+
+<!-- ── MODALS ─────────────────────────────────────────────── -->
+
+<!-- Clear history modal -->
+<div id="clearModal" class="modal-overlay-custom" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-content-custom">
+        <h3 style="color:#dc2626;">⚠️ Clear All History?</h3>
+        <p>This will permanently delete <strong>all</strong> detection events, sensor readings, logs, and notifications. Type <strong>CLEAR ALL</strong> to confirm.</p>
+        <input type="text" id="clearConfirmInput" placeholder='Type "CLEAR ALL"' style="width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.9rem;margin-bottom:1rem;background:var(--card-bg);color:var(--dark);">
+        <div class="modal-btn-group">
+            <button class="confirm-btn" style="background:#dc2626;" onclick="executeClearHistory()">Yes, Delete Everything</button>
+            <button class="cancel-btn" onclick="document.getElementById('clearModal').style.display='none'">Cancel</button>
         </div>
     </div>
+</div>
 
+<!-- Resolve event with notes modal -->
+<div id="resolveModal" class="modal-overlay-custom" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-content-custom">
+        <h3 style="color:var(--primary,#004e7a);">Resolve Detection Event</h3>
+        <p>Add an optional note before resolving this event.</p>
+        <textarea id="notesInput" placeholder="e.g. Area inspected, no further vaping detected. Reminded student of policy."></textarea>
+        <div class="modal-btn-group" style="margin-top:1rem;">
+            <button class="confirm-btn" onclick="executeResolve()">Mark as Resolved</button>
+            <button class="cancel-btn" onclick="document.getElementById('resolveModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
 </div>
 
 <div id="session-warning" role="status"></div>
 <div id="notification" class="notification" role="alert" aria-live="polite"></div>
-
 <div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
     <div class="modal-content-custom">
         <h3 id="logout-title">Confirm Logout</h3>
@@ -285,118 +525,514 @@
     </div>
 </div>
 
-<footer class="site-footer">
-    <p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p>
-</footer>
+<footer class="site-footer"><p>© 2026 FreshZone – Campus Vape Aerosol Detection System</p></footer>
 
 <script src="cookie-consent.js?v=3" defer></script>
 <script src="utils.js"></script>
 <script>
-    let currentUser = null;
+// ═══════════════════════════════════════════════════════════════
+//  FreshZone Admin — Enhanced
+// ═══════════════════════════════════════════════════════════════
 
-    (async function initAdmin() {
-        const user = await hydrateSessionUser();
-        if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; return; }
-        currentUser = user;
+let currentUser   = null;
+let allUsersCache = [];
+let autoRefresh   = true;
+let arInterval    = null;
+let pendingResolveId = null;
+let sessionStart  = Date.now();
 
-        const nameEl = document.getElementById('nav-user-name');
-        if (nameEl) nameEl.textContent = user.full_name || user.name || 'User';
+// ── INIT ──────────────────────────────────────────────────────
+(async function initAdmin() {
+    const user = await hydrateSessionUser();
+    if (!user) { alert('Access denied. Please login.'); window.location.href = 'auth.html'; return; }
+    currentUser = user;
+    const nameEl = document.getElementById('nav-user-name');
+    if (nameEl) nameEl.textContent = user.full_name || user.name || 'User';
 
-        if (user.position !== 'Administrator') {
-            document.getElementById('access-denied-msg').style.display = 'block';
-        } else {
-            document.getElementById('admin-content').style.display = 'block';
-            loadUsers();
-        }
-    })();
-
-    async function loadUsers() {
-        try {
-            const apiBase = (typeof API !== 'undefined') ? API : '';
-            const res = await fetch(`${apiBase}/api/profile/all-users`, {
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (res.status === 401) { window.location.href = 'auth.html'; return; }
-            if (res.status === 403) { showNotification('Access denied: Administrator only.', 'error'); return; }
-            if (res.status === 404) {
-                showNotification('Admin API route not found — deploy the updated profile.js to the server.', 'error');
-                document.getElementById('users-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--danger);">Route not found on server. Deploy the updated profile.js.</td></tr>';
-                return;
-            }
-
-            const data = await res.json();
-            if (!data || !data.success) {
-                showNotification(data?.message || 'Failed to load users.', 'error');
-                return;
-            }
-            renderUsers(data.users);
-        } catch(e) {
-            console.error('[admin] loadUsers error:', e);
-            showNotification('Network error — check your connection.', 'error');
-            document.getElementById('users-tbody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--danger);">Connection error. Check console for details.</td></tr>';
-        }
+    if (user.position !== 'Administrator') {
+        document.getElementById('access-denied-msg').style.display = 'block';
+        return;
     }
 
-    function renderUsers(users) {
-        const tbody = document.getElementById('users-tbody');
-        if (!users || !users.length) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--gray);">No users found.</td></tr>';
+    document.getElementById('admin-content').style.display = 'block';
+    loadStats();
+    loadOpenEvents();
+    startAutoRefresh();
+    startSessionClock();
+})();
+
+// ── SESSION CLOCK ─────────────────────────────────────────────
+function startSessionClock() {
+    setInterval(() => {
+        const s = Math.floor((Date.now() - sessionStart) / 1000);
+        const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+        const el = document.getElementById('session-duration');
+        if (el) el.textContent = `${h}h ${String(m).padStart(2,'0')}m ${String(sec).padStart(2,'0')}s`;
+    }, 1000);
+}
+
+// ── AUTO-REFRESH ──────────────────────────────────────────────
+function startAutoRefresh() {
+    if (arInterval) clearInterval(arInterval);
+    arInterval = setInterval(() => {
+        if (autoRefresh) {
+            loadOpenEvents(true); // silent
+            loadStats();
+        }
+    }, 8000);
+}
+
+function toggleAutoRefresh() {
+    autoRefresh = !autoRefresh;
+    document.getElementById('ar-dot').className   = 'auto-refresh-dot' + (autoRefresh ? '' : ' paused');
+    document.getElementById('ar-label').textContent = autoRefresh ? 'Auto-refresh on' : 'Auto-refresh off';
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+const tabLoaded = {};
+function switchTab(name, btn) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+    if (!tabLoaded[name]) {
+        tabLoaded[name] = true;
+        if (name === 'users')     loadUsers();
+        if (name === 'sensors')   loadSensors();
+        if (name === 'analytics') loadAnalytics();
+        if (name === 'logs')      loadLogs();
+    }
+}
+
+// ── STATS ─────────────────────────────────────────────────────
+async function loadStats() {
+    try {
+        const [usersData, statsData, eventsData] = await Promise.all([
+            apiFetch('/profile/all-users'),
+            apiFetch('/history/stats'),
+            apiFetch('/readings/open-events'),
+        ]);
+        if (usersData?.success) {
+            document.getElementById('stat-users').textContent  = usersData.users.length;
+            document.getElementById('stat-active').textContent = usersData.users.filter(u => u.is_active).length;
+        }
+        if (statsData?.success) {
+            document.getElementById('stat-today').textContent    = statsData.stats.today;
+            document.getElementById('stat-total').textContent    = statsData.stats.total;
+            document.getElementById('stat-resolved').textContent = statsData.stats.resolved;
+        }
+        if (eventsData?.success) {
+            const open = eventsData.data?.length || 0;
+            document.getElementById('stat-open').textContent = open;
+            const badge = document.getElementById('events-badge');
+            badge.textContent = open;
+            badge.style.display = open > 0 ? 'flex' : 'none';
+        }
+    } catch(e) {}
+}
+
+// ── LIVE EVENTS ───────────────────────────────────────────────
+async function loadOpenEvents(silent = false) {
+    const list = document.getElementById('events-list');
+    if (!silent) list.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+    try {
+        const data = await apiFetch('/readings/open-events');
+        if (!data?.success) {
+            list.innerHTML = '<div class="empty-state"><p style="color:var(--danger);">Failed to load events.</p></div>';
             return;
         }
-        tbody.innerHTML = users.map(u => `
-            <tr id="row-${u.id}">
-                <td data-label="Name"><strong>${escHtml(u.full_name || '—')}</strong></td>
-                <td data-label="Employee ID" style="font-family:'Space Grotesk',monospace;font-size:0.82rem;">${escHtml(u.employee_id || '—')}</td>
-                <td data-label="Position">${escHtml(u.position || '—')}</td>
-                <td data-label="Status">
-                    <span class="status-pill ${u.is_active ? 'active' : 'inactive'}">
-                        ${u.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                </td>
-                <td data-label="Action">
-                    <button class="toggle-btn ${u.is_active ? 'deactivate' : 'activate'}"
-                            onclick="toggleUser(${u.id}, ${u.is_active ? 0 : 1})">
-                        ${u.is_active ? 'Deactivate' : 'Activate'}
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    async function toggleUser(userId, newActive) {
-        try {
-            const apiBase = (typeof API !== 'undefined') ? API : '';
-            const csrfMatch = document.cookie.match(/(?:^|;\s*)fz_csrf=([^;]+)/);
-            const csrfToken = csrfMatch ? decodeURIComponent(csrfMatch[1]) : '';
-            const res = await fetch(`${apiBase}/api/profile/toggle-active/${userId}`, {
-                method: 'PATCH',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(csrfToken ? { 'x-csrf-token': csrfToken } : {})
-                },
-                body: JSON.stringify({ is_active: newActive })
-            });
-            if (res.status === 401) { window.location.href = 'auth.html'; return; }
-            const data = await res.json();
-            if (data && data.success) {
-                showNotification(newActive ? 'User activated.' : 'User deactivated.', 'success');
-                loadUsers();
-            } else {
-                showNotification(data?.message || 'Failed to update user.', 'error');
-            }
-        } catch(e) {
-            showNotification('Network error — check your connection.', 'error');
+        if (!data.data?.length) {
+            list.innerHTML = `<div class="empty-state">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <p>All clear! No open detection events.</p>
+            </div>`;
+            return;
         }
+        list.innerHTML = data.data.map(e => {
+            const isAck = e.event_status === 'Acknowledged';
+            const time = e.detected_at
+                ? new Date(e.detected_at).toLocaleString('en-PH', { timeZone:'Asia/Manila', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
+                : '—';
+            const ackTime = e.acknowledged_at
+                ? new Date(e.acknowledged_at).toLocaleString('en-PH', { timeZone:'Asia/Manila', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
+                : null;
+            const pm = e.pm1_0_value !== null && e.pm1_0_value !== undefined
+                ? parseFloat(e.pm1_0_value).toFixed(1) + ' µg/m³' : '—';
+            return `<div class="live-event-card ${isAck ? 'acknowledged-card' : ''}">
+                <div class="event-pulse ${isAck ? 'warn' : ''}"></div>
+                <div class="event-info">
+                    <div class="event-location">${escHtml(e.location_name || e.sensor_location || '—')}</div>
+                    <div class="event-meta">
+                        <span class="status-pill ${e.event_status.toLowerCase()}">${escHtml(e.event_status)}</span>
+                        &nbsp;·&nbsp; PM1.0: <strong>${pm}</strong>
+                        &nbsp;·&nbsp; Detected: ${time}
+                        ${ackTime ? `&nbsp;·&nbsp; Acknowledged: ${ackTime}` : ''}
+                        &nbsp;·&nbsp; Node: <code style="font-size:0.78rem;background:rgba(0,78,122,0.07);padding:1px 6px;border-radius:5px;">${escHtml(e.node_code || '—')}</code>
+                    </div>
+                </div>
+                <div class="event-actions">
+                    ${!isAck ? `<button class="toggle-btn warn" onclick="acknowledgeEvent(${e.id})">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Acknowledge
+                    </button>` : ''}
+                    <button class="toggle-btn activate" onclick="openResolveModal(${e.id})">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        Resolve
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    } catch(e) {
+        if (!silent) list.innerHTML = '<div class="empty-state"><p style="color:var(--danger);">Connection error.</p></div>';
     }
+}
 
-    function escHtml(str) {
-        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+async function acknowledgeEvent(eventId) {
+    try {
+        const data = await apiFetch(`/readings/acknowledge/${eventId}`, { method: 'POST', body: JSON.stringify({}) });
+        if (data?.success) {
+            showNotification('Event acknowledged.', 'success');
+            loadOpenEvents();
+            loadStats();
+        } else {
+            showNotification(data?.message || 'Failed to acknowledge.', 'error');
+        }
+    } catch(e) { showNotification('Connection error.', 'error'); }
+}
+
+function openResolveModal(eventId) {
+    pendingResolveId = eventId;
+    document.getElementById('notesInput').value = '';
+    document.getElementById('resolveModal').style.display = 'flex';
+}
+
+async function executeResolve() {
+    if (!pendingResolveId) return;
+    const notes = document.getElementById('notesInput').value.trim();
+    document.getElementById('resolveModal').style.display = 'none';
+    try {
+        const data = await apiFetch(`/readings/resolve/${pendingResolveId}`, {
+            method: 'POST',
+            body: JSON.stringify({ notes: notes || undefined })
+        });
+        if (data?.success) {
+            showNotification('Event resolved successfully.', 'success');
+            pendingResolveId = null;
+            loadOpenEvents();
+            loadStats();
+            if (tabLoaded.logs) loadLogs();
+            if (tabLoaded.analytics) loadAnalytics();
+        } else {
+            showNotification(data?.message || 'Failed to resolve event.', 'error');
+        }
+    } catch(e) { showNotification('Connection error.', 'error'); }
+}
+
+// ── USERS ─────────────────────────────────────────────────────
+async function loadUsers() {
+    const tbody = document.getElementById('users-tbody');
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--gray);">Loading…</td></tr>';
+    document.getElementById('user-count-label').textContent = '';
+    try {
+        const data = await apiFetch('/profile/all-users');
+        if (!data?.success) { showNotification(data?.message || 'Failed to load users.', 'error'); return; }
+        allUsersCache = data.users;
+        filterUsers();
+        loadStats();
+    } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--danger);">Connection error.</td></tr>';
     }
+}
 
-    initHotkeys('dashboard');
+function filterUsers() {
+    const q      = (document.getElementById('user-search')?.value || '').toLowerCase();
+    const status = document.getElementById('user-status-filter')?.value || '';
+    const filtered = allUsersCache.filter(u => {
+        const matchQ = !q || [u.full_name, u.employee_id, u.email, u.position].some(v => String(v||'').toLowerCase().includes(q));
+        const matchS = !status || (status === 'active' ? u.is_active : !u.is_active);
+        return matchQ && matchS;
+    });
+    renderUsers(filtered);
+    document.getElementById('user-count-label').textContent = `Showing ${filtered.length} of ${allUsersCache.length} user${allUsersCache.length !== 1 ? 's' : ''}`;
+}
+
+function fmtDate(val) {
+    if (!val) return '—';
+    try { return new Date(val).toLocaleDateString('en-PH', { timeZone:'Asia/Manila', month:'short', day:'numeric', year:'numeric' }); } catch(_) { return '—'; }
+}
+function fmtDateTime(val) {
+    if (!val) return '—';
+    try { return new Date(val).toLocaleString('en-PH', { timeZone:'Asia/Manila', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }); } catch(_) { return '—'; }
+}
+
+function renderUsers(users) {
+    const tbody = document.getElementById('users-tbody');
+    if (!users?.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--gray);">No matching users found.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = users.map(u => {
+        const isSelf = currentUser && u.id === currentUser.id;
+        return `<tr id="row-${u.id}">
+            <td><strong>${escHtml(u.full_name || '—')}</strong>${isSelf ? ' <span style="font-size:0.72rem;background:rgba(0,180,216,0.12);color:var(--primary);padding:2px 7px;border-radius:99px;font-weight:700;">You</span>' : ''}</td>
+            <td style="font-family:'Space Grotesk',monospace;font-size:0.82rem;">${escHtml(u.employee_id || '—')}</td>
+            <td>${escHtml(u.position || '—')}</td>
+            <td style="font-size:0.82rem;">${escHtml(u.email || '—')}</td>
+            <td style="font-size:0.8rem;color:var(--gray);">${fmtDate(u.date_joined)}</td>
+            <td style="font-size:0.8rem;color:var(--gray);">${fmtDateTime(u.last_login)}</td>
+            <td><span class="status-pill ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span></td>
+            <td>${isSelf
+                ? '<span style="font-size:0.78rem;color:var(--gray);">—</span>'
+                : `<button class="toggle-btn ${u.is_active ? 'deactivate' : 'activate'}" onclick="toggleUser(${u.id},${u.is_active ? 0 : 1})">${u.is_active ? 'Deactivate' : 'Activate'}</button>`
+            }</td>
+        </tr>`;
+    }).join('');
+}
+
+async function toggleUser(userId, newActive) {
+    try {
+        const data = await apiFetch(`/profile/toggle-active/${userId}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ is_active: newActive })
+        });
+        if (data?.success) {
+            showNotification(newActive ? 'User activated.' : 'User deactivated.', 'success');
+            loadUsers();
+        } else {
+            showNotification(data?.message || 'Failed to update user.', 'error');
+        }
+    } catch(e) { showNotification('Connection error.', 'error'); }
+}
+
+function exportUsers() {
+    if (!allUsersCache.length) { showNotification('Load users first.', 'error'); return; }
+    const cols = ['ID','Employee ID','Full Name','Email','Position','Active','Date Joined','Last Login'];
+    const rows = allUsersCache.map(u => [u.id, u.employee_id, u.full_name, u.email, u.position, u.is_active ? 'Yes' : 'No', fmtDate(u.date_joined), fmtDateTime(u.last_login)]);
+    downloadCSV('freshzone-users.csv', cols, rows);
+}
+
+// ── SENSORS ───────────────────────────────────────────────────
+async function loadSensors() {
+    const list = document.getElementById('sensors-list');
+    list.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+    try {
+        const data = await apiFetch('/readings/live');
+        if (!data?.success || !data.data?.length) {
+            list.innerHTML = '<div class="empty-state"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><p>No sensor nodes found.</p></div>';
+            return;
+        }
+        list.innerHTML = data.data.map(node => {
+            const online = !!node.node_active;
+            const lastSeen = node.last_seen
+                ? new Date(node.last_seen).toLocaleString('en-PH', { timeZone:'Asia/Manila', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' })
+                : 'Never';
+            const pmVal = node.pm1_0 !== null && node.pm1_0 !== undefined ? parseFloat(node.pm1_0) : null;
+            const pm = pmVal !== null ? pmVal.toFixed(1) + ' µg/m³' : '—';
+            // PM bar: 0–100 µg/m³ range, color by threshold
+            const pct = pmVal !== null ? Math.min(100, (pmVal / 100) * 100) : 0;
+            const barColor = pmVal === null ? '#94a3b8' : pmVal > 80 ? '#ef4444' : pmVal > 35 ? '#f59e0b' : '#22c55e';
+            const smoke = node.smoke_detected;
+            return `<div class="node-card">
+                <div class="node-dot ${online ? 'online' : 'offline'}"></div>
+                <div class="node-info">
+                    <div class="node-name">${escHtml(node.location_name || node.node_code)}
+                        ${smoke ? ' <span style="font-size:0.72rem;background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:99px;font-weight:700;">⚠ Vape Detected</span>' : ''}
+                    </div>
+                    <div class="node-meta"><strong>${escHtml(node.node_code)}</strong> &nbsp;·&nbsp; Last seen: ${lastSeen}</div>
+                    <div class="node-pm-bar">
+                        <div class="node-pm-track"><div class="node-pm-fill" style="width:${pct}%;background:${barColor};"></div></div>
+                        <span style="font-size:0.78rem;font-weight:700;color:${barColor};">${pm}</span>
+                    </div>
+                </div>
+                <span class="status-pill ${online ? 'online' : 'offline'}">${online ? 'Online' : 'Offline'}</span>
+            </div>`;
+        }).join('');
+    } catch(e) {
+        list.innerHTML = '<div class="empty-state"><p style="color:var(--danger);">Connection error.</p></div>';
+    }
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────
+async function loadAnalytics() {
+    // Fetch last 500 history entries for analytics
+    try {
+        const data = await apiFetch('/history?limit=500');
+        if (!data?.success || !data.data?.length) {
+            document.getElementById('analytics-summary').innerHTML = '<p style="color:var(--gray);font-size:0.85rem;">No data yet.</p>';
+            return;
+        }
+        const events = data.data;
+
+        // ── Summary ──
+        const total    = events.length;
+        const cleared  = events.filter(e => e.status === 'Cleared').length;
+        const acked    = events.filter(e => e.status === 'Acknowledged').length;
+        const detected = events.filter(e => e.status === 'Detected').length;
+        const resolveRate = total > 0 ? ((cleared / total) * 100).toFixed(1) : 0;
+
+        const pmVals = events.map(e => parseFloat(e.pm1_0)).filter(v => !isNaN(v));
+        const avgPM  = pmVals.length ? (pmVals.reduce((a,b) => a+b, 0) / pmVals.length).toFixed(1) : '—';
+        const maxPM  = pmVals.length ? Math.max(...pmVals).toFixed(1) : '—';
+
+        document.getElementById('analytics-summary').innerHTML = `
+            <div class="metric-row"><span class="metric-label">Total events</span><span class="metric-val">${total}</span></div>
+            <div class="metric-row"><span class="metric-label">Resolved (Cleared)</span><span class="metric-val">${cleared} <span style="font-size:0.75rem;font-weight:500;color:var(--gray);">(${resolveRate}%)</span></span></div>
+            <div class="metric-row"><span class="metric-label">Acknowledged</span><span class="metric-val">${acked}</span></div>
+            <div class="metric-row"><span class="metric-label">Still Detected</span><span class="metric-val">${detected}</span></div>
+            <div class="metric-row"><span class="metric-label">Avg PM1.0</span><span class="metric-val">${avgPM} µg/m³</span></div>
+            <div class="metric-row"><span class="metric-label">Peak PM1.0</span><span class="metric-val">${maxPM} µg/m³</span></div>
+        `;
+
+        // ── By hour (last 7 days) ──
+        const now = Date.now();
+        const sevenDays = 7 * 24 * 3600 * 1000;
+        const recent = events.filter(e => e.detected_at && (now - new Date(e.detected_at).getTime()) < sevenDays);
+        const byHour = Array(24).fill(0);
+        recent.forEach(e => {
+            const h = new Date(e.detected_at).toLocaleString('en-PH', { timeZone:'Asia/Manila', hour:'numeric', hour12:false });
+            const hInt = parseInt(h);
+            if (!isNaN(hInt)) byHour[hInt]++;
+        });
+        const maxH = Math.max(...byHour, 1);
+        const peakHours = byHour.map((c,h) => ({ h, c })).sort((a,b) => b.c - a.c).slice(0,6);
+        document.getElementById('analytics-hours').innerHTML = peakHours.map(({ h, c }) => {
+            const label = h === 0 ? '12am' : h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h-12}pm`;
+            return `<div class="bar-row">
+                <div class="bar-label">${label}</div>
+                <div class="bar-track"><div class="bar-fill" style="width:${(c/maxH*100).toFixed(1)}%"></div></div>
+                <div class="bar-val">${c}</div>
+            </div>`;
+        }).join('') || '<p style="color:var(--gray);font-size:0.85rem;">No data in last 7 days.</p>';
+
+        // ── Response Performance ──
+        const withResp = events.filter(e => e.response_seconds !== null && e.response_seconds !== undefined);
+        const withRes  = events.filter(e => e.resolution_seconds !== null && e.resolution_seconds !== undefined);
+        const avgResp  = withResp.length ? (withResp.reduce((a,e) => a + Number(e.response_seconds), 0) / withResp.length) : null;
+        const avgRes   = withRes.length  ? (withRes.reduce((a,e) => a + Number(e.resolution_seconds), 0) / withRes.length) : null;
+        const fmtSec   = (s) => s === null ? '—' : s < 60 ? `${Math.round(s)}s` : `${Math.floor(s/60)}m ${Math.round(s%60)}s`;
+        document.getElementById('analytics-perf').innerHTML = `
+            <div class="metric-row"><span class="metric-label">Avg. Response Time</span><span class="metric-val">${fmtSec(avgResp)}</span></div>
+            <div class="metric-row"><span class="metric-label">Avg. Resolution Time</span><span class="metric-val">${fmtSec(avgRes)}</span></div>
+            <div class="metric-row"><span class="metric-label">Events with response logged</span><span class="metric-val">${withResp.length}</span></div>
+            <div class="metric-row"><span class="metric-label">Events fully resolved</span><span class="metric-val">${withRes.length}</span></div>
+        `;
+
+        // ── Top staff ──
+        const staffCounts = {};
+        events.forEach(e => {
+            const name = e.handled_by || e.acknowledged_by_name;
+            if (name && name !== '—' && name !== '') {
+                staffCounts[name] = (staffCounts[name] || 0) + 1;
+            }
+        });
+        const staffArr = Object.entries(staffCounts).sort((a,b) => b[1]-a[1]).slice(0,6);
+        const maxStaff = staffArr[0]?.[1] || 1;
+        document.getElementById('analytics-staff').innerHTML = staffArr.length
+            ? staffArr.map(([name, cnt]) => `<div class="bar-row">
+                <div class="bar-label" title="${escHtml(name)}">${escHtml(name)}</div>
+                <div class="bar-track"><div class="bar-fill" style="width:${(cnt/maxStaff*100).toFixed(1)}%"></div></div>
+                <div class="bar-val">${cnt}</div>
+              </div>`).join('')
+            : '<p style="color:var(--gray);font-size:0.85rem;">No staff data yet.</p>';
+
+    } catch(e) {
+        document.getElementById('analytics-summary').innerHTML = '<p style="color:var(--danger);font-size:0.85rem;">Connection error.</p>';
+    }
+}
+
+// ── ACTIVITY LOGS ─────────────────────────────────────────────
+async function loadLogs() {
+    const logsEl = document.getElementById('logs-list');
+    const statusFilter = document.getElementById('log-status-filter')?.value || '';
+    logsEl.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+    try {
+        let url = '/history?limit=60';
+        if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
+        const data = await apiFetch(url);
+        if (!data?.success) { logsEl.innerHTML = '<div class="empty-state"><p style="color:var(--danger);">Failed to load logs.</p></div>'; return; }
+        if (!data.data?.length) { logsEl.innerHTML = '<div class="empty-state"><p>No history yet.</p></div>'; return; }
+
+        logsEl.innerHTML = data.data.map(e => {
+            const time = e.detected_at
+                ? new Date(e.detected_at).toLocaleString('en-PH', { timeZone:'Asia/Manila', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
+                : '—';
+            const statusColors = { Cleared:'#15803d', Acknowledged:'#d97706', Detected:'#dc2626' };
+            const sc = statusColors[e.status] || '#64748b';
+            const pm = e.pm1_0 !== null && e.pm1_0 !== undefined ? parseFloat(e.pm1_0).toFixed(1) + ' µg/m³' : (e.pm1_0_value !== undefined ? parseFloat(e.pm1_0_value||0).toFixed(1) + ' µg/m³' : '—');
+            return `<div class="log-entry">
+                <div class="log-time">${time}</div>
+                <div class="log-action" style="color:${sc};">${escHtml(e.status)}</div>
+                <div class="log-desc">
+                    ${escHtml(e.location)} &mdash; PM1.0: ${pm}
+                    ${e.handled_by && e.handled_by !== '—' ? `<span style="color:var(--gray);font-size:0.78rem;"> · by ${escHtml(e.handled_by)}</span>` : ''}
+                    ${e.notes ? `<span style="color:var(--gray);font-size:0.78rem;"> · "${escHtml(e.notes)}"</span>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    } catch(e) {
+        logsEl.innerHTML = '<div class="empty-state"><p style="color:var(--danger);">Connection error.</p></div>';
+    }
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+async function exportHistory() {
+    showNotification('Preparing export…', 'info');
+    try {
+        const data = await apiFetch('/history?limit=500');
+        if (!data?.success || !data.data?.length) { showNotification('No data to export.', 'error'); return; }
+        const cols = ['ID','Location','Status','PM1.0 (µg/m³)','Detected At','Acknowledged At','Resolved At','Handled By','Notes'];
+        const rows = data.data.map(e => [
+            e.id, e.location, e.status,
+            e.pm1_0 ?? e.pm1_0_value ?? '',
+            fmtDateTime(e.detected_at), fmtDateTime(e.acknowledged_at), fmtDateTime(e.resolved_at),
+            e.handled_by || e.acknowledged_by_name || '',
+            e.notes || ''
+        ]);
+        downloadCSV('freshzone-history.csv', cols, rows);
+        showNotification('History exported!', 'success');
+    } catch(e) { showNotification('Export failed.', 'error'); }
+}
+
+function downloadCSV(filename, cols, rows) {
+    const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csv = [cols.map(esc).join(','), ...rows.map(r => r.map(esc).join(','))].join('\r\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+// ── DANGER ZONE ───────────────────────────────────────────────
+function confirmClearHistory() {
+    document.getElementById('clearConfirmInput').value = '';
+    document.getElementById('clearModal').style.display = 'flex';
+}
+
+async function executeClearHistory() {
+    const val = document.getElementById('clearConfirmInput').value.trim();
+    if (val !== 'CLEAR ALL') { showNotification('Type exactly "CLEAR ALL" to confirm.', 'error'); return; }
+    document.getElementById('clearModal').style.display = 'none';
+    try {
+        const data = await apiFetch('/history/clear-all', { method: 'DELETE' });
+        if (data?.success) {
+            showNotification('All history cleared successfully.', 'success');
+            loadStats();
+            if (tabLoaded.logs)      loadLogs();
+            if (tabLoaded.analytics) loadAnalytics();
+            loadOpenEvents();
+        } else {
+            showNotification(data?.message || 'Failed to clear history.', 'error');
+        }
+    } catch(e) { showNotification('Connection error.', 'error'); }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+initHotkeys('dashboard');
 </script>
 <script src="/pwa.js" defer></script>
 </body>
