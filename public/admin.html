@@ -795,7 +795,7 @@
             const csrfMatch = document.cookie.match(/(?:^|;\s*)fz_csrf=([^;]+)/);
             const csrfToken = csrfMatch ? decodeURIComponent(csrfMatch[1]) : '';
             const res = await fetch(`${apiBase}/api/profile/toggle-active/${userId}`, {
-                method: 'POST',
+                method: 'PATCH',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
