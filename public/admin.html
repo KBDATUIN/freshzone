@@ -512,13 +512,14 @@
                             <tr>
                                 <th>From</th>
                                 <th>Subject</th>
+                                <th>Message</th>
                                 <th>Received</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="tickets-tbody">
-                            <tr><td colspan="5" class="admin-empty">Loading tickets…</td></tr>
+                            <tr><td colspan="6" class="admin-empty">Loading tickets…</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -588,6 +589,22 @@
 
 <div id="session-warning" role="status"></div>
 <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+<!-- Ticket Message Modal -->
+<div id="ticketModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="ticket-modal-title" style="display:none;" onclick="if(event.target===this)closeTicketModal()">
+    <div class="modal-content-custom" style="max-width:520px;width:90%;">
+        <h3 id="ticket-modal-title" style="margin-bottom:0.25rem;">Support Ticket</h3>
+        <p id="ticket-modal-meta" style="font-size:0.78rem;color:var(--gray);margin-bottom:1rem;"></p>
+        <div style="background:var(--card-bg,#f0f9ff);border:1px solid rgba(0,120,180,0.12);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1.25rem;">
+            <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;color:var(--gray);text-transform:uppercase;margin-bottom:0.4rem;">Message</div>
+            <p id="ticket-modal-message" style="white-space:pre-wrap;font-size:0.88rem;color:var(--text);line-height:1.65;margin:0;word-break:break-word;"></p>
+        </div>
+        <div class="modal-btn-group">
+            <button id="ticket-modal-resolve-btn" class="confirm-btn" style="background:linear-gradient(135deg,#15803d,#166534) !important;" onclick="resolveFromModal()">Resolve Ticket</button>
+            <button class="cancel-btn" onclick="closeTicketModal()">Close</button>
+        </div>
+    </div>
+</div>
 
 <div id="logoutModal" class="modal-overlay-custom" role="dialog" aria-modal="true" aria-labelledby="logout-title">
     <div class="modal-content-custom">
@@ -923,7 +940,7 @@
             const res = await fetch(`${apiBase}/api/contact`, { credentials: 'include' }).catch(() => null);
             const tbody = document.getElementById('tickets-tbody');
             if (!res || !res.ok) {
-                tbody.innerHTML = '<tr><td colspan="5" class="admin-empty">No support tickets found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="admin-empty">No support tickets found.</td></tr>';
                 document.getElementById('stat-open-tickets').textContent = '0';
                 return;
             }
@@ -934,27 +951,34 @@
             const open = tickets.filter(t => t.ticket_status !== 'Resolved').length;
             document.getElementById('stat-open-tickets').textContent = open;
             if (!tickets.length) {
-                tbody.innerHTML = '<tr><td colspan="5" class="admin-empty">No support tickets found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="admin-empty">No support tickets found.</td></tr>';
                 return;
             }
             const phOpts = { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             tbody.innerHTML = tickets.map(t => {
                 const isResolved = t.ticket_status === 'Resolved';
                 const receivedTs = t.created_at ? new Date(t.created_at).toLocaleString('en-PH', phOpts) : (t.created_at || '—');
+                const msgPreview = t.message ? (t.message.length > 60 ? escHtml(t.message.slice(0, 60)) + '…' : escHtml(t.message)) : '<span style="color:var(--gray);font-style:italic;">No message</span>';
+                const msgEscaped = escHtml(t.message || '');
+                const nameEscaped = escHtml(t.submitter_name || '—');
+                const emailEscaped = escHtml(t.submitter_email || '');
+                const subjectEscaped = escHtml(t.subject || '—');
                 return `
                 <tr>
-                    <td data-label="From"><strong>${escHtml(t.submitter_name || '—')}</strong><br><span style="font-size:0.75rem;color:var(--gray);">${escHtml(t.submitter_email || '')}</span></td>
-                    <td data-label="Subject">${escHtml(t.subject || '—')}</td>
+                    <td data-label="From"><strong>${nameEscaped}</strong><br><span style="font-size:0.75rem;color:var(--gray);">${emailEscaped}</span></td>
+                    <td data-label="Subject">${subjectEscaped}</td>
+                    <td data-label="Message" style="font-size:0.8rem;color:var(--gray);max-width:200px;">${msgPreview}</td>
                     <td data-label="Received" style="font-family:'Space Grotesk',monospace;font-size:0.78rem;">${escHtml(receivedTs)}</td>
                     <td data-label="Status"><span class="status-pill ${isResolved ? 'resolved' : 'open'}">${isResolved ? 'Resolved' : 'Open'}</span></td>
-                    <td data-label="Action">
+                    <td data-label="Action" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                        <button class="toggle-btn" style="background:rgba(0,120,180,0.12);color:#005c81;" onclick="viewTicket(${t.id}, '${nameEscaped}', '${emailEscaped}', '${subjectEscaped}', '${msgEscaped}', '${escHtml(receivedTs)}', ${isResolved})">View</button>
                         ${!isResolved ? `<button class="toggle-btn resolve" onclick="resolveTicket(${t.id})">Resolve</button>` : '—'}
                     </td>
                 </tr>`;
             }).join('');
         } catch(e) {
             document.getElementById('tickets-tbody').innerHTML =
-                '<tr><td colspan="5" class="admin-empty" style="color:var(--danger);">Error loading tickets.</td></tr>';
+                '<tr><td colspan="6" class="admin-empty" style="color:var(--danger);">Error loading tickets.</td></tr>';
         }
     }
 
@@ -972,6 +996,29 @@
             if (data && data.success) { showNotification('Ticket resolved.', 'success'); loadTickets(); }
             else showNotification(data?.message || 'Failed to resolve ticket.', 'error');
         } catch(e) { showNotification('Network error.', 'error'); }
+    }
+
+    // ── TICKET MODAL ────────────────────────────────────────────────
+    let _ticketModalId = null;
+    function viewTicket(id, name, email, subject, message, received, isResolved) {
+        _ticketModalId = id;
+        document.getElementById('ticket-modal-title').textContent = subject || 'Support Ticket';
+        document.getElementById('ticket-modal-meta').textContent = `From: ${name} (${email}) · Received: ${received}`;
+        document.getElementById('ticket-modal-message').textContent = message || '(No message content)';
+        const resolveBtn = document.getElementById('ticket-modal-resolve-btn');
+        resolveBtn.style.display = isResolved ? 'none' : '';
+        document.getElementById('ticketModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeTicketModal() {
+        document.getElementById('ticketModal').style.display = 'none';
+        document.body.style.overflow = '';
+        _ticketModalId = null;
+    }
+    async function resolveFromModal() {
+        if (!_ticketModalId) return;
+        await resolveTicket(_ticketModalId);
+        closeTicketModal();
     }
 
     // ── HISTORY LOG ────────────────────────────────────────────────
