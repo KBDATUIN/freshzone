@@ -653,50 +653,55 @@
         try {
             const apiBase = (typeof API !== 'undefined') ? API : '';
 
-            // Load user stats
-            const uRes = await fetch(`${apiBase}/api/profile/all-users`, { credentials: 'include' });
-            if (uRes.ok) {
-                const uData = await uRes.json();
+            // Load user stats via /api/profile/all-users
+            const uRes = await fetch(`${apiBase}/api/profile/all-users`, { credentials: 'include' }).catch(() => null);
+            if (uRes && uRes.ok) {
+                const uData = await uRes.json().catch(() => null);
                 if (uData && uData.success && uData.users) {
-                    const total  = uData.users.length;
-                    const active = uData.users.filter(u => u.is_active).length;
-                    document.getElementById('stat-total-users').textContent  = total;
-                    document.getElementById('stat-active-users').textContent = active;
+                    document.getElementById('stat-total-users').textContent  = uData.users.length;
+                    document.getElementById('stat-active-users').textContent = uData.users.filter(u => u.is_active).length;
                 }
             }
 
-            // Load detection stats
-            const dRes = await fetch(`${apiBase}/api/readings/stats`, { credentials: 'include' }).catch(() => null);
-            if (dRes && dRes.ok) {
-                const dData = await dRes.json().catch(() => null);
-                if (dData) {
-                    if (dData.today   !== undefined) document.getElementById('stat-detections-today').textContent  = dData.today;
-                    if (dData.total   !== undefined) document.getElementById('stat-total-detections').textContent  = dData.total;
-                    if (dData.alerts  !== undefined) document.getElementById('stat-open-alerts').textContent       = dData.alerts;
-                    if (dData.tickets !== undefined) document.getElementById('stat-open-tickets').textContent      = dData.tickets;
-                }
-            } else {
-                // Fallback: zero stats
-                ['stat-open-alerts','stat-detections-today','stat-open-tickets'].forEach(id => {
-                    if (document.getElementById(id).textContent === '—')
-                        document.getElementById(id).textContent = '0';
-                });
-            }
-
-            // Load detection count from history if stats endpoint missing
-            const hRes = await fetch(`${apiBase}/api/history?limit=1`, { credentials: 'include' }).catch(() => null);
+            // Load detection stats via /api/history/stats (today + total)
+            const hRes = await fetch(`${apiBase}/api/history/stats`, { credentials: 'include' }).catch(() => null);
             if (hRes && hRes.ok) {
                 const hData = await hRes.json().catch(() => null);
-                if (hData && hData.total !== undefined && document.getElementById('stat-total-detections').textContent === '—') {
-                    document.getElementById('stat-total-detections').textContent = hData.total;
+                if (hData && hData.success && hData.stats) {
+                    document.getElementById('stat-detections-today').textContent = hData.stats.today  ?? '0';
+                    document.getElementById('stat-total-detections').textContent = hData.stats.total  ?? '0';
                 }
+            } else {
+                document.getElementById('stat-detections-today').textContent = '0';
+                document.getElementById('stat-total-detections').textContent = '0';
+            }
+
+            // Load open alerts count via /api/readings/open-events
+            const aRes = await fetch(`${apiBase}/api/readings/open-events`, { credentials: 'include' }).catch(() => null);
+            if (aRes && aRes.ok) {
+                const aData = await aRes.json().catch(() => null);
+                const openCount = (aData && aData.data) ? aData.data.length : 0;
+                document.getElementById('stat-open-alerts').textContent = openCount;
+            } else {
+                document.getElementById('stat-open-alerts').textContent = '0';
+            }
+
+            // Load open tickets count via /api/contact (correct URL)
+            const tRes = await fetch(`${apiBase}/api/contact`, { credentials: 'include' }).catch(() => null);
+            if (tRes && tRes.ok) {
+                const tData = await tRes.json().catch(() => null);
+                const tickets = (tData && tData.data) ? tData.data : [];
+                const openTickets = tickets.filter(t => t.ticket_status !== 'Resolved').length;
+                document.getElementById('stat-open-tickets').textContent = openTickets;
+            } else {
+                document.getElementById('stat-open-tickets').textContent = '0';
             }
 
         } catch(e) {
             console.warn('[admin] loadStats error:', e);
             ['stat-open-alerts','stat-total-users','stat-active-users',
              'stat-detections-today','stat-total-detections','stat-open-tickets']
-            .forEach(id => { if (document.getElementById(id).textContent === '—') document.getElementById(id).textContent = '—'; });
+            .forEach(id => { const el = document.getElementById(id); if (el && el.textContent === '—') el.textContent = '0'; });
         }
     }
 
@@ -785,7 +790,7 @@
             const csrfMatch = document.cookie.match(/(?:^|;\s*)fz_csrf=([^;]+)/);
             const csrfToken = csrfMatch ? decodeURIComponent(csrfMatch[1]) : '';
             const res = await fetch(`${apiBase}/api/profile/toggle-active/${userId}`, {
-                method: 'PATCH',
+                method: 'POST',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
@@ -812,28 +817,37 @@
         const el = document.getElementById('alerts-content');
         try {
             const apiBase = (typeof API !== 'undefined') ? API : '';
-            const res = await fetch(`${apiBase}/api/readings/alerts`, { credentials: 'include' }).catch(() => null);
+            const res = await fetch(`${apiBase}/api/readings/open-events`, { credentials: 'include' }).catch(() => null);
             if (!res || !res.ok) {
                 el.innerHTML = '<div class="admin-empty">No active alerts at this time.</div>';
                 document.getElementById('stat-open-alerts').textContent = '0';
                 return;
             }
             const data = await res.json().catch(() => null);
-            const alerts = data?.alerts || data?.data || [];
+            const alerts = (data && data.data) ? data.data : [];
             document.getElementById('stat-open-alerts').textContent = alerts.length;
             if (!alerts.length) {
                 el.innerHTML = '<div class="admin-empty">No active alerts at this time.</div>';
                 return;
             }
-            el.innerHTML = alerts.map(a => `
+            const phOpts = { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            el.innerHTML = alerts.map(a => {
+                const severity = a.event_status === 'Detected' ? 'high' : 'medium';
+                const location = a.location_name || a.sensor_location || 'Unknown zone';
+                const pm1      = a.pm1_0_value != null ? `PM1.0: ${parseFloat(a.pm1_0_value).toFixed(1)} µg/m³` : '';
+                const ts       = a.detected_at ? new Date(a.detected_at).toLocaleString('en-PH', phOpts) : '';
+                const badge    = a.event_status === 'Acknowledged'
+                    ? '<span style="font-size:0.7rem;color:var(--secondary);margin-left:6px;">Acknowledged</span>'
+                    : '<span style="font-size:0.7rem;color:var(--danger);margin-left:6px;">Detected</span>';
+                return `
                 <div class="alert-item">
-                    <span class="alert-dot ${a.severity || 'medium'}"></span>
+                    <span class="alert-dot ${severity}"></span>
                     <div>
-                        <div style="font-weight:700;font-size:0.88rem;">${escHtml(a.node_id || a.location || 'Unknown node')}</div>
-                        <div style="font-size:0.78rem;color:var(--gray);">${escHtml(a.message || `PM1.0: ${a.value ?? '—'} µg/m³`)} · <span style="font-family:'Space Grotesk',monospace;">${a.time || a.created_at || ''}</span></div>
+                        <div style="font-weight:700;font-size:0.88rem;">${escHtml(location)}${badge}</div>
+                        <div style="font-size:0.78rem;color:var(--gray);">${escHtml(pm1)} · <span style="font-family:'Space Grotesk',monospace;">${escHtml(ts)}</span></div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         } catch(e) {
             el.innerHTML = '<div class="admin-empty">No active alerts at this time.</div>';
         }
@@ -900,7 +914,8 @@
     async function loadTickets() {
         try {
             const apiBase = (typeof API !== 'undefined') ? API : '';
-            const res = await fetch(`${apiBase}/api/contact/tickets`, { credentials: 'include' }).catch(() => null);
+            // Correct URL: /api/contact (not /api/contact/tickets)
+            const res = await fetch(`${apiBase}/api/contact`, { credentials: 'include' }).catch(() => null);
             const tbody = document.getElementById('tickets-tbody');
             if (!res || !res.ok) {
                 tbody.innerHTML = '<tr><td colspan="5" class="admin-empty">No support tickets found.</td></tr>';
@@ -908,24 +923,30 @@
                 return;
             }
             const data = await res.json().catch(() => null);
-            const tickets = data?.tickets || data?.data || [];
-            const open = tickets.filter(t => t.status !== 'resolved').length;
+            // API returns { success, data: rows } — correct field is data.data
+            const tickets = (data && data.data) ? data.data : [];
+            // Correct status field is ticket_status, resolved value is 'Resolved'
+            const open = tickets.filter(t => t.ticket_status !== 'Resolved').length;
             document.getElementById('stat-open-tickets').textContent = open;
             if (!tickets.length) {
                 tbody.innerHTML = '<tr><td colspan="5" class="admin-empty">No support tickets found.</td></tr>';
                 return;
             }
-            tbody.innerHTML = tickets.map(t => `
+            const phOpts = { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            tbody.innerHTML = tickets.map(t => {
+                const isResolved = t.ticket_status === 'Resolved';
+                const receivedTs = t.created_at ? new Date(t.created_at).toLocaleString('en-PH', phOpts) : (t.created_at || '—');
+                return `
                 <tr>
-                    <td data-label="From"><strong>${escHtml(t.name || t.from || '—')}</strong><br><span style="font-size:0.75rem;color:var(--gray);">${escHtml(t.email || '')}</span></td>
-                    <td data-label="Subject">${escHtml(t.subject || t.message?.substring(0, 60) || '—')}</td>
-                    <td data-label="Received" style="font-family:'Space Grotesk',monospace;font-size:0.78rem;">${escHtml(t.created_at || t.date || '—')}</td>
-                    <td data-label="Status"><span class="status-pill ${t.status === 'resolved' ? 'resolved' : 'open'}">${t.status === 'resolved' ? 'Resolved' : 'Open'}</span></td>
+                    <td data-label="From"><strong>${escHtml(t.submitter_name || '—')}</strong><br><span style="font-size:0.75rem;color:var(--gray);">${escHtml(t.submitter_email || '')}</span></td>
+                    <td data-label="Subject">${escHtml(t.subject || '—')}</td>
+                    <td data-label="Received" style="font-family:'Space Grotesk',monospace;font-size:0.78rem;">${escHtml(receivedTs)}</td>
+                    <td data-label="Status"><span class="status-pill ${isResolved ? 'resolved' : 'open'}">${isResolved ? 'Resolved' : 'Open'}</span></td>
                     <td data-label="Action">
-                        ${t.status !== 'resolved' ? `<button class="toggle-btn resolve" onclick="resolveTicket(${t.id})">Resolve</button>` : '—'}
+                        ${!isResolved ? `<button class="toggle-btn resolve" onclick="resolveTicket(${t.id})">Resolve</button>` : '—'}
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
         } catch(e) {
             document.getElementById('tickets-tbody').innerHTML =
                 '<tr><td colspan="5" class="admin-empty" style="color:var(--danger);">Error loading tickets.</td></tr>';
@@ -937,8 +958,8 @@
             const apiBase = (typeof API !== 'undefined') ? API : '';
             const csrfMatch = document.cookie.match(/(?:^|;\s*)fz_csrf=([^;]+)/);
             const csrfToken = csrfMatch ? decodeURIComponent(csrfMatch[1]) : '';
-            const res = await fetch(`${apiBase}/api/contact/tickets/${id}/resolve`, {
-                method: 'PATCH',
+            const res = await fetch(`${apiBase}/api/contact/${id}/resolve`, {
+                method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json', ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}) }
             });
