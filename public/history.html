@@ -598,6 +598,28 @@
 
         let allRecords = [];
 
+        // ── SESSION CACHE — show last-known stats instantly on load ──
+        // Reads the cached stats from sessionStorage and renders them
+        // immediately so the counters never flash "0" while the API loads.
+        const STATS_CACHE_KEY = 'fz_history_stats';
+        function saveCachedStats(stats) {
+            try { sessionStorage.setItem(STATS_CACHE_KEY, JSON.stringify(stats)); } catch(_) {}
+        }
+        function restoreCachedStats() {
+            try {
+                const raw = sessionStorage.getItem(STATS_CACHE_KEY);
+                if (!raw) return;
+                const s = JSON.parse(raw);
+                // Render without animation so it feels instant
+                const setQuick = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+                setQuick('stat-today',    s.today    ?? 0);
+                setQuick('stat-total',    s.total    ?? 0);
+                setQuick('stat-resolved', s.resolved ?? 0);
+            } catch(_) {}
+        }
+        // Show cached values right away — before any API call
+        restoreCachedStats();
+
         async function loadHistory() {
             try {
                 const data = await apiFetch('/history');
@@ -642,6 +664,8 @@
             setStatAnimated('stat-today', today);
             setStatAnimated('stat-total', total);
             setStatAnimated('stat-resolved', resolved);
+            // Persist so the next page visit shows these values instantly
+            saveCachedStats({ today, total, resolved });
         }
 
         function computeHistoryStats() {
@@ -870,11 +894,13 @@
             let _refreshPending = false;
 
             // Debounce so rapid bursts of SSE messages only trigger one refresh
+            let _debounceTimer = null;
             function scheduleRefresh() {
-                if (_refreshPending) return;
-                _refreshPending = true;
-                setTimeout(async function () {
-                    _refreshPending = false;
+                if (_debounceTimer) clearTimeout(_debounceTimer);
+                _debounceTimer = setTimeout(async function () {
+                    _debounceTimer = null;
+                    if (_refreshPending) return;
+                    _refreshPending = true;
                     try {
                         const data = await apiFetch('/history');
                         if (data && data.success) {
@@ -883,7 +909,8 @@
                         renderTable();
                         await loadStats();
                     } catch (_) { /* silently ignore — next SSE event will retry */ }
-                }, 800);
+                    _refreshPending = false;
+                }, 150);
             }
 
             function connectSSE() {
