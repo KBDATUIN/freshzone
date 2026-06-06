@@ -9,20 +9,21 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="style-v2.css">
-    <link rel="stylesheet" href="style-v3.css">
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#004e7a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FreshZone">
-    <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
-    <link rel="stylesheet" href="/pwa.css">
-    <link rel="stylesheet" href="style-fixes.css">
-    <link rel="stylesheet" href="premium-style.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style-v2.css">
+<link rel="stylesheet" href="style-v3.css">
+<link rel="stylesheet" href="profile-modern.css">
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#004e7a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FreshZone">
+<link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+<link rel="stylesheet" href="/pwa.css">
+<link rel="stylesheet" href="style-fixes.css">
+<link rel="stylesheet" href="premium-style.css">
+<link rel="stylesheet" href="polish.css">
 
     <!-- Cropper.js -->
 
@@ -282,100 +283,311 @@
     </div>
 </div>
 
-<div class="container profile-wrapper">
-    <div class="glass-card profile-card">
-
-        <!-- Avatar -->
-        <div class="profile-avatar">
-            <img src="" id="userPhoto" class="profile-img" alt="Profile photo" style="object-fit:cover;object-position:center center;">
-            <input type="file" id="upload" hidden accept="image/*" onchange="openCropModal(this)">
-            <button class="change-photo-btn" onclick="document.getElementById('upload').click()" aria-label="Change profile photo">
-                📷 Change Photo
-            </button>
-        </div>
-
-        <div class="profile-name" id="userName">—</div>
-
-        <div class="profile-divider"></div>
-
-        <!-- View mode -->
-        <div class="profile-details" id="profile-view">
-            <p><strong>Position:</strong> <span id="userPosition"></span></p>
-            <p><strong>Contact:</strong>  <span id="userContact"></span></p>
-            <p><strong>Email:</strong>    <span id="userEmail"></span></p>
-            <p><strong>Employee ID:</strong> <span id="userEmployeeID"></span></p>
-            <p><strong>Date Joined:</strong> <span id="userDateJoined"></span></p>
-            <p><strong>Last Login:</strong>  <span id="userLastLogin"></span></p>
-            <p><strong>Emergency Contact:</strong> <span id="userEmergency"></span></p>
-        </div>
-
-        <div id="roleMessage" class="profile-role-badge"></div>
-
-        <!-- Edit Profile button -->
-        <button onclick="toggleEdit(true)" id="edit-btn" style="margin-top:1rem;width:auto;padding:0.55rem 1.5rem;font-size:0.85rem;border-radius:10px;display:inline-flex;align-items:center;gap:6px;">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Edit Profile
-        </button>
-
-        <!-- Edit form (hidden by default) -->
-        <div class="profile-edit-form" id="profile-edit" style="display:none;">
-            <div class="input-group">
-                <label for="edit-name">Full Name</label>
-                <input type="text" id="edit-name">
-            </div>
-            <div class="input-group">
-                <label for="edit-contact">Contact Number</label>
-                <input type="tel" id="edit-contact">
-            </div>
-            <div class="input-group">
-                <label for="edit-emergency">Emergency Contact</label>
-                <input type="text" id="edit-emergency" placeholder="Name & number">
-            </div>
-            <div class="btn-row">
-                <button class="btn-success" onclick="saveProfile()" style="margin-top:0;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save</button>
-                <button onclick="toggleEdit(false)" style="margin-top:0;background:var(--gray)!important;">Cancel</button>
-            </div>
-        </div>
-
-        <div class="profile-divider" style="margin-top:1.2rem;"></div>
-
-        <!-- Change password section -->
-        <div class="change-pw-section">
-            <h4><svg class="h-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Change Password</h4>
-            <div class="input-group">
-                <label for="pw-current">Current Password</label>
-                <div class="input-password-wrap">
-                    <input type="password" id="pw-current" placeholder="Current password">
-                    <button type="button" class="eye-btn" onclick="togglePassword('pw-current',this)" aria-label="Toggle visibility">
-                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    </button>
+<!-- Profile Hero Header -->
+<div class="profile-hero" aria-label="Profile header">
+    <div class="profile-hero-bg">
+        <div class="profile-hero-grid"></div>
+        <div class="profile-hero-blob profile-hero-blob-1"></div>
+        <div class="profile-hero-blob profile-hero-blob-2"></div>
+        <div class="profile-hero-blob profile-hero-blob-3"></div>
+    </div>
+    <div class="container">
+        <div class="profile-hero-inner">
+            <div class="profile-hero-left">
+                <!-- Avatar Column -->
+                <div class="profile-hero-avatar-col">
+                    <div class="profile-hero-avatar">
+                        <img src="" id="userPhoto" class="profile-img" alt="Profile photo">
+                        <input type="file" id="upload" hidden accept="image/*" onchange="openCropModal(this)">
+                        <div class="profile-hero-avatar-overlay" id="avatar-overlay">
+                            <div class="avatar-overlay-option" onclick="document.getElementById('upload').click()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                Upload
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Hero Info -->
+                <div class="profile-hero-info">
+                    <h1 class="profile-name" id="userName">—</h1>
+                    <div class="profile-role-badge" id="roleMessage"></div>
+                    <div class="profile-last-activity" id="lastActivity" style="display:none;">
+                        <span class="dot"></span>
+                        <span id="lastActivityText">Active just now</span>
+                    </div>
                 </div>
             </div>
-            <div class="input-group">
-                <label for="pw-new">New Password</label>
-                <div class="input-password-wrap">
-                    <input type="password" id="pw-new" placeholder="Min. 8 characters">
-                    <button type="button" class="eye-btn" onclick="togglePassword('pw-new',this)" aria-label="Toggle visibility">
-                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    </button>
+            <!-- Hero Stats -->
+            <div class="profile-hero-stats">
+                <div class="hero-stat" data-icon="●">
+                    <div class="hero-stat-label">STATUS</div>
+                    <div class="hero-stat-value">
+                        <div class="hero-status-dot"></div>
+                        Active
+                    </div>
                 </div>
-                <div class="pw-strength-bar" id="profile-pw-bar"></div>
-                <span class="pw-strength-label" id="profile-pw-label"></span>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat" data-icon="◷">
+                    <div class="hero-stat-label">JOINED</div>
+                    <div class="hero-stat-value" id="heroDateJoined">—</div>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat" data-icon="◆">
+                    <div class="hero-stat-label">ROLE</div>
+                    <div class="hero-stat-value" id="heroPosition">—</div>
+                </div>
             </div>
-            <button onclick="changePassword()" style="margin-top:0.75rem;width:auto;padding:0.55rem 1.4rem;font-size:0.82rem;border-radius:10px;background:var(--primary)!important;">
-                Update Password
-            </button>
         </div>
+    </div>
+</div>
 
-            <div class="profile-divider" style="margin:1.5rem 0 1rem;"></div>
-            <div class="profile-delete-section" style="text-align:left;">
-                <h4 style="margin-bottom:0.5rem;color:var(--danger);">Delete Account</h4>
-                <p style="margin:0 0 1rem;color:#7f1d1d;line-height:1.5;">Deleting your profile will remove your account from the database permanently. This cannot be undone.</p>
-                <button class="btn-danger" id="delete-account-btn" onclick="deleteAccount()" style="width:auto;padding:0.7rem 1.5rem;font-size:0.86rem;">
-                    Delete My Account
+<!-- Profile Body -->
+<div class="container">
+    <div class="profile-body">
+        <div class="profile-body-grid">
+            <!-- Left Column: Profile Details -->
+            <div class="profile-details-card">
+                <div class="profile-details-card-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Profile Information
+                </div>
+
+                <!-- View Mode -->
+                <div class="profile-details" id="profile-view">
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Email Address</div>
+                        <div class="profile-detail-value" id="userEmail">—</div>
+                    </div>
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Employee ID</div>
+                        <div class="profile-detail-value" id="userEmployeeID">—</div>
+                    </div>
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Contact Number</div>
+                        <div class="profile-detail-value" id="userContact">—</div>
+                    </div>
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Position</div>
+                        <div class="profile-detail-value" id="userPosition">—</div>
+                    </div>
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Date Joined</div>
+                        <div class="profile-detail-value" id="userDateJoined">—</div>
+                    </div>
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Last Login</div>
+                        <div class="profile-detail-value" id="userLastLogin">—</div>
+                    </div>
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Emergency Contact</div>
+                        <div class="profile-detail-value" id="userEmergency">—</div>
+                    </div>
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Account ID</div>
+                        <div class="profile-detail-value" id="userAccountID">—</div>
+                    </div>
+                    <div class="profile-detail-row">
+                        <div class="profile-detail-label">Last Updated</div>
+                        <div class="profile-detail-value" id="userLastUpdated">—</div>
+                    </div>
+                </div>
+
+                <!-- Edit Form (hidden by default) -->
+                <div class="profile-edit-form" id="profile-edit" style="display:none;">
+                    <div class="input-group">
+                        <label for="edit-name">Full Name</label>
+                        <input type="text" id="edit-name" placeholder="Enter your full name">
+                    </div>
+                    <div class="input-group">
+                        <label for="edit-contact">Contact Number</label>
+                        <input type="tel" id="edit-contact" placeholder="Enter contact number">
+                    </div>
+                    <div class="input-group">
+                        <label for="edit-emergency">Emergency Contact</label>
+                        <input type="text" id="edit-emergency" placeholder="Name & contact number">
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn-success" onclick="saveProfile()">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                <polyline points="17 21 17 13 7 13 7 21"/>
+                                <polyline points="7 3 7 8 15 8"/>
+                            </svg>
+                            Save Changes
+                        </button>
+                        <button class="btn-cancel" onclick="toggleEdit(false)">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="profile-view-footer" id="view-footer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    Click <strong>Edit Profile</strong> to update your information
+                </div>
+
+                <button onclick="toggleEdit(true)" id="edit-btn">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    Edit Profile
                 </button>
+
+                <!-- Delete Account (inside profile card) -->
+                <div class="profile-delete-section">
+                    <p>Permanently deletes your account and all data. This cannot be undone.</p>
+                    <button class="btn-danger" id="delete-account-btn" onclick="deleteAccount()">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        Delete My Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column: Actions -->
+            <div class="profile-actions">
+                <!-- Account Overview -->
+                <div class="profile-actions-card profile-overview-card">
+                    <div class="profile-details-card-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                        Account Overview
+                    </div>
+                    <div class="overview-stats">
+                        <div class="overview-stat">
+                            <div class="overview-stat-label">Account Status</div>
+                            <div class="overview-stat-value status-active-badge">
+                                <div class="status-dot" style="width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:4px;"></div>
+                                Active
+                            </div>
+                        </div>
+                        <div class="overview-stat">
+                            <div class="overview-stat-label">Email Verified</div>
+                            <div class="overview-stat-value status-verified-badge">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Verified
+                            </div>
+                        </div>
+                        <div class="overview-stat">
+                            <div class="overview-stat-label">Member Since</div>
+                            <div class="overview-stat-value" id="memberSince">—</div>
+                        </div>
+                    </div>
+                    <div class="overview-role" id="overviewRole">
+                        <div class="overview-role-dot"></div>
+                        Staff Access
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="profile-actions-card">
+                    <div class="profile-details-card-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        Security Settings
+                    </div>
+                    <div class="input-group">
+                        <label for="pw-current">Current Password</label>
+                        <div class="input-password-wrap">
+                            <input type="password" id="pw-current" placeholder="Enter current password">
+                            <button type="button" class="eye-btn" onclick="togglePassword('pw-current',this)" aria-label="Toggle visibility">
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="pw-new">New Password</label>
+                        <div class="input-password-wrap">
+                            <input type="password" id="pw-new" placeholder="Minimum 8 characters">
+                            <button type="button" class="eye-btn" onclick="togglePassword('pw-new',this)" aria-label="Toggle visibility">
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <svg class="eye-off-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="pw-strength-bar" id="profile-pw-bar"></div>
+                        <span class="pw-strength-label" id="profile-pw-label"></span>
+                    </div>
+                    <button class="btn-pw-update" onclick="changePassword()">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        Update Password
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links — full-width bar below both columns -->
+    <div class="profile-links-wide">
+        <div class="profile-actions-card profile-links-card">
+            <div class="profile-details-card-header profile-links-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Quick Links
+            </div>
+            <div class="links-list">
+                <a href="dashboard.html" class="links-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                    <span class="links-item-text">
+                        <span class="links-item-title">Dashboard</span>
+                        <span class="links-item-sub">Live air quality monitoring</span>
+                    </span>
+                </a>
+                <a href="history.html" class="links-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="12 8 12 12 14 14"/>
+                        <path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v-4h4"/>
+                    </svg>
+                    <span class="links-item-text">
+                        <span class="links-item-title">History</span>
+                        <span class="links-item-sub">Past detection records</span>
+                    </span>
+                </a>
+                <a href="contact.html" class="links-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                        <polyline points="2,4 12,13 22,4"/>
+                    </svg>
+                    <span class="links-item-text">
+                        <span class="links-item-title">Contact Support</span>
+                        <span class="links-item-sub">Get help or report an issue</span>
+                    </span>
+                </a>
             </div>
         </div>
     </div>
@@ -393,15 +605,15 @@
             <div class="live-sensor-item"><strong>Notification settings</strong>Push notifications are delivered to devices where you have enabled them. Use the bell icon in the top navigation to toggle alerts on your current device. Multiple devices can be registered at once.</div>
         </div>
         <div class="aq-guide-grid">
-            <article class="aq-card">
+            <article class="aq-card" data-icon="◈">
                 <h4>Your role and permissions</h4>
                 <p>Your account role determines available actions. Staff can respond to and resolve alerts. Administrators can also acknowledge alerts, manage accounts, and delete detection history records.</p>
             </article>
-            <article class="aq-card">
+            <article class="aq-card" data-icon="✓">
                 <h4>Your name on audit records</h4>
                 <p>Every alert you acknowledge or resolve is permanently logged with your name, role, and the exact timestamp. These records are exportable as CSV for use in formal school incident reports.</p>
             </article>
-            <article class="aq-card">
+            <article class="aq-card" data-icon="⚿">
                 <h4>Account security</h4>
                 <p>Use the change password option to keep your credentials secure. Do not share your login — each session is tied to your account and recorded in the system log for accountability.</p>
             </article>
@@ -525,15 +737,9 @@
                 minCropBoxHeight: 50,
                 initialAspectRatio: 1,
                 ready() {
-                    document.getElementById('zoom-slider').value = 0;
-                    // Fit entire image into the container so nothing is cropped on load
-                    const containerData = cropperInstance.getContainerData();
+                    // Sync the zoom slider with Cropper's natural initial zoom
                     const imageData = cropperInstance.getImageData();
-                    const scale = Math.min(
-                        containerData.width  / imageData.naturalWidth,
-                        containerData.height / imageData.naturalHeight
-                    );
-                    cropperInstance.zoomTo(scale);
+                    document.getElementById('zoom-slider').value = Math.max(0, imageData.ratio);
                 }
             });
 
@@ -650,59 +856,168 @@
             }
             const u = data.user;
 
-            document.getElementById('userName').textContent       = u.full_name || '—';
+            // Update main profile name
+            document.getElementById('userName').textContent = u.full_name || '—';
+            
+            // Update nav name
             const navName = document.getElementById('nav-user-name');
             if (navName && u.full_name) navName.textContent = u.full_name;
-            document.getElementById('userEmail').textContent      = u.email || '—';
-            document.getElementById('userContact').textContent    = u.contact_number || '—';
-            document.getElementById('userPosition').textContent   = u.position || '—';
-            document.getElementById('userEmployeeID').textContent = u.employee_id || '—';
+            
+            // Helper: set value or mark as "not set"
+            function setValue(id, value) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (!value || value === '—') {
+                    el.textContent = '—';
+                    el.classList.add('is-dash');
+                } else {
+                    el.textContent = value;
+                    el.classList.remove('is-dash');
+                }
+            }
+            
+            // Update profile details
+            setValue('userEmail', u.email);
+            setValue('userContact', u.contact_number);
+            setValue('userPosition', u.position);
+            setValue('userEmployeeID', u.employee_id);
+            
+            // Format dates for Philippines locale
             const phLocale = 'en-PH';
-            const phTZ     = { timeZone: 'Asia/Manila' };
-            document.getElementById('userDateJoined').textContent = u.date_joined
+            const phTZ = { timeZone: 'Asia/Manila' };
+            
+            const dateJoined = u.date_joined
                 ? new Date(u.date_joined).toLocaleDateString(phLocale, { ...phTZ, year:'numeric', month:'long', day:'numeric' })
-                : '—';
-            document.getElementById('userLastLogin').textContent  = u.last_login
+                : '';
+            setValue('userDateJoined', dateJoined);
+            
+            // Update hero stats
+            const heroDateJoined = document.getElementById('heroDateJoined');
+            if (heroDateJoined) {
+                const heroDateStr = u.date_joined
+                    ? new Date(u.date_joined).toLocaleDateString(phLocale, { ...phTZ, year:'numeric', month:'short' })
+                    : '';
+                setValue('heroDateJoined', heroDateStr);
+            }
+            
+            const heroPosition = document.getElementById('heroPosition');
+            if (heroPosition) {
+                setValue('heroPosition', u.position);
+            }
+            
+            const lastLoginStr = u.last_login
                 ? new Date(u.last_login).toLocaleString(phLocale, { ...phTZ, year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:true })
-                : '—';
-            document.getElementById('userEmergency').textContent  = u.emergency_contact || '—';
+                : '';
+            setValue('userLastLogin', lastLoginStr);
+            setValue('userEmergency', u.emergency_contact);
 
+            // Account ID
+            setValue('userAccountID', u.id ? '#' + u.id : '');
+
+            // Last Updated
+            const lastUpdatedStr = u.updated_at
+                ? new Date(u.updated_at).toLocaleString(phLocale, { ...phTZ, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+                : '';
+            setValue('userLastUpdated', lastUpdatedStr);
+
+            // Update member since in overview
+            const memberSince = document.getElementById('memberSince');
+            if (memberSince) {
+                memberSince.textContent = u.date_joined
+                    ? new Date(u.date_joined).getFullYear().toString()
+                    : '—';
+            }
+
+            // Update photo
             const cachedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const photoSrc = u.photo_url || cachedUser.photo_url
-                || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.full_name) + '&background=00b4d8&color=fff&size=150';
+                || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.full_name) + '&background=3b82f6&color=fff&size=150';
             document.getElementById('userPhoto').src = photoSrc;
 
+            // Update last activity (relative time)
+            const lastActivityEl = document.getElementById('lastActivity');
+            const lastActivityText = document.getElementById('lastActivityText');
+            if (lastActivityEl && lastActivityText && u.last_login) {
+                const lastLogin = new Date(u.last_login);
+                const now = new Date();
+                const diffMs = now - lastLogin;
+                const diffMin = Math.floor(diffMs / 60000);
+                const diffHr  = Math.floor(diffMs / 3600000);
+                const diffDay = Math.floor(diffMs / 86400000);
+                let text;
+                if (diffMin < 1)         text = 'Active just now';
+                else if (diffMin < 60)   text = 'Active ' + diffMin + ' min ago';
+                else if (diffHr  < 24)   text = 'Active ' + diffHr  + ' hr ago';
+                else if (diffDay < 7)    text = 'Active ' + diffDay + ' day' + (diffDay === 1 ? '' : 's') + ' ago';
+                else                     text = 'Last seen ' + lastLogin.toLocaleDateString(phLocale, { ...phTZ, month:'short', day:'numeric' });
+                lastActivityText.textContent = text;
+                lastActivityEl.style.display = 'flex';
+            }
+
+            // Update role badges
             const rm = document.getElementById('roleMessage');
+            const overviewRole = document.getElementById('overviewRole');
             if (u.position === 'Administrator') {
-                rm.textContent = 'Full Administrative Access';
-                rm.style.background = 'rgba(0,78,122,0.1)';
-                rm.style.color = 'var(--primary)';
+                if (rm) {
+                    rm.textContent = 'Administrator';
+                    rm.style.background = 'rgba(220, 38, 38, 0.1)';
+                    rm.style.color = '#dc2626';
+                }
+                if (overviewRole) {
+                    overviewRole.innerHTML = '<div class="overview-role-dot" style="background:#dc2626;"></div>Administrative Access';
+                    overviewRole.style.color = '#dc2626';
+                    overviewRole.style.background = 'rgba(220, 38, 38, 0.1)';
+                    overviewRole.style.borderColor = 'rgba(220, 38, 38, 0.2)';
+                }
+                
+                // Show admin nav links
                 const da = document.getElementById('admin-nav-link-desktop');
                 const ma = document.getElementById('admin-nav-link-mobile');
                 if (da) da.style.display = '';
                 if (ma) ma.style.display = '';
+                
+                // Hide contact links for admin
                 const cd = document.getElementById('contact-nav-link-desktop');
                 const cm = document.getElementById('contact-nav-link-mobile');
                 if (cd) cd.style.display = 'none';
                 if (cm) cm.style.display = 'none';
             } else {
-                rm.textContent = 'Staff Access';
-                rm.style.background = 'rgba(40,167,69,0.1)';
-                rm.style.color = 'var(--success)';
+                if (rm) {
+                    rm.textContent = 'Staff Member';
+                    rm.style.background = 'rgba(34, 197, 94, 0.1)';
+                    rm.style.color = '#22c55e';
+                }
+                if (overviewRole) {
+                    overviewRole.innerHTML = '<div class="overview-role-dot"></div>Staff Access';
+                }
             }
         } catch (err) {
+            console.error('Error loading profile:', err);
             showNotification('Error loading profile.', 'error');
         }
     }
 
     function toggleEdit(open) {
-        document.getElementById('profile-edit').style.display = open ? 'block' : 'none';
-        document.getElementById('profile-view').style.display = open ? 'none' : 'block';
-        document.getElementById('edit-btn').style.display     = open ? 'none' : 'inline-block';
+        const editForm = document.getElementById('profile-edit');
+        const viewMode = document.getElementById('profile-view');
+        const editBtn = document.getElementById('edit-btn');
+        const viewFooter = document.getElementById('view-footer');
+        
         if (open) {
-            document.getElementById('edit-name').value      = document.getElementById('userName').textContent;
-            document.getElementById('edit-contact').value   = document.getElementById('userContact').textContent;
-            document.getElementById('edit-emergency').value = document.getElementById('userEmergency').textContent;
+            editForm.style.display = 'block';
+            viewMode.style.display = 'none';
+            editBtn.style.display = 'none';
+            if (viewFooter) viewFooter.style.display = 'none';
+            
+            // Populate edit form
+            document.getElementById('edit-name').value = document.getElementById('userName').textContent || '';
+            document.getElementById('edit-contact').value = document.getElementById('userContact').textContent === '—' ? '' : document.getElementById('userContact').textContent;
+            document.getElementById('edit-emergency').value = document.getElementById('userEmergency').textContent === '—' ? '' : document.getElementById('userEmergency').textContent;
+        } else {
+            editForm.style.display = 'none';
+            viewMode.style.display = 'block';
+            editBtn.style.display = 'inline-flex';
+            if (viewFooter) viewFooter.style.display = 'flex';
         }
     }
 
@@ -787,18 +1102,22 @@
         if (/[0-9]/.test(pw)) score++;
         if (/[^A-Za-z0-9]/.test(pw)) score++;
         const levels = [
-            {pct:'0%',  color:'#ddd',    text:''},
-            {pct:'20%', color:'#e74c3c', text:'Very Weak'},
-            {pct:'40%', color:'#e67e22', text:'Weak'},
-            {pct:'60%', color:'#f39c12', text:'Fair'},
-            {pct:'80%', color:'#2ecc71', text:'Strong'},
-            {pct:'100%',color:'#27ae60', text:'Very Strong'},
+            {pct:'0%',  color:'#ddd',    text:'',         cls:''},
+            {pct:'20%', color:'#ef4444', text:'Very Weak', cls:'weak'},
+            {pct:'40%', color:'#f59e0b', text:'Weak',      cls:'weak'},
+            {pct:'60%', color:'#f59e0b', text:'Fair',      cls:'fair'},
+            {pct:'80%', color:'#22c55e', text:'Strong',    cls:'strong'},
+            {pct:'100%',color:'#16a34a', text:'Very Strong', cls:'strong'},
         ];
         const lv = levels[Math.min(score, 5)];
-        document.getElementById('profile-pw-bar').style.width      = lv.pct;
-        document.getElementById('profile-pw-bar').style.background = lv.color;
-        document.getElementById('profile-pw-label').textContent    = lv.text;
-        document.getElementById('profile-pw-label').style.color    = lv.color;
+        const bar   = document.getElementById('profile-pw-bar');
+        const label = document.getElementById('profile-pw-label');
+        bar.style.width      = lv.pct;
+        bar.style.background = lv.color;
+        bar.style.boxShadow  = lv.pct !== '0%' ? ('0 0 8px ' + lv.color + '66') : 'none';
+        label.textContent    = lv.text;
+        label.style.color    = lv.color;
+        label.className      = 'pw-strength-label ' + lv.cls;
     });
 
     initHotkeys('profile');

@@ -55,7 +55,7 @@ if (sentryDsn) {
     });
 }
 
-// FIX: Trust Railway's Proxy for Rate Limiting and HTTPS detection
+// Trust Render's proxy for rate limiting and HTTPS detection
 app.set('trust proxy', 1);
 
 // ── HTTPS REDIRECT MIDDLEWARE ────────────────────────────────
@@ -140,7 +140,7 @@ app.use(cors({
             'http://localhost:5500',
             'http://127.0.0.1:5500',
         ].filter(Boolean);
-        if (!origin || allowed.includes(origin) || /ngrok/.test(origin) || /railway\.app/.test(origin)) {
+        if (!origin || allowed.includes(origin) || /ngrok/.test(origin) || /onrender\.com/.test(origin)) {
             callback(null, true);
         } else {
             if (process.env.NODE_ENV !== 'production') {
@@ -163,7 +163,7 @@ app.use(helmet({
             scriptSrcAttr: ["'self'", "'unsafe-inline'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://*.googleapis.com", "https://fonts.googleapis.com", "https://api.fontshare.com", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "blob:", "https://ui-avatars.com"],
-            connectSrc: ["'self'", "https://freshzone-production.up.railway.app", "https://freshzone.space", "https://www.freshzone.space", "https://*.googleapis.com", "https://api.fontshare.com", "https://cdn.fontshare.com", "https://cdnjs.cloudflare.com"],
+            connectSrc: ["'self'", "https://freshzone.space", "https://www.freshzone.space", "https://*.googleapis.com", "https://api.fontshare.com", "https://cdn.fontshare.com", "https://cdnjs.cloudflare.com"],
             fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://*.gstatic.com", "https://*.googleapis.com", "https://fonts.googleapis.com", "https://api.fontshare.com", "https://cdn.fontshare.com", "https://cdnjs.cloudflare.com"],
             objectSrc: ["'none'"],
             frameAncestors: ["'none'"],

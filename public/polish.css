@@ -1,0 +1,1035 @@
+/* ═══════════════════════════════════════════════════════════════
+   FRESHZONE POLISH · v1.0 — Shared design-language layer
+   Loaded LAST on every page — adds hover/focus/transition polish
+   that matches the auth page. Does NOT override existing layout.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── DESIGN TOKENS (use the same names as dashboard's :root) ─ */
+:root {
+    --fz-transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    --fz-transition:      0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    --fz-transition-slow: 0.3s  cubic-bezier(0.4, 0, 0.2, 1);
+    --fz-transition-pop:  0.4s  cubic-bezier(0.175, 0.885, 0.32, 1.1);
+
+    --fz-radius-sm: 8px;
+    --fz-radius-md: 12px;
+    --fz-radius-lg: 16px;
+    --fz-radius-xl: 20px;
+
+    --fz-glow-focus: 0 0 0 3px rgba(0, 180, 216, 0.2);
+}
+
+/* ── GLOBAL POLISH ──────────────────────────────────────────── */
+* { -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+
+/* Better focus ring (keyboard accessibility) */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--secondary, #00b4d8);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Selection color */
+::selection {
+    background: rgba(0, 180, 216, 0.25);
+    color: inherit;
+}
+[data-theme="dark"] ::selection {
+    background: rgba(34, 211, 238, 0.3);
+    color: #fff;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 78, 122, 0.25);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background var(--fz-transition);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 180, 216, 0.5); background-clip: padding-box; border: 2px solid transparent; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(125, 211, 252, 0.25); background-clip: padding-box; border: 2px solid transparent; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(125, 211, 252, 0.5); background-clip: padding-box; border: 2px solid transparent; }
+
+/* ── LOGO FIX (preserve aspect ratio, no compression) ──────── */
+.logo img,
+header img,
+nav img,
+.brand img,
+.page-hero img,
+.auth-topbar-logo,
+.foot-brand img,
+.profile-brand img,
+.site-brand img,
+img[alt*="FreshZone" i],
+img[src*="logo1.png" i] {
+    height: 48px;
+    width: auto;
+    max-width: 220px;
+    object-fit: contain;
+    transition: transform var(--fz-transition), opacity var(--fz-transition);
+}
+header img:hover,
+nav img:hover,
+.logo img:hover,
+.brand img:hover {
+    transform: scale(1.04);
+    opacity: 0.95;
+}
+@media (max-width: 540px) {
+    .logo img, header img, nav img, .page-hero img { height: 38px; }
+}
+
+/* ── BUTTONS (uniform hover/active) ────────────────────────── */
+button,
+.btn,
+button.btn-primary,
+button.btn-success,
+button.btn-danger,
+.ack-btn,
+.resolve-btn,
+.push-toggle-wrap,
+[role="button"] {
+    transition:
+        transform var(--fz-transition),
+        box-shadow var(--fz-transition),
+        filter var(--fz-transition),
+        background-color var(--fz-transition),
+        border-color var(--fz-transition),
+        color var(--fz-transition) !important;
+}
+
+button:not(:disabled):hover,
+.btn:not(:disabled):hover,
+[role="button"]:not([aria-disabled="true"]):hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+button:not(:disabled):active,
+.btn:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active {
+    transform: translateY(0) scale(0.99);
+    filter: brightness(0.98);
+}
+button:disabled,
+.btn:disabled,
+[role="disabled"] {
+    cursor: not-allowed !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 0.6;
+}
+
+/* ── CARDS (uniform hover lift) ─────────────────────────────── */
+.glass-card,
+.card,
+.stat-box,
+.location-card,
+.value-card,
+.profile-card,
+.info-card,
+.feature-card,
+.alert-card,
+.activity-card,
+.history-card,
+.user-card,
+.notif-card,
+.contact-card,
+.team-card,
+.aq-card,
+.about-team-card,
+.sys-info-card,
+.admin-section,
+.profile-actions-card,
+.ticket-item,
+.links-item,
+.timeline-item,
+.about-stat-item,
+.hero-stat,
+.overview-stat,
+.about-tech-pill,
+.filter-action-btn,
+.admin-section-btn {
+    transition:
+        transform var(--fz-transition-slow),
+        box-shadow var(--fz-transition-slow),
+        border-color var(--fz-transition),
+        background-color var(--fz-transition) !important;
+}
+.glass-card:hover,
+.card:hover,
+.stat-box:hover,
+.location-card:hover,
+.value-card:hover,
+.profile-card:hover,
+.info-card:hover,
+.feature-card:hover,
+.activity-card:hover,
+.user-card:hover,
+.notif-card:hover,
+.contact-card:hover,
+.team-card:hover,
+.aq-card:hover,
+.about-team-card:hover,
+.sys-info-card:hover,
+.ticket-item:hover,
+.links-item:hover,
+.timeline-item:hover,
+.about-tech-pill:hover,
+.filter-action-btn:hover,
+.admin-section-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08));
+}
+
+/* Stat-box specific: -5px lift (matches existing dashboard) */
+.stat-box:hover { transform: translateY(-5px); }
+
+/* Section blocks: subtle lift only (these are large containers) */
+.admin-section:hover,
+.profile-actions-card:hover,
+.sys-info-card:hover {
+    transform: translateY(-2px);
+}
+.about-stat-item:hover,
+.hero-stat:hover,
+.overview-stat:hover {
+    transform: translateY(-2px);
+}
+
+/* Card click affordance (when card is a link) */
+a.glass-card,
+a.card,
+a.stat-box,
+a.location-card,
+a.value-card,
+a.profile-card,
+a.info-card {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* ── LINKS (subtle hover polish) ────────────────────────────── */
+a {
+    transition: color var(--fz-transition-fast), opacity var(--fz-transition-fast);
+}
+.nav-links a,
+.top-link,
+.foot-link {
+    transition:
+        background-color var(--fz-transition),
+        color var(--fz-transition),
+        transform var(--fz-transition) !important;
+}
+
+/* ── FORM INPUTS (consistent focus ring) ────────────────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+select,
+textarea {
+    transition:
+        border-color var(--fz-transition),
+        box-shadow var(--fz-transition),
+        background-color var(--fz-transition) !important;
+}
+input:focus,
+select:focus,
+textarea:focus {
+    box-shadow: var(--fz-glow-focus);
+}
+
+/* ── BUTTON RIPPLE EFFECT (subtle) ──────────────────────────── */
+button,
+.btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+button::after,
+.btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.18), transparent 70%);
+    opacity: 0;
+    transition: opacity var(--fz-transition);
+    z-index: -1;
+    pointer-events: none;
+}
+button:not(:disabled):hover::after,
+.btn:not(:disabled):hover::after { opacity: 1; }
+
+/* ── TABLES (row hover polish) ──────────────────────────────── */
+tbody tr {
+    transition:
+        background-color var(--fz-transition-fast),
+        transform var(--fz-transition-fast) !important;
+}
+tbody tr:hover {
+    background-color: rgba(0, 180, 216, 0.06) !important;
+}
+[data-theme="dark"] tbody tr:hover {
+    background-color: rgba(34, 211, 238, 0.06) !important;
+}
+
+/* ── NAV LINKS (active/hover polish) ────────────────────────── */
+.nav-links a,
+.nav-link,
+.mobile-nav a,
+.bottom-nav a {
+    transition:
+        background-color var(--fz-transition),
+        color var(--fz-transition),
+        transform var(--fz-transition),
+        box-shadow var(--fz-transition) !important;
+}
+.nav-links a:hover,
+.nav-link:hover,
+.bottom-nav a:hover {
+    transform: translateY(-1px);
+}
+
+/* ── ENTRANCE ANIMATIONS (fade-up) ──────────────────────────── */
+@keyframes fz-fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fz-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@keyframes fz-slide-in-left {
+    from { opacity: 0; transform: translateX(-30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fz-slide-in-right {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fz-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.6; }
+}
+@keyframes fz-spin {
+    to { transform: rotate(360deg); }
+}
+@keyframes fz-shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+}
+
+/* Apply fade-up to common elements (respects prefers-reduced-motion) */
+.glass-card,
+.card,
+.stat-box,
+.location-card,
+.value-card,
+.profile-card,
+.info-card,
+.feature-card,
+.activity-card,
+.user-card,
+.notif-card,
+.contact-card,
+.team-card,
+.page-hero,
+.hero,
+.alert-card,
+.history-card {
+    animation: fz-fade-up 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.glass-card:nth-child(2),
+.card:nth-child(2),
+.stat-box:nth-child(2),
+.location-card:nth-child(2),
+.value-card:nth-child(2) { animation-delay: 0.05s; }
+.glass-card:nth-child(3),
+.card:nth-child(3),
+.stat-box:nth-child(3),
+.location-card:nth-child(3),
+.value-card:nth-child(3) { animation-delay: 0.1s; }
+.glass-card:nth-child(4),
+.card:nth-child(4),
+.stat-box:nth-child(4),
+.location-card:nth-child(4),
+.value-card:nth-child(4) { animation-delay: 0.15s; }
+.glass-card:nth-child(5),
+.card:nth-child(5),
+.location-card:nth-child(5),
+.value-card:nth-child(5) { animation-delay: 0.2s; }
+.glass-card:nth-child(6),
+.card:nth-child(6),
+.location-card:nth-child(6),
+.value-card:nth-child(6) { animation-delay: 0.25s; }
+.glass-card:nth-child(7),
+.card:nth-child(7),
+.location-card:nth-child(7),
+.value-card:nth-child(7) { animation-delay: 0.3s; }
+.glass-card:nth-child(8),
+.card:nth-child(8),
+.location-card:nth-child(8),
+.value-card:nth-child(8) { animation-delay: 0.35s; }
+.glass-card:nth-child(9),
+.location-card:nth-child(9),
+.value-card:nth-child(9) { animation-delay: 0.4s; }
+.glass-card:nth-child(10),
+.location-card:nth-child(10),
+.value-card:nth-child(10) { animation-delay: 0.45s; }
+.glass-card:nth-child(11),
+.location-card:nth-child(11),
+.value-card:nth-child(11) { animation-delay: 0.5s; }
+.glass-card:nth-child(12),
+.location-card:nth-child(12),
+.value-card:nth-child(12) { animation-delay: 0.55s; }
+
+/* ── DARK MODE POLISH ───────────────────────────────────────── */
+[data-theme="dark"] {
+    --fz-glow-focus: 0 0 0 3px rgba(34, 211, 238, 0.25);
+}
+[data-theme="dark"] ::placeholder { color: rgba(148, 163, 184, 0.6); }
+
+/* ── TOAST / NOTIFICATION POLISH (top-right, slide-down) ────── */
+.notification {
+    transition:
+        all var(--fz-transition-pop) !important;
+}
+.notification.show {
+    transform: translateY(0) scale(1) !important;
+}
+
+/* ── PAGE HERO (subtle entrance) ─────────────────────────────── */
+.page-hero {
+    animation: fz-fade-up 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.hero {
+    animation: fz-fade-up 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.hero img { animation: float 6s ease-in-out infinite; }
+
+/* ── PROFILE PICTURE HOVER ──────────────────────────────────── */
+.profile-pic,
+.avatar,
+.user-avatar,
+.profile-photo,
+.about-team-avatar {
+    transition:
+        transform var(--fz-transition-slow),
+        box-shadow var(--fz-transition-slow) !important;
+}
+.profile-pic:hover,
+.avatar:hover,
+.user-avatar:hover,
+.profile-photo:hover,
+.about-team-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ── BADGE / CHIP POLISH ────────────────────────────────────── */
+.badge,
+.chip,
+.tag,
+.pill,
+.status-pill,
+.sensor-badge,
+.ticket-ref-badge {
+    transition:
+        background-color var(--fz-transition-fast),
+        color var(--fz-transition-fast),
+        transform var(--fz-transition-fast) !important;
+}
+.badge:hover,
+.chip:hover,
+.tag:hover,
+.sensor-badge:hover,
+.ticket-ref-badge:hover {
+    transform: translateY(-1px);
+}
+
+/* ── FORM LABEL FOCUS LINK (label glows with input) ─────────── */
+label {
+    transition: color var(--fz-transition-fast);
+}
+input:focus + label,
+input:focus ~ label,
+.field:focus-within label {
+    color: var(--secondary, #00b4d8);
+}
+
+/* ── SMOOTH PAGE TRANSITIONS ────────────────────────────────── */
+main, .main, .page, .page-wrap {
+    animation: fz-fade-in 0.4s ease both;
+}
+
+/* ── SENSOR CARDS — enhanced (dashboard) ─────────────────────── */
+.location-card {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+.location-card.detecting {
+    animation: cardPulse 2s ease-in-out infinite, fz-fade-up 0.6s ease both;
+}
+
+/* ── STAT BOX — counter shine ───────────────────────────────── */
+.stat-box {
+    position: relative;
+    overflow: hidden;
+}
+.stat-box::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transition: left 0.7s ease;
+    pointer-events: none;
+}
+.stat-box:hover::after { left: 100%; }
+[data-theme="dark"] .stat-box::after {
+    background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.15), transparent);
+}
+
+/* ── REDUCED MOTION ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ── UTILITY: STAGGER (auto-cascade children) ───────────────── */
+.fz-stagger > *:nth-child(1)  { animation-delay: 0.02s; }
+.fz-stagger > *:nth-child(2)  { animation-delay: 0.05s; }
+.fz-stagger > *:nth-child(3)  { animation-delay: 0.08s; }
+.fz-stagger > *:nth-child(4)  { animation-delay: 0.11s; }
+.fz-stagger > *:nth-child(5)  { animation-delay: 0.14s; }
+.fz-stagger > *:nth-child(6)  { animation-delay: 0.17s; }
+.fz-stagger > *:nth-child(7)  { animation-delay: 0.20s; }
+.fz-stagger > *:nth-child(8)  { animation-delay: 0.23s; }
+.fz-stagger > *:nth-child(9)  { animation-delay: 0.26s; }
+.fz-stagger > *:nth-child(10) { animation-delay: 0.29s; }
+.fz-stagger > *:nth-child(11) { animation-delay: 0.32s; }
+.fz-stagger > *:nth-child(12) { animation-delay: 0.35s; }
+.fz-stagger > * { animation: fz-fade-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+/* ── UTILITY: FADE-IN-UP (opt-in) ───────────────────────────── */
+.fz-fade-up { animation: fz-fade-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.fz-fade-in { animation: fz-fade-in 0.4s ease both; }
+.fz-slide-left  { animation: fz-slide-in-left 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.fz-slide-right { animation: fz-slide-in-right 0.5s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+/* ── SKELETON LOADER (for data-loading states) ──────────────── */
+.fz-skeleton {
+    background:
+        linear-gradient(90deg,
+            rgba(0, 0, 0, 0.04) 0%,
+            rgba(0, 0, 0, 0.08) 50%,
+            rgba(0, 0, 0, 0.04) 100%);
+    background-size: 200% 100%;
+    animation: fz-shimmer 1.4s ease-in-out infinite;
+    border-radius: var(--fz-radius-sm, 8px);
+    color: transparent !important;
+    pointer-events: none;
+    user-select: none;
+}
+[data-theme="dark"] .fz-skeleton {
+    background:
+        linear-gradient(90deg,
+            rgba(255, 255, 255, 0.04) 0%,
+            rgba(255, 255, 255, 0.10) 50%,
+            rgba(255, 255, 255, 0.04) 100%);
+    background-size: 200% 100%;
+}
+.fz-skeleton-line { height: 0.9em; margin: 0.4em 0; }
+.fz-skeleton-line:last-child { width: 70%; }
+.fz-skeleton-circle { width: 48px; height: 48px; border-radius: 50%; }
+
+/* ── EMPTY STATE (no-data, no-results, etc.) ────────────────── */
+.fz-empty {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--text-muted, #6b7280);
+    animation: fz-fade-in 0.5s ease both;
+}
+.fz-empty-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: rgba(0, 180, 216, 0.08);
+    color: var(--secondary, #00b4d8);
+    font-size: 1.75rem;
+}
+.fz-empty-title { font-size: 1.05rem; font-weight: 600; color: var(--text, #1f2937); margin-bottom: 0.4rem; }
+.fz-empty-text  { font-size: 0.9rem; line-height: 1.5; max-width: 360px; margin: 0 auto; }
+[data-theme="dark"] .fz-empty-title { color: #e5e7eb; }
+
+/* ── LIVE STATUS DOT (pulsing indicator) ────────────────────── */
+.fz-live-dot,
+.sensor-dot,
+.nav-user-dot,
+.overview-role-dot,
+.sensor-badge-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    position: relative;
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+    animation: fz-live-pulse 2s infinite;
+}
+.fz-live-dot.offline,
+.sensor-dot.offline,
+.nav-user-dot.offline { background: #ef4444; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+.fz-live-dot.warn,
+.sensor-dot.warn,
+.nav-user-dot.warn { background: #f59e0b; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+@keyframes fz-live-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+    70%  { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* ── STICKY HEADER SHADOW (subtle lift on scroll) ───────────── */
+header.is-sticky,
+.fz-nav.is-sticky,
+.top-bar.is-sticky,
+.app-header.is-sticky {
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    transition: box-shadow var(--fz-transition), background-color var(--fz-transition) !important;
+}
+[data-theme="dark"] header.is-sticky,
+[data-theme="dark"] .fz-nav.is-sticky,
+[data-theme="dark"] .top-bar.is-sticky,
+[data-theme="dark"] .app-header.is-sticky {
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* ── DISABLED FIELD (form inputs) ───────────────────────────── */
+input:disabled,
+select:disabled,
+textarea:disabled {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+    background: rgba(0, 0, 0, 0.02) !important;
+}
+[data-theme="dark"] input:disabled,
+[data-theme="dark"] select:disabled,
+[data-theme="dark"] textarea:disabled {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* ── REQUIRED FIELD INDICATOR (asterisk polish) ─────────────── */
+.fz-required::after {
+    content: ' *';
+    color: #ef4444;
+    font-weight: 700;
+    margin-left: 2px;
+}
+
+/* ── FORM VALIDATION VISUAL FEEDBACK ────────────────────────── */
+.fz-field-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    animation: fz-fade-up 0.3s ease both;
+}
+.fz-field-error::before { content: '⚠'; font-size: 0.9rem; }
+input.fz-invalid,
+select.fz-invalid,
+textarea.fz-invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+input.fz-valid,
+select.fz-valid,
+textarea.fz-valid {
+    border-color: #22c55e !important;
+}
+
+/* ── MODAL / DIALOG ENTRANCE ────────────────────────────────── */
+.fz-modal,
+.modal,
+[role="dialog"] {
+    animation: fz-modal-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.fz-modal-overlay,
+.modal-overlay {
+    animation: fz-fade-in 0.2s ease both;
+}
+@keyframes fz-modal-in {
+    from { opacity: 0; transform: translateY(-20px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── TOOLTIP (CSS-only on data-tip) ─────────────────────────── */
+[data-tip] {
+    position: relative;
+}
+[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: rgba(15, 23, 42, 0.95);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    animation: fz-tooltip-in 0.2s ease 0.1s forwards;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+[data-tip]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(15, 23, 42, 0.95);
+    pointer-events: none;
+    opacity: 0;
+    animation: fz-tooltip-in 0.2s ease 0.1s forwards;
+    z-index: 1000;
+}
+@keyframes fz-tooltip-in {
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── IMAGE FADE-IN ON LOAD ──────────────────────────────────── */
+img {
+    background: rgba(0, 0, 0, 0.03);
+    transition: opacity var(--fz-transition) !important;
+}
+img[src]:not([src=""]):not(.fz-skeleton) {
+    animation: fz-fade-in 0.4s ease;
+}
+[data-theme="dark"] img {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ── PROGRESS BAR POLISH ────────────────────────────────────── */
+.fz-progress,
+progress {
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.06);
+    transition: background var(--fz-transition);
+}
+.fz-progress-bar,
+progress::-webkit-progress-bar {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 999px;
+}
+.fz-progress-fill,
+progress::-webkit-progress-value {
+    background: linear-gradient(90deg, var(--primary, #004e7a), var(--secondary, #00b4d8));
+    border-radius: 999px;
+    transition: width var(--fz-transition-slow);
+}
+[data-theme="dark"] .fz-progress,
+[data-theme="dark"] progress { background: rgba(255, 255, 255, 0.08); }
+
+/* ── SWITCH / TOGGLE POLISH ─────────────────────────────────── */
+.fz-switch,
+.push-toggle-wrap {
+    transition: background var(--fz-transition-fast), transform var(--fz-transition-fast) !important;
+}
+
+/* ── COUNTER (data-target) — animated number reveal ─────────── */
+.fz-counter {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+    transition: filter var(--fz-transition);
+}
+.fz-counter.updating { filter: blur(2px); }
+
+/* ── DIVIDER POLISH ─────────────────────────────────────────── */
+.fz-divider,
+hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.12), transparent);
+    margin: 1.5rem 0;
+}
+[data-theme="dark"] .fz-divider,
+[data-theme="dark"] hr {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+}
+
+/* ── BODY FADE-IN (page entrance) ───────────────────────────── */
+body {
+    animation: fz-fade-in 0.5s ease both;
+}
+
+/* ── SECTION HEADERS (fade-up) ──────────────────────────────── */
+h1, h2, h3, h4 {
+    animation: fz-fade-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+h1 { animation-delay: 0.05s; }
+h2 { animation-delay: 0.08s; }
+h3 { animation-delay: 0.1s;  }
+
+/* ── SCROLL-PADDING (anchor links land below sticky header) ── */
+html { scroll-padding-top: 80px; }
+
+/* ── PAGE-SPECIFIC COMPONENT POLISH ─────────────────────────── */
+
+/* Filter UI (history page) */
+.filter-bar,
+.filter-group,
+.filter-input-wrap,
+.filter-actions-row {
+    transition: border-color var(--fz-transition), background-color var(--fz-transition) !important;
+}
+
+/* Form input groups (profile page) */
+.input-group,
+.input-password-wrap {
+    transition: border-color var(--fz-transition) !important;
+}
+.eye-btn,
+.toggle-btn,
+.cancel-btn,
+.confirm-btn,
+.admin-section-btn {
+    transition:
+        transform var(--fz-transition-fast),
+        background-color var(--fz-transition-fast),
+        color var(--fz-transition-fast) !important;
+}
+.eye-btn:hover,
+.toggle-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Char counter (contact page) */
+.char-count {
+    transition: color var(--fz-transition-fast);
+    font-variant-numeric: tabular-nums;
+}
+.char-count.warn    { color: #f59e0b; }
+.char-count.over    { color: #ef4444; font-weight: 600; }
+
+/* Section eyebrow (about page) */
+.section-eyebrow {
+    transition: color var(--fz-transition);
+}
+
+/* Section chevron (admin accordion) */
+.section-chevron {
+    transition: transform var(--fz-transition-slow) !important;
+}
+.admin-section.open .section-chevron { transform: rotate(180deg); }
+
+/* Admin table polish */
+.admin-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    transition: opacity var(--fz-transition);
+}
+.admin-table th {
+    background: rgba(0, 0, 0, 0.03);
+    text-align: left;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+}
+[data-theme="dark"] .admin-table th { background: rgba(255, 255, 255, 0.05); }
+.admin-table th,
+.admin-table td {
+    transition: background-color var(--fz-transition-fast) !important;
+    padding: 0.75rem 1rem;
+}
+.th-cell {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted, #6b7280);
+    font-weight: 700;
+}
+.empty-row td {
+    text-align: center;
+    color: var(--text-muted, #6b7280);
+    padding: 2rem 1rem;
+    font-style: italic;
+}
+
+/* AQI band (history page) */
+.aqi-band {
+    transition:
+        transform var(--fz-transition),
+        box-shadow var(--fz-transition) !important;
+    position: relative;
+    overflow: hidden;
+}
+.aqi-band::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+.aqi-band:hover::after { transform: translateX(100%); }
+.aqi-band:hover { transform: translateY(-1px); }
+
+/* Live sensor item (history sidebar) */
+.live-sensor-item {
+    transition:
+        background-color var(--fz-transition),
+        transform var(--fz-transition-fast) !important;
+}
+.live-sensor-item:hover {
+    transform: translateX(2px);
+    background-color: rgba(0, 180, 216, 0.05);
+}
+
+/* Profile detail row (profile page) */
+.profile-detail-row {
+    transition: background-color var(--fz-transition-fast);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    margin: 0 -0.5rem;
+}
+.profile-detail-row:hover {
+    background-color: rgba(0, 180, 216, 0.04);
+}
+[data-theme="dark"] .profile-detail-row:hover {
+    background-color: rgba(34, 211, 238, 0.04);
+}
+
+/* Hero stat divider (profile page) */
+.hero-stat-divider {
+    transition: background var(--fz-transition);
+}
+
+/* Push toggle (about/contact) */
+.push-toggle-icon,
+.push-toggle-label {
+    transition: color var(--fz-transition-fast), transform var(--fz-transition-fast) !important;
+}
+.push-toggle-icon:hover { transform: scale(1.1); }
+
+/* Mobile nav extras */
+.mobile-nav-close,
+.mobile-nav-logout {
+    transition:
+        background-color var(--fz-transition),
+        color var(--fz-transition) !important;
+}
+.mobile-nav-divider {
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+    height: 1px;
+    margin: 0.5rem 0;
+}
+[data-theme="dark"] .mobile-nav-divider {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+/* Header icon / h-icon */
+.h-icon {
+    transition: transform var(--fz-transition) !important;
+}
+.h-icon:hover { transform: rotate(-8deg) scale(1.1); }
+
+/* Modal custom classes (match fz-modal behavior) */
+.modal-overlay-custom,
+.modal-content-custom {
+    transition: opacity var(--fz-transition), transform var(--fz-transition) !important;
+}
+.modal-content-custom {
+    animation: fz-modal-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.modal-btn-group { display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+/* Ticket item hover already in card list (above) */
+.ticket-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted, #6b7280);
+}
+.ticket-resolve {
+    transition: opacity var(--fz-transition-fast), transform var(--fz-transition-fast) !important;
+    opacity: 0.7;
+}
+.ticket-item:hover .ticket-resolve { opacity: 1; transform: translateX(2px); }
+.ticket-success {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+/* Admin empty state */
+.admin-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted, #6b7280);
+    font-size: 0.95rem;
+    animation: fz-fade-in 0.5s ease both;
+}
+
+/* About sensor badge */
+.sensor-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* AQI guide head */
+.aq-guide-head {
+    transition: color var(--fz-transition);
+}
+
+/* Status active badge (profile) */
+.status-active-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.12);
+    color: #15803d;
+    font-size: 0.78rem;
+    font-weight: 600;
+    transition: background-color var(--fz-transition-fast), color var(--fz-transition-fast);
+}
+[data-theme="dark"] .status-active-badge {
+    background: rgba(34, 197, 94, 0.18);
+    color: #4ade80;
+}
+
+/* Section icon (admin) */
+.section-icon {
+    transition: transform var(--fz-transition), color var(--fz-transition) !important;
+}
+.admin-section:hover .section-icon { transform: scale(1.1); }
+
+/* ── PRINT ──────────────────────────────────────────────────── */
+@media print {
+    .glass-card, .card, .stat-box, .location-card, .value-card { box-shadow: none !important; transform: none !important; }
+    button, .btn { display: none !important; }
+}

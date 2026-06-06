@@ -1,0 +1,36 @@
+# ============================================================
+#  render.yaml — FreshZone Render Blueprint
+#  Deploy: Connect your GitHub repo to Render, it auto-detects this file.
+#  Docs:   https://render.com/docs/blueprint-spec
+# ============================================================
+
+services:
+  - type: web
+    name: freshzone
+    env: node
+    region: singapore  # Closest to PH for lower latency
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false       # You'll paste your PlanetScale connection string here
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RESEND_API_KEY
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: FRONTEND_URL
+        value: https://freshzone.onrender.com
+      - key: SENTRY_DSN
+        sync: false

@@ -26,9 +26,9 @@ function isValidPassword(pw) {
 router.get('/', authMiddleware, async (req, res) => {
     try {
         const [rows] = await db.query(
-            `SELECT id, employee_id, full_name, email, contact_number,
+            `    SELECT id, employee_id, full_name, email, contact_number,
                     position, photo_url, emergency_contact,
-                    date_joined, last_login
+                    date_joined, last_login, updated_at
              FROM accounts WHERE id = ? AND is_active = 1`,
             [req.user.id]
         );

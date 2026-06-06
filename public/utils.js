@@ -8,9 +8,10 @@ const API = (function() {
     const p = window.location.port;
     // Local dev on port 3000 — server running locally
     if ((h === 'localhost' || h === '127.0.0.1') && p === '3000') return 'http://localhost:3000';
-    // Live Server / VS Code (port 5500/5501) — hit Railway backend
-    if ((h === 'localhost' || h === '127.0.0.1')) return 'https://freshzone-production.up.railway.app';
-    // Production — same-origin (frontend and backend on freshzone.space)
+    // Live Server / VS Code (port 5500/5501) — no separate backend fallback
+    // Instead, set FRONTEND_URL on Render or use the dev proxy
+    if ((h === 'localhost' || h === '127.0.0.1')) return 'http://localhost:3000';
+    // Production — same-origin (frontend and backend on same domain)
     return '';
 })();
 
@@ -110,53 +111,9 @@ function toggleDarkMode() {
     _updateToggleBtns(next);
 }
 
-// ── MOBILE NAV ────────────────────────────────────────────────
-function openMobileNav() {
-    const nav = document.getElementById('mobile-nav');
-    const hamburger = document.getElementById('hamburger');
-    if (!nav) return;
-
-    // Prevent double-open
-    if (nav.classList.contains('open')) return;
-
-    nav.classList.add('open');
-    // Mark hamburger as open (CSS will hide it via opacity to remove double-X)
-    if (hamburger) {
-        hamburger.classList.add('open');
-        hamburger.setAttribute('aria-expanded', 'true');
-    }
-    // Lock scroll — use padding to prevent layout shift
-    const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = 'hidden';
-    if (scrollbarW > 0) document.body.style.paddingRight = scrollbarW + 'px';
-
-    // Focus the close button inside drawer for accessibility
-    requestAnimationFrame(() => {
-        document.querySelector('.mobile-nav-close')?.focus();
-    });
-}
-
-function closeMobileNav() {
-    const nav = document.getElementById('mobile-nav');
-    const hamburger = document.getElementById('hamburger');
-    if (!nav) return;
-
-    nav.classList.remove('open');
-    if (hamburger) {
-        hamburger.classList.remove('open');
-        hamburger.setAttribute('aria-expanded', 'false');
-        // Return focus to hamburger after close
-        requestAnimationFrame(() => hamburger.focus());
-    }
-    // Restore scroll
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
-}
-
-// Close mobile nav on Escape
+// Close modals on Escape
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        closeMobileNav();
         closeLogoutModal();
     }
 });
@@ -249,7 +206,7 @@ function initHotkeys(pageKey) {
         if (k === 'L') { openLogoutModal(); return; }
         if (e.key === 'Escape') {
             document.getElementById('shortcut-modal').style.display = 'none';
-            closeLogoutModal(); closeMobileNav();
+            closeLogoutModal();
         }
     });
 
@@ -368,53 +325,24 @@ function urlBase64ToUint8Array(base64String) {
     return output;
 }
 
-// -- NAV BUILDER -------------------------------------------------------
-// Builds the full <nav> + mobile drawer into #nav-placeholder.
-// Call loadNav('dashboard') etc. to mark the active link.
-// Not called automatically -- add to individual pages when ready.
-function loadNav(activeLink) {
-    var ph = document.getElementById('nav-placeholder');
-    if (!ph) return;
-    var pages = [
-        ['dashboard', 'dashboard.html', 'Dashboard'],
-        ['history',   'history.html',   'History'  ],
-        ['about',     'about.html',     'About'    ],
-        ['profile',   'profile.html',   'Profile'  ],
-        ['contact',   'contact.html',   'Contact'  ]
-    ];
-    function aTag(key, href, label) {
-        return '<a href="' + href + '"' + (key === activeLink ? ' class="active"' : '') + '>' + label + '</a>';
+// ── BOTTOM NAV ────────────────────────────────────────────────
+function toggleBottomMore() {
+    const menu = document.getElementById('fz-bn-more-menu');
+    if (menu) menu.classList.toggle('open');
+}
+
+// Close More menu on outside click
+document.addEventListener('click', function(e) {
+    const more = document.getElementById('fz-bn-more');
+    const menu = document.getElementById('fz-bn-more-menu');
+    if (more && menu && !more.contains(e.target)) {
+        menu.classList.remove('open');
     }
-    var nav = document.createElement('nav');
-    nav.setAttribute('role', 'navigation');
-    nav.setAttribute('aria-label', 'Main navigation');
-    nav.innerHTML = [
-        '<div class="nav-container">',
-        '  <a href="dashboard.html" class="logo" aria-label="FreshZone Home"><img src="logo1.png" alt="FreshZone Logo"></a>',
-        '  <div class="nav-links" id="desktop-nav">',
-             pages.map(function(p){ return aTag(p[0],p[1],p[2]); }).join(''),
-        '  <a href="#" onclick="openLogoutModal();return false;">Logout</a></div>',
-        '  <div class="nav-controls">',
-        '    <div class="nav-user" id="nav-user-display"><span class="nav-user-dot"></span><span id="nav-user-name">\u2014</span></div>',
-        '    <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>',
-        '    <button class="hamburger" id="hamburger" onclick="openMobileNav()" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>',
-        '  </div></div>'
-    ].join('');
-    var drawer = document.createElement('div');
-    drawer.className = 'mobile-nav';
-    drawer.id = 'mobile-nav';
-    drawer.setAttribute('role', 'dialog');
-    drawer.setAttribute('aria-modal', 'true');
-    drawer.innerHTML = [
-        '<div class="mobile-nav-drawer" onclick="event.stopPropagation()">',
-        '<button class="mobile-nav-close" onclick="closeMobileNav()" aria-label="Close menu"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>',
-             pages.map(function(p){ return aTag(p[0],p[1],p[2]); }).join(''),
-        '<div class="mobile-nav-divider"></div>',
-        '<a href="#" onclick="openLogoutModal();closeMobileNav();return false;" class="mobile-nav-logout">Logout</a>',
-        '<a href="#" onclick="togglePushNotifications();closeMobileNav();return false;" id="mobile-push-btn">Notifications</a>',
-        '</div>'
-    ].join('');
-    ph.replaceWith(nav, drawer);
+});
+
+function loadNav() {
+    const bottomNav = document.getElementById('fz-bottom-nav');
+    if (bottomNav) bottomNav.style.display = 'flex';
 }
 
 // ── LOADING STATE HELPERS ─────────────────────────────────────

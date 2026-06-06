@@ -1,5 +1,5 @@
 // ============================================================
-//  mailer.js — Resend (HTTPS-based, works on Railway)
+//  mailer.js — Resend (HTTPS-based transactional email)
 // ============================================================
 const { Resend } = require('resend');
 
